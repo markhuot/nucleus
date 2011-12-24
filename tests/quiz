@@ -1,0 +1,86 @@
+#!/usr/bin/php
+<?php
+
+define('EOL', "\033[0m\r\n");
+define('GREEN', "\033[0;32m");
+define('BOLDGREEN', "\033[1;32m");
+define('RED', "\033[0;31m");
+define('BOLDRED', "\033[1;31m");
+define('YELLOW', "\033[0;33m");
+define('BOLDYELLOW', "\033[1;33m");
+
+class Quiz {
+	
+}
+
+$restrict = array();
+if (count($argv) > 1) {
+	foreach (array_slice($argv, 1) as $arg) {
+		list($class, $method) = explode('::', $arg);
+		$restrict[$class][] = $method;
+	}
+}
+
+$tests = array();
+$dir = dirname(__FILE__).'/';
+if (is_dir($dir)) {
+	if ($dh = opendir($dir)) {
+		while (($file = readdir($dh)) !== false) {
+			if (preg_match('/^(\d*)(.*).php$/', $file, $match)) {
+				$class = $match[2];
+				require_once $dir.$file;
+				$parent_class =  get_parent_class($class);
+				if (class_exists($class) && $parent_class == 'Quiz') {
+					$tests[] = $match[2];
+				}
+			}
+		}
+		closedir($dh);
+	}
+}
+
+$summary = (object)array('passed' => 0, 'failed' => 0, 'exceptions' => 0);
+foreach ($tests as $test) {
+	$testClass = new $test;
+	$methods = get_class_methods($testClass);
+	$backtrace = (object)array_pop(debug_backtrace());
+
+	if ($restrict && !isset($restrict[$test])) {
+		continue;
+	}
+
+	echo BOLDYELLOW.'- '.get_class($testClass).EOL;
+
+	foreach ($methods as $method) {
+
+		if ($restrict && !in_array($method, $restrict[$test])) {
+			continue;
+		}
+
+		if (in_array($method, array('__construct'))) {
+			continue;
+		}
+
+		try {
+			$success = $testClass->{$method}();
+			if ($success) {
+				$summary->passed++;
+				echo '    '.GREEN.$method.': YES'.EOL;
+			}
+			else {
+				$summary->failed++;
+				echo '    '.RED.$method.': NO'.EOL;
+			}
+		} catch (Exception $e) {
+			$summary->exceptions++;
+			echo '    '.YELLOW.$method.': '.get_class($e).EOL;
+		}
+	}
+}
+
+$color = BOLDGREEN;
+if ($summary->failed) {
+	$color = BOLDRED;
+}
+
+echo $color."Test Complete: {$summary->passed} passed, {$summary->failed} failed, {$summary->exceptions} exceptions.".EOL;
