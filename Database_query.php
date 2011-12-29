@@ -7,13 +7,14 @@ class Database_query {
 	private $pass;
 	private $name;
 
-	private $queries = array();
-	private $select = array();
-	private $from = array();
-	private $tables = array();
-	private $joins = array();
-	private $where = array();
-	private $orderby = array();
+	private $queries = array();       // Each query run by this object
+	private $select = array();        // The requested selections
+	private $from = array();          // The primary table to pull from
+	private $tables = array();        // Every table referenced in this query
+	private $joins = array();         // The requested joins (indexed by name)
+	private $join_configs = array();  // Store successful join configs
+	private $where = array();         // Any defined where statements
+	private $orderby = array();       // The requested order
 
 	// ------------------------------------------------------------------------
 
@@ -36,6 +37,7 @@ class Database_query {
 		$this->from = $defaults->from;
 		$this->tables = $defaults->tables;
 		$this->joins = $defaults->joins;
+		$this->join_configs = $defaults->join_configs;
 		$this->where = $defaults->where;
 		$this->orderby = $defaults->orderby;
 	}
@@ -88,18 +90,17 @@ class Database_query {
 
 	public function build_select() {
 		$columns = array();
-		foreach ($this->tables as $table) {
+		foreach ($this->tables as $identifier => $table) {
 			$query = mysql_query("DESCRIBE {$table}");
 			
 			if (!$query) {
 				throw new Exception('Could not build SELECT, invalid table specified');
-				return FALSE;
 			}
 
 			while($row = mysql_fetch_assoc($query)) {
 				$field = $row['Field'];
 				if (in_array($field, $this->select) || !$this->select) {
-					$columns[] = "{$table}.{$field} AS `{$table}.{$field}`";
+					$columns[] = "{$identifier}.{$field} AS `{$identifier}.{$field}`";
 				}
 			}
 		}
@@ -109,20 +110,27 @@ class Database_query {
 	// ------------------------------------------------------------------------
 
 	public function from($table, $alias=FALSE) {
-		array_unshift($this->tables, $table);
-		$this->from[] = $table;
+		$key = $this->add_table($table, $alias, TRUE);
+		$this->from[$key] = $table;
 		return $this;
 	}
 
 	public function build_from() {
-		return ' FROM '.implode(', ', $this->from);
+		$sql = ' FROM ';
+		foreach ($this->from as $key => $table) {
+			$sql.= "{$table} AS {$key}";
+		}
+		return $sql;
 	}
 
 	// ------------------------------------------------------------------------
 
 	public function join($table, $config=array()) {
 		if (is_string($table)) {
-			$config['table_name'] = $table;
+			preg_match('/^(?:(.*?)\.)?(.*)$/', $table, $matches);
+			$config['class_name'] = $matches[1]?:null;
+			$config['table_name'] = $matches[2];
+			$table = $matches[2];
 		}
 
 		else if (is_array($table)) {
@@ -130,38 +138,56 @@ class Database_query {
 			$table = $config['table_name'];
 		}
 
-		$this->tables[] = $table;
+		$config['as'] = $this->add_table($table, @$config['as']);
 		$this->joins[] = $config;
 		return $this;
 	}
 
 	public function build_joins() {
 		$sql = '';
-		
+
 		// Loop through each of our joins and build SQL for it
 		foreach ($this->joins as $join_config) {
 
-			// Loop through each of the tables specified by the query and see
-			// if the join in question maps to the table in question.
-			// Essentially we're going through each join and finding what table
-			// it relates to.
-			foreach ($this->tables as $table) {
-				$sql.= $this->_check_has_one($join_config, $table);
-				$sql.= $this->_check_has_many($join_config, $table);
+			// Check if we know what table we're attaching too.
+			if (@$join_config['class_name']) {
+				$sql.= $this->_check_has_one(
+					$join_config,
+					Database::plural($join_config['class_name']),
+					$this->table_identifier_for(Database::plural($join_config['class_name']))
+				);
+				$sql.= $this->_check_has_many(
+					$join_config,
+					Database::plural($join_config['class_name']),
+					$this->table_identifier_for(Database::plural($join_config['class_name']))
+				);
+			}
+
+			// If we don't know what table we're attching too we'll need to
+			// loop through the defined tables (from left to right) and find
+			// the first match.
+			else {
+				foreach ($this->tables as $key => $table) {
+					if ($sql.= $this->_check_has_one($join_config, $table, $key)) {
+						continue 2;
+					}
+					if ($sql.= $this->_check_has_many($join_config, $table, $key)) {
+						continue 2;
+					}
+				}
 			}
 		}
 
 		return $sql;
 	}
 
-	private function _check_has_one($join_config, $table) {
-		// Determine some default variables for the join. Broken out
-		// because silly PEP8 requires an 80 character limit and I
+	private function _check_has_one($join_config, $table, $identifier) {
+		// Localize some default variables for the join. Broken out
+		// because silly PEP8 requires an 80 character limit and I line
 		// hate wraping in my text editor. ;)
 		$join_table_name = $join_config['table_name'];
 
-		// Merge our default config with the passed config. This will
-		// search for a hasMany relationship.
+		// Merge our default config with the passed config.
 		$join = array_merge(array(
 			'as' => $join_table_name,
 			'class_name' => ucfirst(Database::singular($join_table_name)),
@@ -177,18 +203,34 @@ class Database_query {
 			return '';
 		}
 
+		// This was a successful join, store the utilized config
+		$this->join_configs[$join['as']] = $join;
+
 		// Finally, assemble the SQL statement
-		return ' '.strtoupper($join['type'])." JOIN {$join['table_name']} AS {$join['as']} ON {$table}.{$join['primary_key']}={$join['table_name']}.{$join['foreign_key']}";
+		$sql = ' ';
+		$sql.= strtoupper($join['type']);
+		$sql.= ' JOIN ';
+		$sql.= $join['table_name'];
+		$sql.= ' AS ';
+		$sql.= $join['as'];
+		$sql.= ' ON ';
+		$sql.= $identifier;
+		$sql.= '.';
+		$sql.= $join['primary_key'];
+		$sql.= '=';
+		$sql.= $join['as'];
+		$sql.= '.';
+		$sql.= $join['foreign_key'];
+		return $sql;
 	}
 
-	private function _check_has_many($join_config, $table) {
-		// Determine some default variables for the join. Broken out
+	private function _check_has_many($join_config, $table, $identifier) {
+		// Localize some default variables for the join. Broken out
 		// because silly PEP8 requires an 80 character limit and I
 		// hate wraping in my text editor. ;)
 		$join_table_name = $join_config['table_name'];
 
-		// Merge our default config with the passed config. This will
-		// search for a hasMany relationship.
+		// Merge our default config with the passed config.
 		$join = array_merge(array(
 			'as' => $join_table_name,
 			'class_name' => ucfirst(Database::singular($join_table_name)),
@@ -204,8 +246,25 @@ class Database_query {
 			return '';
 		}
 
+		// This was a successful join, store the utilized config
+		$this->join_configs[$join['as']] = $join;
+
 		// Finally, assemble the SQL statement
-		return ' '.strtoupper($join['type'])." JOIN {$join['table_name']} AS {$join['as']} ON {$table}.{$join['primary_key']}={$join['table_name']}.{$join['foreign_key']}";
+		$sql = ' ';
+		$sql.= strtoupper($join['type']);
+		$sql.= ' JOIN ';
+		$sql.= $join['table_name'];
+		$sql.= ' AS ';
+		$sql.= $join['as'];
+		$sql.= ' ON ';
+		$sql.= $identifier;
+		$sql.= '.';
+		$sql.= $join['primary_key'];
+		$sql.= '=';
+		$sql.= $join['as'];
+		$sql.= '.';
+		$sql.= $join['foreign_key'];
+		return $sql;
 	}
 
 	// ------------------------------------------------------------------------
@@ -258,7 +317,9 @@ class Database_query {
 		$this->queries[] = ($query = $this->_build_query());
 		$result = new Database_result(
 			$this->primary_table(),
-			$this->_build_result($query)
+			$this->_build_result($query),
+			$this->join_configs,
+			clone $this
 		);
 
 		$this->reset();
@@ -286,6 +347,7 @@ class Database_query {
 		while ($row = mysql_fetch_assoc($query)) {
 			$result[] = $row;
 		}
+
 		return $result;
 	}
 
@@ -293,6 +355,20 @@ class Database_query {
 
 	public function primary_table() {
 		return @$this->tables[0]?:FALSE;
+	}
+
+	public function add_table($table, $alias=FALSE, $primary=FALSE) {
+		$key = $alias?:'t'.count($this->tables);
+		$this->tables[$key] = $table;
+		return $key;
+	}
+
+	public function table_identifier_for($table_name) {
+		return array_search($table_name, $this->tables);
+	}
+
+	public function table_name_for($identifier) {
+		return @$this->tables[$identifier];
 	}
 
 	// ------------------------------------------------------------------------

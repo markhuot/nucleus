@@ -44,6 +44,22 @@ class Database_result implements Iterator {
 	private $records = array();
 
 	/**
+	 * Joins
+	 * Any joins present in the Database_query will be passed into the result
+	 * for parsing. We'll loop through each row of the result checking if any
+	 * rows are a part of a related/joined table.
+	 */
+	private $joins = array();
+
+	/**
+	 * Query
+	 * The query that generated this result set. This is useful because it
+	 * defines how JOINs were added and what identifiers table names were
+	 * mapped to.
+	 */
+	private $query;
+
+	/**
 	 * Table Name
 	 * Each relation has one, and only one, primary table. It is this table
 	 * that we iterate over and this table that drives all the relations. In
@@ -75,8 +91,10 @@ class Database_result implements Iterator {
 	 * parsed table will become the primary table. If you leave out the rows
 	 * you must manually call `parse_row_to_records` or `add_record`.
 	 */
-	public function __construct($table_name=FALSE, $rows=array()) {
+	public function __construct($table_name=FALSE, $rows=array(), $joins=array(), $query=FALSE) {
 		$this->table_name = $table_name;
+		$this->joins = $joins;
+		$this->query = $query;
 		foreach ($rows as $row) {
 			foreach ($this->parse_row_to_records($row) as $record) {
 				$this->add_record($record);
@@ -115,17 +133,18 @@ class Database_result implements Iterator {
 			// Explode the column name to determine the table name. So, a
 			// column name of `posts.title` will be from the table `posts` and
 			// have a column name of `title`.
-			list($table_name, $column) = explode('.', $key);
+			list($table_identifier, $column) = explode('.', $key);
+			$table_name = $this->query->table_name_for($table_identifier);
 			
 			// If this is the first column from the determined table create
 			// a new database record to hold it.
-			if (!@$records[$table_name]) {
-				$records[$table_name] = new Database_record($this, $table_name);
+			if (!@$records[$table_identifier]) {
+				$records[$table_identifier] = new Database_record($this, $table_name);
 			}
 
 			// Finally, add the column and it's value to the appropriate
 			// database record
-			$records[$table_name]->set_data($column, $value);
+			$records[$table_identifier]->set_data($column, $value);
 		}
 
 		// Loop through each record and remove records that don't have a PK
@@ -158,15 +177,21 @@ class Database_result implements Iterator {
 		}
 
 		// If the record's table name matches the primary table name then we
-		// want to add this record to the `$records` collection. We assume
-		// that the primary key is unique, which it should be. This allows us
-		// to add the same record multiple times without fear. This is a very
-		// real possibility when parsing a query with related data. For example
-		// a result set of posts and comments may have a single post repeated
-		// several times as each comment is returned. In this way we can simply
-		// replace the `post` record each time its encountered.
+		// want to add this record to the `$records` collection using the
+		// default key/id. We assume that the primary key is unique, which it
+		// should be. This allows us to add the same record multiple times
+		// without fear. This is a very real possibility when parsing a query
+		// with related data. For example a result set of posts and comments
+		// may have a single post repeated several times as each comment is
+		// returned. In this way we can simply replace the `post` record each
+		// time its encountered.
 		if ($record->table_name() == $this->table_name) {
-			$this->records[$record->table_name()][$this->key][$this->id][$record->id()] = $record;
+			$this->records
+				[$record->table_name()]
+				[$this->key]
+				[$this->id]
+				[$record->id()] =
+					$record;
 		}
 
 		// If the record's table is not the primary table then we'll dump it
@@ -175,9 +200,29 @@ class Database_result implements Iterator {
 		// name) is used, then the foreign key used for the match, and finally
 		// the id. This creates an array as defined in the $related_records
 		// comment above.
-		foreach ($record->fk() as $foreign_key => $foreign_id) {
-			$this->records[$record->table_name()][$foreign_key][$foreign_id][$record->id()] = $record;
+		foreach ($this->joins as $join_config) {
+			if ($record->table_name() == $join_config['table_name']) {
+				$this->records
+					[$join_config['as']]
+					[$join_config['foreign_key']]
+					[$record->{$join_config['foreign_key']}]
+					[$record->id()] =
+						$record;
+			}
 		}
+	}
+
+	/**
+	 * Records
+	 * Returns the currently focused collection.
+	 */
+	public function records() {
+		$collection = @$this->records
+			[$this->table_name]
+			[$this->key]
+			[$this->id];
+
+		return $collection;
 	}
 
 	/**
@@ -188,51 +233,45 @@ class Database_result implements Iterator {
 	 * column in the first record.
 	 */
 	public function record($key) {
+		$collection = @$this->records();
+		$keys = array_keys($collection);
+
 		if (is_string($key)) {
-			return $this->collection(0)->{$key};
+			return @$collection[$keys[0]]->{$key};
 		}
 
 		else {
-			return $this->collection($key);
+			return @$collection[$keys[$key]];
 		}
 	}
 
 	/**
 	 * Related
-	 * If a relation exists as the defined key it is returned, otherwise
+	 * If a relation exists at the defined key it is returned, otherwise
 	 * FALSE is returned.
 	 */
-	public function related($table_name, $id, $config=array()) {
-		$available_keys = @array_keys($this->records[$table_name]);
+	public function related($name, $record, $config=array()) {
+		if (!($identifier = $this->query->table_identifier_for($name))) {
+			return FALSE;
+		}
 
-		extract(array_merge(array(
-			'foreign_key' => @$available_keys[0]
-		), $config));
+		if ($join_config = $this->joins[$identifier]) {
+			$table = $join_config['table_name'];
+			$as = $join_config['as'];
+			$pk = $join_config['primary_key'];
+			$fk = $join_config['foreign_key'];
+			$id = $record->{$pk};
 
-		if (@$this->records[$table_name][$foreign_key][$id]) {
-			$result = clone $this;
-			$result->table_name = $table_name;
-			$result->key = $foreign_key;
-			$result->id = $id;
-			return $result;
+			if ($this->records[$as][$fk][$id]) {
+				$result = clone $this;
+				$result->table_name = $as;
+				$result->key = $fk;
+				$result->id = $id;
+				return $result;
+			}
 		}
 
 		return FALSE;
-	}
-
-	/**
-	 * Collection
-	 * Returns an array of the currently focused records. If passed an integer
-	 * it returns the object at the specified numerical location within the
-	 * collection.
-	 */
-	public function collection($key=FALSE) {
-		if ($key === FALSE) {
-			return @$this->records[$this->table_name][$this->key][$this->id];
-		}
-
-		$keys = array_keys(@$this->records[$this->table_name][$this->key][$this->id]);
-		return @$this->records[$this->table_name][$this->key][$this->id][$keys[$key]];
 	}
 
 	/**
@@ -240,7 +279,7 @@ class Database_result implements Iterator {
 	 * Returns the number of rows in this result set.
 	 */
 	public function size() {
-		return count($this->collection());
+		return count($this->records());
 	}
 
 	/**
@@ -256,18 +295,18 @@ class Database_result implements Iterator {
 	}
 
     public function current() {
-    	return $this->collection($this->index);
+    	return $this->record($this->index);
     }
 
     function next() {
-    	return $this->collection(++$this->index)?:FALSE;
+    	return $this->record(++$this->index)?:FALSE;
     }
 
     function valid() {
-    	return $this->collection($this->index)?TRUE:FALSE;
+    	return $this->record($this->index)?TRUE:FALSE;
     }
 
     function rewind() {
-    	return $this->collection($this->index = 0);
+    	return $this->record($this->index = 0);
     }
 }
