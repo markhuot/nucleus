@@ -316,10 +316,8 @@ class Database_query {
 	public function go() {
 		$this->queries[] = ($query = $this->_build_query());
 		$result = new Database_result(
-			$this->primary_table(),
-			$this->_build_result($query),
-			$this->join_configs,
-			clone $this
+			clone $this,
+			$this->_build_result($query)
 		);
 
 		$this->reset();
@@ -354,7 +352,8 @@ class Database_query {
 	// ------------------------------------------------------------------------
 
 	public function primary_table() {
-		return @$this->tables[0]?:FALSE;
+		$keys = array_keys($this->tables);
+		return @$this->tables[$keys[0]]?:FALSE;
 	}
 
 	public function add_table($table, $alias=FALSE, $primary=FALSE) {
@@ -369,6 +368,14 @@ class Database_query {
 
 	public function table_name_for($identifier) {
 		return @$this->tables[$identifier];
+	}
+
+	public function join_configs($identifier=FALSE) {
+		if ($identifier === FALSE) {
+			return $this->join_configs;
+		}
+
+		return @$this->join_configs[$identifier];
 	}
 
 	// ------------------------------------------------------------------------

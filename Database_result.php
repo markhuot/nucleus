@@ -21,7 +21,7 @@ class Database_result implements Iterator {
 	 *             )
 	 *         )
 	 *     ), 
-	 *     [post_data] = array(
+	 *     [t1] = array(                              // Stored by the table id
 	 *         [post_id] = array(
 	 *             [3] = Database_result Object
 	 *                 [12] = Database_record Object,
@@ -30,7 +30,7 @@ class Database_result implements Iterator {
 	 *             )
 	 *         )
 	 *     ),
-	 *     [comments] = array(
+	 *     [t2] = array(
 	 *         [post_id] = array(
 	 *             [3] = Database_result Object (
 	 *                 [1] Database_record Object,
@@ -42,14 +42,6 @@ class Database_result implements Iterator {
 	 * )
 	 */
 	private $records = array();
-
-	/**
-	 * Joins
-	 * Any joins present in the Database_query will be passed into the result
-	 * for parsing. We'll loop through each row of the result checking if any
-	 * rows are a part of a related/joined table.
-	 */
-	private $joins = array();
 
 	/**
 	 * Query
@@ -86,15 +78,11 @@ class Database_result implements Iterator {
 
 	/**
 	 * Construct
-	 * Accepts the name of the primary table and the rows to parse. Both of
-	 * these paramters are optional. If you leave out the table the first
-	 * parsed table will become the primary table. If you leave out the rows
-	 * you must manually call `parse_row_to_records` or `add_record`.
+	 * Accepts the rows to parse and the query that generated this result.
 	 */
-	public function __construct($table_name=FALSE, $rows=array(), $joins=array(), $query=FALSE) {
-		$this->table_name = $table_name;
-		$this->joins = $joins;
+	public function __construct($query=FALSE, $rows=array()) {
 		$this->query = $query;
+		$this->table_name = $this->query->primary_table();
 		foreach ($rows as $row) {
 			foreach ($this->parse_row_to_records($row) as $record) {
 				$this->add_record($record);
@@ -169,13 +157,6 @@ class Database_result implements Iterator {
 	 */
 	public function add_record($record) {
 
-		// If we haven't defined a primary table yet for this result set then
-		// assume the first passed record is from the primary table. This is a
-		// bit of a leap, but seems to work in "most" instances.
-		if (!$this->table_name) {
-			$this->table_name = $record->table_name();
-		}
-
 		// If the record's table name matches the primary table name then we
 		// want to add this record to the `$records` collection using the
 		// default key/id. We assume that the primary key is unique, which it
@@ -200,7 +181,7 @@ class Database_result implements Iterator {
 		// name) is used, then the foreign key used for the match, and finally
 		// the id. This creates an array as defined in the $related_records
 		// comment above.
-		foreach ($this->joins as $join_config) {
+		foreach ($this->query->join_configs() as $join_config) {
 			if ($record->table_name() == $join_config['table_name']) {
 				$this->records
 					[$join_config['as']]
@@ -255,7 +236,7 @@ class Database_result implements Iterator {
 			return FALSE;
 		}
 
-		if ($join_config = $this->joins[$identifier]) {
+		if ($join_config = $this->query->join_configs($identifier)) {
 			$table = $join_config['table_name'];
 			$as = $join_config['as'];
 			$pk = $join_config['primary_key'];
