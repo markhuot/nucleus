@@ -127,7 +127,7 @@ class Database_result implements Iterator {
 			// If this is the first column from the determined table create
 			// a new database record to hold it.
 			if (!@$records[$table_identifier]) {
-				$records[$table_identifier] = new Database_record($this, $table_name);
+				$records[$table_identifier] = new Database_record($this, $table_name, $table_identifier);
 			}
 
 			// Finally, add the column and it's value to the appropriate
@@ -182,7 +182,7 @@ class Database_result implements Iterator {
 		// the id. This creates an array as defined in the $related_records
 		// comment above.
 		foreach ($this->query->join_configs() as $join_config) {
-			if ($record->table_name() == $join_config['table_name']) {
+			if ($record->table_identifier() == $join_config['as']) {
 				$this->records
 					[$join_config['as']]
 					[$join_config['foreign_key']]

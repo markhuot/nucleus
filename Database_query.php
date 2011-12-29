@@ -149,122 +149,97 @@ class Database_query {
 		// Loop through each of our joins and build SQL for it
 		foreach ($this->joins as $join_config) {
 
-			// Check if we know what table we're attaching too.
-			if (@$join_config['class_name']) {
-				$sql.= $this->_check_has_one(
-					$join_config,
-					Database::plural($join_config['class_name']),
-					$this->table_identifier_for(Database::plural($join_config['class_name']))
-				);
-				$sql.= $this->_check_has_many(
-					$join_config,
-					Database::plural($join_config['class_name']),
-					$this->table_identifier_for(Database::plural($join_config['class_name']))
-				);
+			// If it's not defined what we're attaching on to then we'll assume
+			// you're attaching onto the primary table. If this is not the
+			// intent be more descriptive in your ->join('posts.comments')
+			if (!$join_config['class_name']) {
+				$join_config['class_name'] = Database::singular($this->primary_table());
 			}
 
-			// If we don't know what table we're attching too we'll need to
-			// loop through the defined tables (from left to right) and find
-			// the first match.
-			else {
-				foreach ($this->tables as $key => $table) {
-					if ($sql.= $this->_check_has_one($join_config, $table, $key)) {
-						continue 2;
-					}
-					if ($sql.= $this->_check_has_many($join_config, $table, $key)) {
-						continue 2;
-					}
-				}
-			}
+			// localize some variables for shorter lines
+			$table = Database::plural($join_config['class_name']);
+			$identifier = $this->table_identifier_for(Database::plural($join_config['class_name']));
+
+			$this->_check_has_one($join_config, $table, $identifier);
+			$this->_check_has_many($join_config, $table, $identifier);
+		}
+
+		foreach ($this->join_configs as $join) {
+			// Finally, assemble the SQL statement
+			$sql.= ' ';
+			$sql.= strtoupper($join['type']);
+			$sql.= ' JOIN ';
+			$sql.= $join['table_name'];
+			$sql.= ' AS ';
+			$sql.= $join['as'];
+			$sql.= ' ON ';
+			$sql.= $join['identifier'];
+			$sql.= '.';
+			$sql.= $join['primary_key'];
+			$sql.= '=';
+			$sql.= $join['as'];
+			$sql.= '.';
+			$sql.= $join['foreign_key'];
 		}
 
 		return $sql;
 	}
 
-	private function _check_has_one($join_config, $table, $identifier) {
-		// Localize some default variables for the join. Broken out
-		// because silly PEP8 requires an 80 character limit and I line
-		// hate wraping in my text editor. ;)
-		$join_table_name = $join_config['table_name'];
-
+	private function _check_has_one($join, $table, $identifier) {
+		
 		// Merge our default config with the passed config.
 		$join = array_merge(array(
-			'as' => $join_table_name,
-			'class_name' => ucfirst(Database::singular($join_table_name)),
-			'primary_key' => Database::singular($join_table_name).'_id',
+			'as' => $join['table_name'],
+			'class_name' => ucfirst(Database::singular($join['table_name'])),
+			'primary_key' => Database::singular($join['table_name']).'_id',
 			'foreign_key' => 'id',
-			'type' => 'left'
-		), $join_config);
+			'type' => 'left',
+			'identifier' => $identifier
+		), $join);
 
 		// Check that each table has the necessary columns to support
 		// this relationship.
-		if (!$this->table_has_column($table, $join['primary_key']) || 
-		    !$this->table_has_column($join['table_name'], $join['foreign_key']) || $table == $join['table_name']) {
-			return '';
+		if (!$this->_check_join($table, $join)) {
+			return false;
 		}
 
 		// This was a successful join, store the utilized config
 		$this->join_configs[$join['as']] = $join;
 
-		// Finally, assemble the SQL statement
-		$sql = ' ';
-		$sql.= strtoupper($join['type']);
-		$sql.= ' JOIN ';
-		$sql.= $join['table_name'];
-		$sql.= ' AS ';
-		$sql.= $join['as'];
-		$sql.= ' ON ';
-		$sql.= $identifier;
-		$sql.= '.';
-		$sql.= $join['primary_key'];
-		$sql.= '=';
-		$sql.= $join['as'];
-		$sql.= '.';
-		$sql.= $join['foreign_key'];
-		return $sql;
+		return $join;
 	}
 
-	private function _check_has_many($join_config, $table, $identifier) {
-		// Localize some default variables for the join. Broken out
-		// because silly PEP8 requires an 80 character limit and I
-		// hate wraping in my text editor. ;)
-		$join_table_name = $join_config['table_name'];
+	private function _check_has_many($join, $table, $identifier) {
 
 		// Merge our default config with the passed config.
 		$join = array_merge(array(
-			'as' => $join_table_name,
-			'class_name' => ucfirst(Database::singular($join_table_name)),
+			'as' => $join['table_name'],
+			'class_name' => ucfirst(Database::singular($join['table_name'])),
 			'primary_key' => 'id',
 			'foreign_key' => Database::singular($table).'_id',
-			'type' => 'left'
-		), $join_config);
+			'type' => 'left',
+			'identifier' => $identifier
+		), $join);
 
 		// Check that each table has the necessary columns to support
 		// this relationship.
-		if (!$this->table_has_column($table, $join['primary_key']) || 
-		    !$this->table_has_column($join['table_name'], $join['foreign_key']) || $table == $join['table_name']) {
-			return '';
+		if (!$this->_check_join($table, $join)) {
+			return false;
 		}
 
 		// This was a successful join, store the utilized config
 		$this->join_configs[$join['as']] = $join;
 
-		// Finally, assemble the SQL statement
-		$sql = ' ';
-		$sql.= strtoupper($join['type']);
-		$sql.= ' JOIN ';
-		$sql.= $join['table_name'];
-		$sql.= ' AS ';
-		$sql.= $join['as'];
-		$sql.= ' ON ';
-		$sql.= $identifier;
-		$sql.= '.';
-		$sql.= $join['primary_key'];
-		$sql.= '=';
-		$sql.= $join['as'];
-		$sql.= '.';
-		$sql.= $join['foreign_key'];
-		return $sql;
+		return $join;
+	}
+
+	private function _check_join($table, $join) {
+		if ($this->table_has_column($table, $join['primary_key']) && 
+		    $this->table_has_column($join['table_name'], $join['foreign_key'])) {
+			return TRUE;
+		}
+
+		return FALSE;
 	}
 
 	// ------------------------------------------------------------------------

@@ -3,12 +3,14 @@
 class Database_record {
 	private $result;
 	private $table_name;
+	private $table_identifier;
 	private $pk = 'id';
 	private $id;
 	private $data;
 
-	public function __construct($result=FALSE, $table_name=FALSE, $data=array()) {
+	public function __construct($result=FALSE, $table_name=FALSE, $table_identifier=FALSE, $data=array()) {
 		$this->result = $result;
+		$this->table_identifier = $table_identifier;
 		$this->set_table_name($table_name);
 		$this->set_data($data);
 	}
@@ -27,6 +29,10 @@ class Database_record {
 
 	public function table_name() {
 		return $this->table_name;
+	}
+
+	public function table_identifier() {
+		return $this->table_identifier;
 	}
 
 	public function set_data($key, $value=FALSE) {
