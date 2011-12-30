@@ -174,7 +174,6 @@ class Database_query {
 	}
 
 	private function _check_join($join_config) {
-		$sql = '';
 
 		// If it's not defined what we're attaching on to then we'll assume
 		// you're attaching onto the primary table. If this is not the
