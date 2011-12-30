@@ -206,7 +206,7 @@ class Database_query {
 			'identifier' => $identifier
 		), $join_config);
 
-		return $this->_check_join_tables($table, $join_config);
+		return $this->_check_join_tables($table, $join_config)?$join_config:FALSE;
 	}
 
 	private function _check_has_many($join_config, $table, $identifier) {
@@ -221,7 +221,7 @@ class Database_query {
 			'identifier' => $identifier
 		), $join_config);
 
-		return $this->_check_join_tables($table, $join_config);
+		return $this->_check_join_tables($table, $join_config)?$join_config:FALSE;
 	}
 
 	private function _check_join_tables($table, $join) {
