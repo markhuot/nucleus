@@ -150,7 +150,7 @@ class Database_query {
 		foreach ($this->joins as $join_config) {
 			if ($join_config = $this->_check_join($join_config)) {
 				// This was a successful join, store the utilized config
-				$this->join_configs[$join['as']] = $join;
+				$this->join_configs[$join['as']] = $join_config;
 
 				// Finally, assemble the SQL statement
 				$sql.= ' ';
