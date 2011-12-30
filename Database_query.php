@@ -148,7 +148,26 @@ class Database_query {
 
 		// Loop through each of our joins and build SQL for it
 		foreach ($this->joins as $join_config) {
-			$sql.= $this->_check_join($join_config);
+			if ($join_config = $this->_check_join($join_config)) {
+				// This was a successful join, store the utilized config
+				$this->join_configs[$join['as']] = $join;
+
+				// Finally, assemble the SQL statement
+				$sql.= ' ';
+				$sql.= strtoupper($join['type']);
+				$sql.= ' JOIN ';
+				$sql.= $join['table_name'];
+				$sql.= ' AS ';
+				$sql.= $join['as'];
+				$sql.= ' ON ';
+				$sql.= $join['identifier'];
+				$sql.= '.';
+				$sql.= $join['primary_key'];
+				$sql.= '=';
+				$sql.= $join['as'];
+				$sql.= '.';
+				$sql.= $join['foreign_key'];
+			}
 		}
 
 		return $sql;
@@ -170,28 +189,10 @@ class Database_query {
 
 		if ($join_config = $this->_check_has_one($join_config, $table, $identifier) || 
 		    $join_config = $this->_check_has_many($join_config, $table, $identifier)) {
-
-			// This was a successful join, store the utilized config
-			$this->join_configs[$join['as']] = $join;
-
-			// Finally, assemble the SQL statement
-			$sql.= ' ';
-			$sql.= strtoupper($join['type']);
-			$sql.= ' JOIN ';
-			$sql.= $join['table_name'];
-			$sql.= ' AS ';
-			$sql.= $join['as'];
-			$sql.= ' ON ';
-			$sql.= $join['identifier'];
-			$sql.= '.';
-			$sql.= $join['primary_key'];
-			$sql.= '=';
-			$sql.= $join['as'];
-			$sql.= '.';
-			$sql.= $join['foreign_key'];
+			return $join_config;
 		}
 
-		return $sql;
+		return FALSE;
 	}
 
 	private function _check_has_one($join_config, $table, $identifier) {
