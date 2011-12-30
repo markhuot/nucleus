@@ -148,40 +148,47 @@ class Database_query {
 
 		// Loop through each of our joins and build SQL for it
 		foreach ($this->joins as $join_config) {
+			$sql.= $this->_check_join($join_config);
+		}
 
-			// If it's not defined what we're attaching on to then we'll assume
-			// you're attaching onto the primary table. If this is not the
-			// intent be more descriptive in your ->join('posts.comments')
-			if (!$join_config['class_name']) {
-				$join_config['class_name'] = Database::singular($this->primary_table());
-			}
+		return $sql;
+	}
 
-			// localize some variables for shorter lines
-			$table = Database::plural($join_config['class_name']);
-			$identifier = $this->table_identifier_for(Database::plural($join_config['class_name']));
+	private function _check_join($join_config) {
+		$sql = '';
 
-			if ($join_config = $this->_check_has_one($join_config, $table, $identifier) || 
-			    $join_config = $this->_check_has_many($join_config, $table, $identifier)) {
+		// If it's not defined what we're attaching on to then we'll assume
+		// you're attaching onto the primary table. If this is not the
+		// intent be more descriptive in your ->join('posts.comments')
+		if (!$join_config['class_name']) {
+			$join_config['class_name'] = Database::singular($this->primary_table());
+		}
 
-				// This was a successful join, store the utilized config
-				$this->join_configs[$join['as']] = $join;
+		// localize some variables for shorter lines
+		$table = Database::plural($join_config['class_name']);
+		$identifier = $this->table_identifier_for(Database::plural($join_config['class_name']));
 
-				// Finally, assemble the SQL statement
-				$sql.= ' ';
-				$sql.= strtoupper($join['type']);
-				$sql.= ' JOIN ';
-				$sql.= $join['table_name'];
-				$sql.= ' AS ';
-				$sql.= $join['as'];
-				$sql.= ' ON ';
-				$sql.= $join['identifier'];
-				$sql.= '.';
-				$sql.= $join['primary_key'];
-				$sql.= '=';
-				$sql.= $join['as'];
-				$sql.= '.';
-				$sql.= $join['foreign_key'];
-			}
+		if ($join_config = $this->_check_has_one($join_config, $table, $identifier) || 
+		    $join_config = $this->_check_has_many($join_config, $table, $identifier)) {
+
+			// This was a successful join, store the utilized config
+			$this->join_configs[$join['as']] = $join;
+
+			// Finally, assemble the SQL statement
+			$sql.= ' ';
+			$sql.= strtoupper($join['type']);
+			$sql.= ' JOIN ';
+			$sql.= $join['table_name'];
+			$sql.= ' AS ';
+			$sql.= $join['as'];
+			$sql.= ' ON ';
+			$sql.= $join['identifier'];
+			$sql.= '.';
+			$sql.= $join['primary_key'];
+			$sql.= '=';
+			$sql.= $join['as'];
+			$sql.= '.';
+			$sql.= $join['foreign_key'];
 		}
 
 		return $sql;
@@ -199,7 +206,7 @@ class Database_query {
 			'identifier' => $identifier
 		), $join_config);
 
-		return $this->_check_join($table, $join_config);
+		return $this->_check_join_tables($table, $join_config);
 	}
 
 	private function _check_has_many($join_config, $table, $identifier) {
@@ -214,10 +221,10 @@ class Database_query {
 			'identifier' => $identifier
 		), $join_config);
 
-		return $this->_check_join($table, $join_config);
+		return $this->_check_join_tables($table, $join_config);
 	}
 
-	private function _check_join($table, $join) {
+	private function _check_join_tables($table, $join) {
 		if ($this->table_has_column($table, $join['primary_key']) && 
 		    $this->table_has_column($join['table_name'], $join['foreign_key'])) {
 			return TRUE;
