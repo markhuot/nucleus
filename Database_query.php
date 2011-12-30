@@ -160,77 +160,61 @@ class Database_query {
 			$table = Database::plural($join_config['class_name']);
 			$identifier = $this->table_identifier_for(Database::plural($join_config['class_name']));
 
-			$this->_check_has_one($join_config, $table, $identifier);
-			$this->_check_has_many($join_config, $table, $identifier);
-		}
+			if ($join_config = $this->_check_has_one($join_config, $table, $identifier) || 
+			    $join_config = $this->_check_has_many($join_config, $table, $identifier)) {
 
-		foreach ($this->join_configs as $join) {
-			// Finally, assemble the SQL statement
-			$sql.= ' ';
-			$sql.= strtoupper($join['type']);
-			$sql.= ' JOIN ';
-			$sql.= $join['table_name'];
-			$sql.= ' AS ';
-			$sql.= $join['as'];
-			$sql.= ' ON ';
-			$sql.= $join['identifier'];
-			$sql.= '.';
-			$sql.= $join['primary_key'];
-			$sql.= '=';
-			$sql.= $join['as'];
-			$sql.= '.';
-			$sql.= $join['foreign_key'];
+				// This was a successful join, store the utilized config
+				$this->join_configs[$join['as']] = $join;
+
+				// Finally, assemble the SQL statement
+				$sql.= ' ';
+				$sql.= strtoupper($join['type']);
+				$sql.= ' JOIN ';
+				$sql.= $join['table_name'];
+				$sql.= ' AS ';
+				$sql.= $join['as'];
+				$sql.= ' ON ';
+				$sql.= $join['identifier'];
+				$sql.= '.';
+				$sql.= $join['primary_key'];
+				$sql.= '=';
+				$sql.= $join['as'];
+				$sql.= '.';
+				$sql.= $join['foreign_key'];
+			}
 		}
 
 		return $sql;
 	}
 
-	private function _check_has_one($join, $table, $identifier) {
+	private function _check_has_one($join_config, $table, $identifier) {
 		
 		// Merge our default config with the passed config.
-		$join = array_merge(array(
-			'as' => $join['table_name'],
-			'class_name' => ucfirst(Database::singular($join['table_name'])),
-			'primary_key' => Database::singular($join['table_name']).'_id',
+		$join_config = array_merge(array(
+			'as' => $join_config['table_name'],
+			'class_name' => ucfirst(Database::singular($join_config['table_name'])),
+			'primary_key' => Database::singular($join_config['table_name']).'_id',
 			'foreign_key' => 'id',
 			'type' => 'left',
 			'identifier' => $identifier
-		), $join);
+		), $join_config);
 
-		// Check that each table has the necessary columns to support
-		// this relationship.
-		if (!$this->_check_join($table, $join)) {
-			return false;
-		}
-
-		// This was a successful join, store the utilized config
-		$this->join_configs[$join['as']] = $join;
-
-		return $join;
+		return $this->_check_join($table, $join_config);
 	}
 
-	private function _check_has_many($join, $table, $identifier) {
+	private function _check_has_many($join_config, $table, $identifier) {
 
 		// Merge our default config with the passed config.
-		$join = array_merge(array(
-			'as' => $join['table_name'],
-			'class_name' => ucfirst(Database::singular($join['table_name'])),
+		$join_config = array_merge(array(
+			'as' => $join_config['table_name'],
+			'class_name' => ucfirst(Database::singular($join_config['table_name'])),
 			'primary_key' => 'id',
 			'foreign_key' => Database::singular($table).'_id',
 			'type' => 'left',
 			'identifier' => $identifier
-		), $join);
+		), $join_config);
 
-		// Check that each table has the necessary columns to support
-		// this relationship.
-		if (!$this->_check_join($table, $join)) {
-			return false;
-		}
-
-		// This was a successful join, store the utilized config
-		$this->join_configs[$join['as']] = $join;
-
-		return $join;
+		return $this->_check_join($table, $join_config);
 	}
 
 	private function _check_join($table, $join) {
