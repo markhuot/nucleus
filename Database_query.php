@@ -125,38 +125,43 @@ class Database_query {
 
 	// ------------------------------------------------------------------------
 
-	// 'as'            How we'll refer to the related entries
-	// 'class_name'    The primary class name
-	// ?               The primary table name
-	// 'identifier'    The primary table identifier
-	// 'primary_key'   The primary table key
-	// ?               The related class name
-	// 'table_name'    The related table name
-	// ?               The related table identifier
-	// 'foreign_key'   The related table key
-	// 'type'          The type of join
+	// 'as'             How we'll refer to the related entries
+	// 'primary_class'  The primary class name
+	// 'primary_table'  The primary table name
+	// 'primary_id'     The primary table identifier
+	// 'primary_key'    The primary table key
+	// 'foreign_class'  The related class name
+	// 'foreign_table'  The related table name
+	// 'foreign_id'     The related table identifier
+	// 'foreign_key'    The related table key
+	// 'type'           The type of join
 
 	public function join($table, $config=array()) {
 		if (is_string($table)) {
 			preg_match('/^(?:(.*?)\.)?(.*)$/', $table, $matches);
-			$config['class_name'] = $matches[1]?:null;
-			$config['table_name'] = $matches[2];
+			$config['primary_table'] = $matches[1]?:null;
+			$config['foreign_table'] = $matches[2];
 			$table = $matches[2];
 		}
 
 		else if (is_array($table)) {
 			$config = $table;
-			$table = $config['table_name'];
 		}
 
 		// If it's not defined what we're attaching on to then we'll assume
 		// you're attaching onto the primary table. If this is not the
 		// intent be more descriptive in your ->join('posts.comments')
-		if (!@$config['class_name']) {
-			$config['class_name'] = Database::singular($this->primary_table());
+		if (!@$config['primary_table']) {
+			$config['primary_table'] = $this->primary_table();
+		}
+		if (!@$config['primary_class']) {
+			$config['primary_class'] = Database::singular($config['primary_table']);
+		}
+		if (!@$config['foreign_class']) {
+			$config['foreign_class'] = Database::singular($config['foreign_table']);
 		}
 
-		$config['as'] = $this->add_table($table, @$config['as']);
+		$config['as'] = $this->add_table($config['foreign_table'], @$config['as']);
 		$this->joins[] = $config;
 		return $this;
 	}
@@ -166,7 +171,10 @@ class Database_query {
 
 		// Loop through each of our joins and build SQL for it
 		foreach ($this->joins as $join_config) {
-			if ($join_config = $this->_check_join($join_config)) {
+		
+			if ($join_config = $this->_check_has_one($join_config) || 
+				$join_config = $this->_check_has_many($join_config)) {
+				
 				// This was a successful join, store the utilized config
 				$this->join_configs[$join['as']] = $join_config;
 
@@ -174,70 +182,48 @@ class Database_query {
 				$sql.= ' ';
 				$sql.= strtoupper($join['type']);
 				$sql.= ' JOIN ';
-				$sql.= $join['table_name'];
+				$sql.= $join['foreign_table'];
 				$sql.= ' AS ';
-				$sql.= $join['as'];
+				$sql.= $join['foreign_id'];
 				$sql.= ' ON ';
-				$sql.= $join['identifier'];
-				$sql.= '.';
-				$sql.= $join['primary_key'];
-				$sql.= '=';
-				$sql.= $join['as'];
+				$sql.= $join['foreign_id'];
 				$sql.= '.';
 				$sql.= $join['foreign_key'];
+				$sql.= '=';
+				$sql.= $join['primary_id'];
+				$sql.= '.';
+				$sql.= $join['primary_key'];
 			}
 		}
 
 		return $sql;
 	}
 
-	private function _check_join($join_config) {
-
-		// localize some variables for shorter lines
-		$table = Database::plural($join_config['class_name']);
-		$identifier = $this->table_identifier_for(Database::plural($join_config['class_name']));
-
-		if ($join_config = $this->_check_has_one($join_config, $table, $identifier) || 
-		    $join_config = $this->_check_has_many($join_config, $table, $identifier)) {
-			return $join_config;
-		}
-
-		return FALSE;
-	}
-
-	private function _check_has_one($join_config, $table, $identifier) {
+	private function _check_has_one($join_config) {
 		
 		// Merge our default config with the passed config.
 		$join_config = array_merge(array(
-			'as' => $join_config['table_name'],
-			'class_name' => ucfirst(Database::singular($join_config['table_name'])),
-			'primary_key' => Database::singular($join_config['table_name']).'_id',
-			'foreign_key' => 'id',
-			'type' => 'left',
-			'identifier' => $identifier
+			'primary_key' => Database::singular($join_config['foreign_table']).'_id',
+			'foreign_key' => 'id'
 		), $join_config);
 
-		return $this->_check_join_tables($table, $join_config)?$join_config:FALSE;
+		return $this->_check_join_tables($join_config)?$join_config:FALSE;
 	}
 
-	private function _check_has_many($join_config, $table, $identifier) {
+	private function _check_has_many($join_config) {
 
 		// Merge our default config with the passed config.
 		$join_config = array_merge(array(
-			'as' => $join_config['table_name'],
-			'class_name' => ucfirst(Database::singular($join_config['table_name'])),
 			'primary_key' => 'id',
-			'foreign_key' => Database::singular($table).'_id',
-			'type' => 'left',
-			'identifier' => $identifier
+			'foreign_key' => Database::singular($join_config['primary_table']).'_id'
 		), $join_config);
 
-		return $this->_check_join_tables($table, $join_config)?$join_config:FALSE;
+		return $this->_check_join_tables($join_config)?$join_config:FALSE;
 	}
 
-	private function _check_join_tables($table, $join) {
-		if ($this->table_has_column($table, $join['primary_key']) && 
-		    $this->table_has_column($join['table_name'], $join['foreign_key'])) {
+	private function _check_join_tables($join_config) {
+		if ($this->table_has_column($join_config['primary_table'], $join_config['primary_key']) && 
+		    $this->table_has_column($join_config['foreign_table'], $join_config['foreign_key'])) {
 			return TRUE;
 		}
 
