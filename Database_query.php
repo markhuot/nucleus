@@ -138,6 +138,13 @@ class Database_query {
 			$table = $config['table_name'];
 		}
 
+		// If it's not defined what we're attaching on to then we'll assume
+		// you're attaching onto the primary table. If this is not the
+		// intent be more descriptive in your ->join('posts.comments')
+		if (!@$config['class_name']) {
+			$config['class_name'] = Database::singular($this->primary_table());
+		}
+
 		$config['as'] = $this->add_table($table, @$config['as']);
 		$this->joins[] = $config;
 		return $this;
@@ -174,13 +181,6 @@ class Database_query {
 	}
 
 	private function _check_join($join_config) {
-
-		// If it's not defined what we're attaching on to then we'll assume
-		// you're attaching onto the primary table. If this is not the
-		// intent be more descriptive in your ->join('posts.comments')
-		if (!$join_config['class_name']) {
-			$join_config['class_name'] = Database::singular($this->primary_table());
-		}
 
 		// localize some variables for shorter lines
 		$table = Database::plural($join_config['class_name']);
