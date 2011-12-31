@@ -147,16 +147,13 @@ class Database_query {
 		else if (is_array($table)) {
 			$config = $table;
 		}
-
-		// If it's not defined what we're attaching on to then we'll assume
-		// you're attaching onto the primary table. If this is not the
-		// intent be more descriptive in your ->join('posts.comments')
-		if (!@$config['primary_table']) {
-			$config['primary_table'] = $this->primary_table();
-		}
-
-		$config['foreign_id'] = $this->add_table($config['foreign_table'], @$config['as']);
-		$this->joins[] = $config;
+		
+		$this->joins[] = array_merge(array(
+			'type' => 'left',
+			'primary_table' => $this->primary_table(),
+			'foreign_id' => $this->add_table($config['foreign_table'], @$config['as'])
+		), $config);
+		
 		return $this;
 	}
 
