@@ -141,7 +141,6 @@ class Database_query {
 			preg_match('/^(?:(.*?)\.)?(.*)$/', $table, $matches);
 			$config['primary_table'] = $matches[1]?:null;
 			$config['foreign_table'] = $matches[2];
-			$table = $matches[2];
 		}
 
 		else if (is_array($table)) {
