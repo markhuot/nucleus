@@ -155,7 +155,7 @@ class Database_query {
 			$config['primary_table'] = $this->primary_table();
 		}
 
-		$config['as'] = $this->add_table($config['foreign_table'], @$config['as']);
+		$config['foreign_id'] = $this->add_table($config['foreign_table'], @$config['as']);
 		$this->joins[] = $config;
 		return $this;
 	}
