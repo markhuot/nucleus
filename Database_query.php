@@ -280,10 +280,11 @@ class Database_query {
 	// ------------------------------------------------------------------------
 
 	public function go() {
-		$this->queries[] = ($query = $this->_build_query());
+		$this->queries[] = ($sql = $this->_build_query());
+		$rows = $this->_fetch_rows($sql)
 		$result = new Database_result(
 			clone $this,
-			$this->_build_result($query)
+			$rows
 		);
 
 		$this->reset();
@@ -299,8 +300,8 @@ class Database_query {
 		return trim($sql);
 	}
 
-	private function _build_result($sql) {
-		$result = array();
+	private function _fetch_rows($sql) {
+		$rows = array();
 		$query = mysql_query($sql);
 
 		if (!$query) {
@@ -309,10 +310,10 @@ class Database_query {
 		}
 
 		while ($row = mysql_fetch_assoc($query)) {
-			$result[] = $row;
+			$rows[] = $row;
 		}
 
-		return $result;
+		return $rows;
 	}
 
 	// ------------------------------------------------------------------------
