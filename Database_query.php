@@ -154,12 +154,6 @@ class Database_query {
 		if (!@$config['primary_table']) {
 			$config['primary_table'] = $this->primary_table();
 		}
-		if (!@$config['primary_class']) {
-			$config['primary_class'] = Database::singular($config['primary_table']);
-		}
-		if (!@$config['foreign_class']) {
-			$config['foreign_class'] = Database::singular($config['foreign_table']);
-		}
 
 		$config['as'] = $this->add_table($config['foreign_table'], @$config['as']);
 		$this->joins[] = $config;
