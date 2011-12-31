@@ -164,60 +164,60 @@ class Database_query {
 		$sql = '';
 
 		// Loop through each of our joins and build SQL for it
-		foreach ($this->joins as $join_config) {
+		foreach ($this->joins as $config) {
 		
-			if ($join_config = $this->_check_has_one($join_config) || 
-				$join_config = $this->_check_has_many($join_config)) {
+			if ($config = $this->_check_has_one($config) || 
+				$config = $this->_check_has_many($config)) {
 				
 				// This was a successful join, store the utilized config
-				$this->join_configs[$join['as']] = $join_config;
+				$this->join_configs[$config['foreign_id']] = $config;
 
 				// Finally, assemble the SQL statement
 				$sql.= ' ';
-				$sql.= strtoupper($join['type']);
+				$sql.= strtoupper($config['type']);
 				$sql.= ' JOIN ';
-				$sql.= $join['foreign_table'];
+				$sql.= $config['foreign_table'];
 				$sql.= ' AS ';
-				$sql.= $join['foreign_id'];
+				$sql.= $config['foreign_id'];
 				$sql.= ' ON ';
-				$sql.= $join['foreign_id'];
+				$sql.= $config['foreign_id'];
 				$sql.= '.';
-				$sql.= $join['foreign_key'];
+				$sql.= $config['foreign_key'];
 				$sql.= '=';
-				$sql.= $join['primary_id'];
+				$sql.= $config['primary_id'];
 				$sql.= '.';
-				$sql.= $join['primary_key'];
+				$sql.= $config['primary_key'];
 			}
 		}
 
 		return $sql;
 	}
 
-	private function _check_has_one($join_config) {
+	private function _check_has_one($config) {
 		
 		// Merge our default config with the passed config.
-		$join_config = array_merge(array(
-			'primary_key' => Database::singular($join_config['foreign_table']).'_id',
+		$config = array_merge(array(
+			'primary_key' => Database::singular($config['foreign_table']).'_id',
 			'foreign_key' => 'id'
-		), $join_config);
+		), $config);
 
-		return $this->_check_join_tables($join_config)?$join_config:FALSE;
+		return $this->_check_join_tables($config)?$config:FALSE;
 	}
 
-	private function _check_has_many($join_config) {
+	private function _check_has_many($config) {
 
 		// Merge our default config with the passed config.
-		$join_config = array_merge(array(
+		$config = array_merge(array(
 			'primary_key' => 'id',
-			'foreign_key' => Database::singular($join_config['primary_table']).'_id'
-		), $join_config);
+			'foreign_key' => Database::singular($config['primary_table']).'_id'
+		), $config);
 
-		return $this->_check_join_tables($join_config)?$join_config:FALSE;
+		return $this->_check_join_tables($config)?$config:FALSE;
 	}
 
-	private function _check_join_tables($join_config) {
-		if ($this->table_has_column($join_config['primary_table'], $join_config['primary_key']) && 
-		    $this->table_has_column($join_config['foreign_table'], $join_config['foreign_key'])) {
+	private function _check_join_tables($config) {
+		if ($this->table_has_column($config['primary_table'], $config['primary_key']) && 
+		    $this->table_has_column($config['foreign_table'], $config['foreign_key'])) {
 			return TRUE;
 		}
 
