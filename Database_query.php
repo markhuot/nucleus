@@ -126,12 +126,12 @@ class Database_query {
 	// ------------------------------------------------------------------------
 
 	// 'as'            How we'll refer to the related entries
-	// ?               The primary class name
-	// 'table_mame'    The primary table name
+	// 'class_name'    The primary class name
+	// ?               The primary table name
 	// 'identifier'    The primary table identifier
 	// 'primary_key'   The primary table key
-	// 'class_name'    The related class name
-	// ?               The related table name
+	// ?               The related class name
+	// 'table_name'    The related table name
 	// ?               The related table identifier
 	// 'foreign_key'   The related table key
 	// 'type'          The type of join
