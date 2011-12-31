@@ -235,7 +235,18 @@ class Database_query {
 
 	// ------------------------------------------------------------------------
 
-	public function where($key, $value, $operator='=') {
+	public function where($key, $value) {
+		if (func_num_args() == 2) {
+			$key = func_get_arg(0);
+			$operator = '=';
+			$value = func_get_arg(1);
+		}
+		if (func_num_args() == 3) {
+			$key = func_get_arg(0);
+			$operator = func_get_arg(1);
+			$value = func_get_arg(2);
+		}
+
 		if ($value === TRUE) { $value = 1; }
 		if ($value === FALSE) { $value = 0; }
 		if ($value === NULL) { $operator = 'IS'; $value = 'NULL'; }
