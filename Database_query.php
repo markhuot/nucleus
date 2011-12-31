@@ -149,6 +149,7 @@ class Database_query {
 		}
 		
 		$this->joins[] = array_merge(array(
+			'as' => $config['foreign_table'],
 			'type' => 'left',
 			'primary_table' => $this->primary_table(),
 			'foreign_id' => $this->add_table($config['foreign_table'], @$config['as'])
