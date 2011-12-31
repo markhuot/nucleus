@@ -125,6 +125,13 @@ class Database_query {
 
 	// ------------------------------------------------------------------------
 
+	// 'as'            How we'll refer to the related entries
+	// 'identifier'    The primary table identifier
+	// 'primary_key'   The primary table key
+	// 'class_name'    The related class name
+	// 'foreign_key'   The related table key
+	// 'type'          The type of join
+
 	public function join($table, $config=array()) {
 		if (is_string($table)) {
 			preg_match('/^(?:(.*?)\.)?(.*)$/', $table, $matches);
