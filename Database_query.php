@@ -151,6 +151,7 @@ class Database_query {
 			'as' => $config['foreign_table'],
 			'type' => 'left',
 			'primary_table' => $this->primary_table(),
+			'primary_id' => $this->table_identifier_for($this->primary_table()),
 			'foreign_id' => $this->add_table($config['foreign_table'], @$config['as'])
 		), $config);
 		
