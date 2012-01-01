@@ -106,3 +106,9 @@ class Database {
 	}
 
 }
+
+function orset(&$key, $value) {
+	if (!$key) {
+		$key = $value;
+	}
+}
