@@ -15,6 +15,17 @@ class Database_query {
 	private $join_configs = array();  // Store successful join configs
 	private $where = array();         // Any defined where statements
 	private $orderby = array();       // The requested order
+	
+	private static $config_keys = array(
+		'as',
+		'type',
+		'primary_table',
+		'primary_key',
+		'primary_id',
+		'foreign_table',
+		'foreign_key',
+		'foreign_id'
+	);
 
 	// ------------------------------------------------------------------------
 
@@ -136,25 +147,22 @@ class Database_query {
 	// 'foreign_key'    The related table key
 	// 'type'           The type of join
 
-	public function join($table, $config=array()) {
-		if (is_string($table)) {
-			preg_match('/^(?:(.*?)\.)?(.*)$/', $table, $matches);
-			$config['primary_table'] = $matches[1]?:null;
-			$config['foreign_table'] = $matches[2];
+	public function join($foreign_table, $config=array()) {
+		extract(array_intersect_key($config, self::$config_keys));
+	
+		if (is_string($foreign_table)) {
+			preg_match('/^(?:(.*?)\.)?(.*)$/', $foreign_table, $matches);
+			$primary_table = $matches[1]?:null;
+			$foreign_table = $matches[2];
 		}
 
-		else if (is_array($table)) {
-			$config = $table;
-		}
+		orset($as, $foreign_table);
+		orset($type, 'left');
+		orset($primary_table, $this->primary_table();
+		orset($primary_id, $this->table_identifier_for($primary_table));
+		orset($foreign_id, $this->add_table($foreign_table, $as));
 		
-		$this->joins[] = array_merge(array(
-			'as' => $config['foreign_table'],
-			'type' => 'left',
-			'primary_table' => $this->primary_table(),
-			'primary_id' => $this->table_identifier_for($this->primary_table()),
-			'foreign_id' => $this->add_table($config['foreign_table'], @$config['as'])
-		), $config);
-		
+		$this->joins[] = compact(self::$config_keys);
 		return $this;
 	}
 
