@@ -16,7 +16,7 @@ class Database_query {
 	private $where = array();         // Any defined where statements
 	private $orderby = array();       // The requested order
 	
-	private static $config_keys = array(
+	private static $join_keys = array(
 		'as',
 		'type',
 		'primary_table',
@@ -148,7 +148,7 @@ class Database_query {
 	// 'type'           The type of join
 
 	public function join($foreign_table, $config=array()) {
-		extract(array_intersect_key($config, self::$config_keys));
+		extract(array_intersect_key($config, self::$join_keys));
 	
 		if (is_string($foreign_table)) {
 			preg_match('/^(?:(.*?)\.)?(.*)$/', $foreign_table, $matches);
@@ -162,7 +162,7 @@ class Database_query {
 		orset($primary_id, $this->table_identifier_for($primary_table));
 		orset($foreign_id, $this->add_table($foreign_table, $as));
 		
-		$this->joins[] = compact(self::$config_keys);
+		$this->joins[] = compact(self::$join_keys);
 		return $this;
 	}
 
