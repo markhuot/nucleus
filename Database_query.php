@@ -158,7 +158,7 @@ class Database_query {
 
 		orset($as, $foreign_table);
 		orset($type, 'left');
-		orset($primary_table, $this->primary_table();
+		orset($primary_table, $this->primary_table());
 		orset($primary_id, $this->table_identifier_for($primary_table));
 		orset($foreign_id, $this->add_table($foreign_table, $as));
 		
