@@ -79,7 +79,7 @@ foreach ($tests as $test) {
 }
 
 $color = BOLDGREEN;
-if ($summary->failed) {
+if ($summary->failed || $summary->exceptions) {
 	$color = BOLDRED;
 }
 
