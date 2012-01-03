@@ -289,7 +289,7 @@ class Database_query {
 
 	public function go() {
 		$this->queries[] = ($sql = $this->_build_query());
-		$rows = $this->_fetch_rows($sql)
+		$rows = $this->_fetch_rows($sql);
 		$result = new Database_result(
 			clone $this,
 			$rows
