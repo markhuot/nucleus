@@ -156,15 +156,9 @@ class Nucleus_result implements Iterator {
 	 */
 	public function add_record($record) {
 
-		// If the record's table name matches the primary table name then we
-		// want to add this record to the `$records` collection using the
-		// default key/id. We assume that the primary key is unique, which it
-		// should be. This allows us to add the same record multiple times
-		// without fear. This is a very real possibility when parsing a query
-		// with related data. For example a result set of posts and comments
-		// may have a single post repeated several times as each comment is
-		// returned. In this way we can simply replace the `post` record each
-		// time its encountered.
+		// First we'll check if the identifier matches the primary table
+		// identifier. If it does we'll just add it to the records array using
+		// the default keys.
 		if ($record->table_identifier() == $this->table_identifier) {
 			$this->records
 				[$this->table_identifier]
@@ -174,20 +168,18 @@ class Nucleus_result implements Iterator {
 					$record;
 		}
 
-		// If the record's table is not the primary table then we'll dump it
-		// into the related_records collection. This collection is organized
-		// into three depths. First the relation name (commonly the table
-		// name) is used, then the foreign key used for the match, and finally
-		// the id. This creates an array as defined in the $related_records
-		// comment above.
-		foreach ($this->query->join_configs() as $config) {
-			if ($record->table_identifier() == $config['foreign_id']) {
-				$this->records
-					[$config['foreign_id']]
-					[$config['foreign_key']]
-					[$record->{$config['foreign_key']}]
-					[$record->id()] =
-						$record;
+		// If the record's identifier does not match the primary identifier for
+		// this result then we'll check to see how the record is related.
+		else {
+			foreach ($this->query->join_configs() as $config) {
+				if ($record->table_identifier() == $config['foreign_id']) {
+					$this->records
+						[$config['foreign_id']]
+						[$config['foreign_key']]
+						[$record->{$config['foreign_key']}]
+						[$record->id()] =
+							$record;
+				}
 			}
 		}
 	}
