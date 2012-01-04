@@ -176,7 +176,7 @@ class Database_query {
 				$config = $this->_check_has_many($config)) {
 				
 				// This was a successful join, store the utilized config
-				$this->join_configs[$config['foreign_id']] = $config;
+				$this->join_configs[$config['primary_id'].'.'.$config['as']] = $config;
 
 				// Finally, assemble the SQL statement
 				$sql.= ' ';
