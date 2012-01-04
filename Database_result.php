@@ -212,7 +212,7 @@ class Database_result implements Iterator {
 	 * column in the first record.
 	 */
 	public function record($key) {
-		$collection = @$this->records();
+		$collection = $this->records();
 		$keys = array_keys($collection);
 
 		if (is_string($key)) {
