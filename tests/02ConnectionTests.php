@@ -6,8 +6,11 @@ class ConnectionTests extends Quiz {
 	
 	private $db;
 
-	public function canConnect() {
+	public function __construct() {
 		$this->db = new Database_query('192.168.94.31', 'root', 'root');
+	}
+
+	public function canConnect() {
 		return $this->db->connection();
 	}
 
