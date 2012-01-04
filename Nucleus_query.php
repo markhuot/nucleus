@@ -151,11 +151,9 @@ class Nucleus_query {
 	public function join($foreign_table, $config=array()) {
 		extract(array_intersect_key($config, self::$join_keys));
 	
-		if (is_string($foreign_table)) {
-			preg_match('/^(?:(.*?)\.)?(.*)$/', $foreign_table, $matches);
-			$primary_table = $matches[1]?:null;
-			$foreign_table = $matches[2];
-		}
+		preg_match('/^(?:(.*?)\.)?(.*)$/', $foreign_table, $matches);
+		$primary_table = $matches[1]?:null;
+		$foreign_table = $matches[2];
 
 		orset($as, $foreign_table);
 		orset($type, 'left');
