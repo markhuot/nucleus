@@ -179,7 +179,7 @@ class Nucleus_query {
 			$sql.= ' ';
 
 			if (($config = $this->_check_has_one($join)) !== FALSE || 
-				($config = $this->_check_has_many($join)) !== FALSE ||
+				($config = $this->_check_has_many($join)) !== FALSE || 
 				($config = $this->_check_many_many($join)) !== FALSE) {
 				
 				// This was a successful join, store the utilized config
