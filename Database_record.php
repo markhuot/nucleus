@@ -5,7 +5,6 @@ class Database_record {
 	private $table_name;
 	private $table_identifier;
 	private $pk = 'id';
-	private $id;
 	private $data;
 
 	public function __construct($result=FALSE, $table_name=FALSE, $table_identifier=FALSE, $data=array()) {
@@ -20,7 +19,7 @@ class Database_record {
 	}
 
 	public function id() {
-		return $this->id;
+		return $this->data[$this->pk()];
 	}
 
 	public function set_table_name($table_name) {
@@ -41,10 +40,6 @@ class Database_record {
 				$this->set_data($key, $value);
 			}
 			return;
-		}
-
-		if ($key == $this->pk) {
-			$this->id = $value;
 		}
 
 		$this->data[$key] = $value;
