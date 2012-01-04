@@ -345,11 +345,11 @@ class Database_query {
 		return @$this->tables[$identifier];
 	}
 
-	public function join_configs($key=FALSE) {
-		if ($key === FALSE) {
-			return $this->join_configs;
-		}
+	public function join_configs() {
+		return $this->join_configs;
+	}
 
+	public function join_config($key=FALSE) {
 		return @$this->join_configs[$key];
 	}
 
