@@ -232,24 +232,24 @@ class Database_result implements Iterator {
 	 * FALSE is returned.
 	 */
 	public function related($name, $record, $config=array()) {
-		if (!($identifier = $this->query->table_identifier_for($name))) {
+		$key = $record->table_identifier().'_'.$name;
+		if (!($config = $this->query->join_config($key))) {
 			return FALSE;
 		}
 
-		if ($join_config = $this->query->join_configs($identifier)) {
-			$table = $join_config['table_name'];
-			$as = $join_config['as'];
-			$pk = $join_config['primary_key'];
-			$fk = $join_config['foreign_key'];
-			$id = $record->{$pk};
+		
+		$table = $config['table_name'];
+		$as = $config['as'];
+		$pk = $config['primary_key'];
+		$fk = $config['foreign_key'];
+		$id = $record->{$pk};
 
-			if ($this->records[$as][$fk][$id]) {
-				$result = clone $this;
-				$result->table_name = $as;
-				$result->key = $fk;
-				$result->id = $id;
-				return $result;
-			}
+		if ($this->records[$as][$fk][$id]) {
+			$result = clone $this;
+			$result->table_name = $as;
+			$result->key = $fk;
+			$result->id = $id;
+			return $result;
 		}
 
 		return FALSE;
