@@ -93,7 +93,9 @@ class RelationTests extends Quiz {
 		$post_title = $comment->posts->record('title');
 		$post_user = $comment->posts->record(0)->users->record('name');
 
-		return $post_title == 'Let\'s save the world' && $comment_user == 'Nina Myers' && $post_user == 'Jack Bauer';
+		return $post_title == "Let's save the world" && 
+		       $comment_user == 'Nina Myers' &&
+		       $post_user == 'Jack Bauer';
 	}
 
 }

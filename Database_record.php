@@ -7,9 +7,9 @@ class Database_record {
 	private $pk = 'id';
 	private $data;
 
-	public function __construct($result=FALSE, $table_identifier=FALSE, $data=array()) {
+	public function __construct($result=FALSE, $id=FALSE, $data=array()) {
 		$this->set_result($result);
-		$this->set_table_identifier($table_identifier);
+		$this->set_table_identifier($id);
 		$this->set_data($data);
 	}
 

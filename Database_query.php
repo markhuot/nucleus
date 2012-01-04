@@ -15,16 +15,18 @@ class Database_query {
 	private $join_configs = array();  // Store successful join configs
 	private $where = array();         // Any defined where statements
 	private $orderby = array();       // The requested order
-	
+
 	private static $join_keys = array(
-		'as',
-		'type',
-		'primary_table',
-		'primary_key',
-		'primary_id',
-		'foreign_table',
-		'foreign_key',
-		'foreign_id'
+		'as',                         // How we'll refer to the related entries
+		'type',                       // The type of join
+		'primary_class',              // The primary class name
+		'primary_table',              // The primary table name
+		'primary_key',                // The primary table key
+		'primary_id',                 // The primary table identifier
+		'foreign_class',              // The related class name
+		'foreign_table',              // The related table name
+		'foreign_key',                // The related table key
+		'foreign_id'                  // The related table identifier
 	);
 
 	// ------------------------------------------------------------------------
@@ -146,17 +148,6 @@ class Database_query {
 
 	// ------------------------------------------------------------------------
 
-	// 'as'             How we'll refer to the related entries
-	// 'primary_class'  The primary class name
-	// 'primary_table'  The primary table name
-	// 'primary_id'     The primary table identifier
-	// 'primary_key'    The primary table key
-	// 'foreign_class'  The related class name
-	// 'foreign_table'  The related table name
-	// 'foreign_id'     The related table identifier
-	// 'foreign_key'    The related table key
-	// 'type'           The type of join
-
 	public function join($foreign_table, $config=array()) {
 		extract(array_intersect_key($config, self::$join_keys));
 	
@@ -211,8 +202,6 @@ class Database_query {
 	}
 
 	private function _check_has_one($config) {
-		
-		// Merge our default config with the passed config.
 		$config = array_merge(array(
 			'primary_key' => Database::singular($config['foreign_table']).'_id',
 			'foreign_key' => 'id'
@@ -222,8 +211,6 @@ class Database_query {
 	}
 
 	private function _check_has_many($config) {
-
-		// Merge our default config with the passed config.
 		$config = array_merge(array(
 			'primary_key' => 'id',
 			'foreign_key' => Database::singular($config['primary_table']).'_id'
@@ -233,8 +220,12 @@ class Database_query {
 	}
 
 	private function _check_join_tables($config) {
-		if ($this->table_has_column($config['primary_table'], $config['primary_key']) && 
-		    $this->table_has_column($config['foreign_table'], $config['foreign_key'])) {
+		if ($this->table_has_column(
+				$config['primary_table'],
+				$config['primary_key']) && 
+		    $this->table_has_column(
+			    $config['foreign_table'],
+			    $config['foreign_key'])) {
 			return TRUE;
 		}
 
