@@ -156,32 +156,20 @@ class Nucleus_result implements Iterator {
 	 */
 	public function add_record($record) {
 
-		// First we'll check if the identifier matches the primary table
-		// identifier. If it does we'll just add it to the records array using
-		// the default keys.
-		if ($record->table_identifier() == $this->table_identifier) {
-			$this->records
-				[$this->table_identifier]
-				[$this->key]
-				[$this->id]
-				[$record->id()] =
-					$record;
-		}
+		// Setup the defaults
+		$table_identifier = $record->table_identifier();
+		$key = $this->key;
+		$id = $this->id;
 
-		// If the record's identifier does not match the primary identifier for
-		// this result then we'll check to see how the record is related.
-		else {
-			foreach ($this->query->join_configs() as $config) {
-				if ($record->table_identifier() == $config['foreign_id']) {
-					$this->records
-						[$config['foreign_id']]
-						[$config['foreign_key']]
-						[$record->{$config['foreign_key']}]
-						[$record->id()] =
-							$record;
-				}
-			}
-		}
+		// Check if this record is the primary record or joined on via a
+		// relationship.
+		if ($config = $this->query->join_for_foreign_id($table_identifier)) {
+			$key = $config['foreign_key'];
+			$id = $record->{$config['foreign_key']};
+		}	
+
+		// Store the record
+		$this->records[$table_identifier][$key][$id][$record->id()] = $record;
 	}
 
 	/**
