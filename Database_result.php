@@ -167,7 +167,7 @@ class Database_result implements Iterator {
 		// time its encountered.
 		if ($record->table_identifier() == $this->table_identifier) {
 			$this->records
-				[$record->table_identifier()]
+				[$this->table_identifier]
 				[$this->key]
 				[$this->id]
 				[$record->id()] =
