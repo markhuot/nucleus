@@ -162,7 +162,8 @@ class Database_query {
 		orset($primary_id, $this->table_identifier_for($primary_table));
 		orset($foreign_id, $this->add_table($foreign_table, $as));
 		
-		$this->joins[] = compact(self::$join_keys);
+		$key = $primary_id.'.'.$as;
+		$this->joins[$key] = compact(self::$join_keys);
 		return $this;
 	}
 
@@ -170,13 +171,13 @@ class Database_query {
 		$sql = '';
 
 		// Loop through each of our joins and build SQL for it
-		foreach ($this->joins as $config) {
+		foreach ($this->joins as $key => $join) {
 		
-			if ($config = $this->_check_has_one($config) || 
-				$config = $this->_check_has_many($config)) {
+			if (($config = $this->_check_has_one($join)) || 
+				($config = $this->_check_has_many($join))) {
 				
 				// This was a successful join, store the utilized config
-				$this->join_configs[$config['primary_id'].'.'.$config['as']] = $config;
+				$this->join_configs[$key] = $config;
 
 				// Finally, assemble the SQL statement
 				$sql.= ' ';
