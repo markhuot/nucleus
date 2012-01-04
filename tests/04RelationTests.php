@@ -98,4 +98,15 @@ class RelationTests extends Quiz {
 		       $post_user == 'Jack Bauer';
 	}
 
+
+
+	public function manyManyJoin() {
+		$result = $this->db
+			->from('posts')
+			->join('categories')
+			->go();
+		$class = get_class($result->record(0)->categories);
+		return $class == 'Nucleus_result';
+	}
+
 }
