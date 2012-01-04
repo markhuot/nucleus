@@ -231,7 +231,7 @@ class Database_result implements Iterator {
 	 * If a relation exists at the defined key it is returned, otherwise
 	 * FALSE is returned.
 	 */
-	public function related($name, $record, $config=array()) {
+	public function related($name, $record) {
 		$key = $record->table_identifier().'_'.$name;
 		if (!($config = $this->query->join_config($key))) {
 			return FALSE;
