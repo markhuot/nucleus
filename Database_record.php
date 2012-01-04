@@ -50,8 +50,8 @@ class Database_record {
 
 	public function __get($key) {
 
-		if ($value = @$this->data[$key]) {
-			return $value;
+		if (isset($this->data[$key])) {
+			return $this->data[$key];
 		}
 
 		if ($related = $this->result->related($key, $this)) {
