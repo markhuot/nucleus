@@ -165,7 +165,7 @@ class Nucleus_result implements Iterator {
 		// relationship.
 		if ($config = $this->query->join_for_foreign_id($table_identifier)) {
 			$key = $config['foreign_key'];
-			$id = $record->{$config['foreign_key']};
+			$id = $record->{$key};
 		}	
 
 		// Store the record
