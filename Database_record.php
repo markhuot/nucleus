@@ -8,8 +8,8 @@ class Database_record {
 	private $data;
 
 	public function __construct($result=FALSE, $table_name=FALSE, $table_identifier=FALSE, $data=array()) {
-		$this->result = $result;
-		$this->table_identifier = $table_identifier;
+		$this->set_result($result);
+		$this->set_table_identifier($table_identifier);
 		$this->set_table_name($table_name);
 		$this->set_data($data);
 	}
@@ -32,6 +32,14 @@ class Database_record {
 
 	public function table_identifier() {
 		return $this->table_identifier;
+	}
+
+	public function set_table_identifier($table_identifier) {
+		$this->table_identifier = $table_identifier;
+	}
+
+	public function set_result($result) {
+		$this->result = $result;
 	}
 
 	public function set_data($key, $value=FALSE) {
