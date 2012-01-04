@@ -5,7 +5,7 @@ class ReadTests extends Quiz {
 	private $db;
 
 	public function __construct() {
-		$this->db = new Database_query('192.168.94.31', 'root', 'root');
+		$this->db = new Nucleus_query('192.168.94.31', 'root', 'root');
 		$this->db->select_db('tmp');
 	}
 
@@ -14,7 +14,7 @@ class ReadTests extends Quiz {
 	}
 
 	public function recordByIndex() {
-		return get_class($this->db->get('posts')->record(0)) == 'Database_record';
+		return get_class($this->db->get('posts')->record(0)) == 'Nucleus_record';
 	}
 
 	public function firstRecordByIndex() {

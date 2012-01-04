@@ -5,19 +5,19 @@ class RelationTests extends Quiz {
 	private $db;
 
 	public function __construct() {
-		$this->db = new Database_query('192.168.94.31', 'root', 'root');
+		$this->db = new Nucleus_query('192.168.94.31', 'root', 'root');
 		$this->db->select_db('tmp');
 	}
 
 	public function hasManyClass() {
 		$result = $this->db->from('posts')->join('comments')->go();
 		$class = get_class($result->record(0)->comments);
-		return $class == 'Database_result';
+		return $class == 'Nucleus_result';
 	}
 
 	public function hasManyEntryClass() {
 		$class = get_class($this->db->from('posts')->join('comments')->go()->record(0)->comments->record(0));
-		return $class == 'Database_record';
+		return $class == 'Nucleus_record';
 	}
 
 	public function hasManyEntryData() {
@@ -33,13 +33,13 @@ class RelationTests extends Quiz {
 	public function hasOneClass() {
 		$result = $this->db->from('comments')->join('posts')->go();
 		$class = @get_class($result->record(0)->posts);
-		return $class == 'Database_result';
+		return $class == 'Nucleus_result';
 	}
 
 	public function hasOneEntryClass() {
 		$result = $this->db->from('comments')->join('posts')->go();
 		$class = @get_class($result->record(0)->posts->record(0));
-		return $class == 'Database_record';
+		return $class == 'Nucleus_record';
 	}
 
 	public function hasOneEntryData() {

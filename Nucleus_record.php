@@ -1,6 +1,6 @@
 <?php
 
-class Database_record {
+class Nucleus_record {
 	private $result;
 	private $table_name;
 	private $table_identifier;

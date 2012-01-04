@@ -1,17 +1,17 @@
 <?php
 
 spl_autoload_register(function($class_name) {
-	if (substr($class_name, 0, 9) === 'Database_') {
+	if (substr($class_name, 0, 8) === 'Nucleus_') {
 		require_once dirname(__FILE__).'/'.$class_name.'.php';
 	}
 });
 
-class Database {
+class Nucleus {
 	
 	private $query;
 
 	public function __construct($host=NULL, $user=NULL, $pass=NULL, $name=NULL) {
-		$this->query = new Database_query($host=NULL, $user=NULL, $pass=NULL, $name=NULL);
+		$this->query = new Nucleus_query($host=NULL, $user=NULL, $pass=NULL, $name=NULL);
 	}
 
 	public function __call($method, $args) {

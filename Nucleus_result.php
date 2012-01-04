@@ -1,6 +1,6 @@
 <?php
 
-class Database_result implements Iterator {
+class Nucleus_result implements Iterator {
 	/**
 	 * Index
 	 * The index of the iterator as we loop over the records.
@@ -14,28 +14,28 @@ class Database_result implements Iterator {
 	 * $records = array(
 	 *     [t0] = array(                              // The table name
 	 *         [id] = array(                          // The related table key
-	 *             [null] = Database_result Object    // The related table id
-	 *                 [12] = Database_record Object, // The related object
-	 *                 [9] = Database_record Object,  // The key maps to the...
-	 *                 [2] = Database_record Object,  // ..object's primary key
+	 *             [null] = Nucleus_result Object     // The related table id
+	 *                 [12] = Nucleus_record Object,  // The related object
+	 *                 [9] = Nucleus_record Object,   // The key maps to the...
+	 *                 [2] = Nucleus_record Object,   // ..object's primary key
 	 *             )
 	 *         )
 	 *     ), 
 	 *     [t1] = array(                              // Stored by the table id
 	 *         [post_id] = array(
-	 *             [3] = Database_result Object
-	 *                 [12] = Database_record Object,
-	 *                 [9] = Database_record Object,
-	 *                 [2] = Database_record Object,
+	 *             [3] = Nucleus_result Object
+	 *                 [12] = Nucleus_record Object,
+	 *                 [9] = Nucleus_record Object,
+	 *                 [2] = Nucleus_record Object,
 	 *             )
 	 *         )
 	 *     ),
 	 *     [t2] = array(
 	 *         [post_id] = array(
-	 *             [3] = Database_result Object (
-	 *                 [1] Database_record Object,
-	 *                 [2] Database_record Object,
-	 *                 [3] Database_record Object,
+	 *             [3] = Nucleus_result Object (
+	 *                 [1] Nucleus_record Object,
+	 *                 [2] Nucleus_record Object,
+	 *                 [3] Nucleus_record Object,
 	 *             )
 	 *         )
 	 *     )
@@ -96,7 +96,7 @@ class Database_result implements Iterator {
 	 * want to make sure certain properties are reset.
 	 */
 	public function __clone() {
-		$defaults = (object)get_class_vars('Database_result');
+		$defaults = (object)get_class_vars('Nucleus_result');
 		$this->index = $defaults->index;
 	}
 
@@ -126,7 +126,7 @@ class Database_result implements Iterator {
 			// If this is the first column from the determined table create
 			// a new database record to hold it.
 			if (!@$records[$table_identifier]) {
-				$records[$table_identifier] = new Database_record($this, $table_identifier);
+				$records[$table_identifier] = new Nucleus_record($this, $table_identifier);
 			}
 
 			// Finally, add the column and it's value to the appropriate
@@ -206,7 +206,7 @@ class Database_result implements Iterator {
 	/**
 	 * Record
 	 * Returns the record in question. You can ask for a record by
-	 * index (0,1,2,3…) which will return the actual Database_record or you
+	 * index (0,1,2,3…) which will return the actual Nucleus_record or you
 	 * can ask for a string "title" or "body" to return the value of the 
 	 * column in the first record.
 	 */

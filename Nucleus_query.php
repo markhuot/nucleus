@@ -1,6 +1,6 @@
 <?php
 
-class Database_query {
+class Nucleus_query {
 	private $connection;
 	private $host;
 	private $user;
@@ -51,7 +51,7 @@ class Database_query {
 	// ------------------------------------------------------------------------
 
 	public function reset() {
-		$defaults = (object)get_class_vars('Database_query');
+		$defaults = (object)get_class_vars('Nucleus_query');
 		$this->select = $defaults->select;
 		$this->from = $defaults->from;
 		$this->tables = $defaults->tables;
@@ -203,7 +203,7 @@ class Database_query {
 
 	private function _check_has_one($config) {
 		$config = array_merge(array(
-			'primary_key' => Database::singular($config['foreign_table']).'_id',
+			'primary_key' => Nucleus::singular($config['foreign_table']).'_id',
 			'foreign_key' => 'id'
 		), $config);
 
@@ -213,7 +213,7 @@ class Database_query {
 	private function _check_has_many($config) {
 		$config = array_merge(array(
 			'primary_key' => 'id',
-			'foreign_key' => Database::singular($config['primary_table']).'_id'
+			'foreign_key' => Nucleus::singular($config['primary_table']).'_id'
 		), $config);
 
 		return $this->_check_join_tables($config)?$config:FALSE;
@@ -292,7 +292,7 @@ class Database_query {
 	public function go() {
 		$this->queries[] = ($sql = $this->_build_query());
 		$rows = $this->_fetch_rows($sql);
-		$result = new Database_result(
+		$result = new Nucleus_result(
 			clone $this,
 			$rows
 		);
