@@ -12,7 +12,7 @@ class Database_result implements Iterator {
 	 * Stores each record this result set is responsible for. It is stored in a
 	 * nested fashion like this:
 	 * $records = array(
-	 *     [t0] = array(                           // The related table name
+	 *     [t0] = array(                              // The table name
 	 *         [id] = array(                          // The related table key
 	 *             [null] = Database_result Object    // The related table id
 	 *                 [12] = Database_record Object, // The related object
