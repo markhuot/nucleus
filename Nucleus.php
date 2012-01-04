@@ -112,3 +112,9 @@ function orset(&$key, $value) {
 		$key = $value;
 	}
 }
+
+function join_table_name($a, $b) {
+	$tables = array($a, $b);
+	sort($tables);
+	return implode('_', $tables);
+}
