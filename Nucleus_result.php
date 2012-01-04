@@ -129,7 +129,7 @@ class Nucleus_result implements Iterator {
 				$records[$table_identifier] = new Nucleus_record($this, $table_identifier);
 			}
 
-			// Finally, add the column and it's value to the appropriate
+			// Finally, add the column and its value to the appropriate
 			// database record
 			$records[$table_identifier]->set_data($column, $value);
 		}
