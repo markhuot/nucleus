@@ -7,10 +7,9 @@ class Database_record {
 	private $pk = 'id';
 	private $data;
 
-	public function __construct($result=FALSE, $table_name=FALSE, $table_identifier=FALSE, $data=array()) {
+	public function __construct($result=FALSE, $table_identifier=FALSE, $data=array()) {
 		$this->set_result($result);
 		$this->set_table_identifier($table_identifier);
-		$this->set_table_name($table_name);
 		$this->set_data($data);
 	}
 
@@ -20,14 +19,6 @@ class Database_record {
 
 	public function id() {
 		return $this->data[$this->pk()];
-	}
-
-	public function set_table_name($table_name) {
-		$this->table_name = $table_name;
-	}
-
-	public function table_name() {
-		return $this->table_name;
 	}
 
 	public function table_identifier() {
