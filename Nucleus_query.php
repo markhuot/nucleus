@@ -360,6 +360,16 @@ class Nucleus_query {
 		return @$this->join_configs[$key];
 	}
 
+	public function join_for_foreign_id($identifier) {
+		foreach ($this->join_configs as $join) {
+			if ($join['foreign_id'] == $identifier) {
+				return $join;
+			}
+		}
+
+		return FALSE;
+	}
+
 	// ------------------------------------------------------------------------
 
 	public function query() {
