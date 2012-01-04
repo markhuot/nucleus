@@ -97,7 +97,7 @@ class RelationTests extends Quiz {
 		       $comment_user == 'Nina Myers' &&
 		       $post_user == 'Jack Bauer';
 	}
-	
+
 	public function manyManyJoin() {
 		$result = $this->db
 			->from('posts')
