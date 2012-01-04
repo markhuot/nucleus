@@ -198,12 +198,10 @@ class Database_result implements Iterator {
 	 * Returns the currently focused collection.
 	 */
 	public function records() {
-		$collection = @$this->records
+		return @$this->records
 			[$this->table_name]
 			[$this->key]
 			[$this->id];
-
-		return $collection;
 	}
 
 	/**
