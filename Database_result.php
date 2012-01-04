@@ -12,7 +12,7 @@ class Database_result implements Iterator {
 	 * Stores each record this result set is responsible for. It is stored in a
 	 * nested fashion like this:
 	 * $records = array(
-	 *     [posts] = array(                           // The related table name
+	 *     [t0] = array(                           // The related table name
 	 *         [id] = array(                          // The related table key
 	 *             [null] = Database_result Object    // The related table id
 	 *                 [12] = Database_record Object, // The related object
@@ -59,7 +59,7 @@ class Database_result implements Iterator {
 	 * table would be the `posts` table. This is passed into the constructor
 	 * and must be passed with every result.
 	 */
-	private $table_name;
+	private $table_identifier;
 
 	/**
 	 * Key
@@ -82,7 +82,7 @@ class Database_result implements Iterator {
 	 */
 	public function __construct($query=FALSE, $rows=array()) {
 		$this->query = $query;
-		$this->table_name = $this->query->primary_table();
+		$this->table_identifier = $this->query->primary_table_identifier();
 		foreach ($rows as $row) {
 			foreach ($this->parse_row_to_records($row) as $record) {
 				$this->add_record($record);
@@ -122,12 +122,11 @@ class Database_result implements Iterator {
 			// column name of `posts.title` will be from the table `posts` and
 			// have a column name of `title`.
 			list($table_identifier, $column) = explode('.', $key);
-			$table_name = $this->query->table_name_for($table_identifier);
 			
 			// If this is the first column from the determined table create
 			// a new database record to hold it.
 			if (!@$records[$table_identifier]) {
-				$records[$table_identifier] = new Database_record($this, $table_name, $table_identifier);
+				$records[$table_identifier] = new Database_record($this, $table_identifier);
 			}
 
 			// Finally, add the column and it's value to the appropriate
@@ -166,9 +165,9 @@ class Database_result implements Iterator {
 		// may have a single post repeated several times as each comment is
 		// returned. In this way we can simply replace the `post` record each
 		// time its encountered.
-		if ($record->table_name() == $this->table_name) {
+		if ($record->table_identifier() == $this->table_identifier) {
 			$this->records
-				[$record->table_name()]
+				[$this->table_identifier]
 				[$this->key]
 				[$this->id]
 				[$record->id()] =
@@ -181,12 +180,12 @@ class Database_result implements Iterator {
 		// name) is used, then the foreign key used for the match, and finally
 		// the id. This creates an array as defined in the $related_records
 		// comment above.
-		foreach ($this->query->join_configs() as $join_config) {
-			if ($record->table_identifier() == $join_config['as']) {
+		foreach ($this->query->join_configs() as $config) {
+			if ($record->table_identifier() == $config['foreign_id']) {
 				$this->records
-					[$join_config['as']]
-					[$join_config['foreign_key']]
-					[$record->{$join_config['foreign_key']}]
+					[$config['foreign_id']]
+					[$config['foreign_key']]
+					[$record->{$config['foreign_key']}]
 					[$record->id()] =
 						$record;
 			}
@@ -198,12 +197,10 @@ class Database_result implements Iterator {
 	 * Returns the currently focused collection.
 	 */
 	public function records() {
-		$collection = @$this->records
-			[$this->table_name]
+		return @$this->records
+			[$this->table_identifier]
 			[$this->key]
 			[$this->id];
-
-		return $collection;
 	}
 
 	/**
@@ -214,7 +211,7 @@ class Database_result implements Iterator {
 	 * column in the first record.
 	 */
 	public function record($key) {
-		$collection = @$this->records();
+		$collection = $this->records();
 		$keys = array_keys($collection);
 
 		if (is_string($key)) {
@@ -231,25 +228,23 @@ class Database_result implements Iterator {
 	 * If a relation exists at the defined key it is returned, otherwise
 	 * FALSE is returned.
 	 */
-	public function related($name, $record, $config=array()) {
-		if (!($identifier = $this->query->table_identifier_for($name))) {
+	public function related($name, $record) {
+		$key = $record->table_identifier().'.'.$name;
+		if (!($config = $this->query->join_config($key))) {
 			return FALSE;
 		}
+		
+		$table_identifier = $config['foreign_id'];
+		$pk = $config['primary_key'];
+		$fk = $config['foreign_key'];
+		$id = $record->{$pk};
 
-		if ($join_config = $this->query->join_configs($identifier)) {
-			$table = $join_config['table_name'];
-			$as = $join_config['as'];
-			$pk = $join_config['primary_key'];
-			$fk = $join_config['foreign_key'];
-			$id = $record->{$pk};
-
-			if ($this->records[$as][$fk][$id]) {
-				$result = clone $this;
-				$result->table_name = $as;
-				$result->key = $fk;
-				$result->id = $id;
-				return $result;
-			}
+		if ($this->records[$table_identifier][$fk][$id]) {
+			$result = clone $this;
+			$result->table_identifier = $table_identifier;
+			$result->key = $fk;
+			$result->id = $id;
+			return $result;
 		}
 
 		return FALSE;

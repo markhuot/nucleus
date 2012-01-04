@@ -5,13 +5,11 @@ class Database_record {
 	private $table_name;
 	private $table_identifier;
 	private $pk = 'id';
-	private $id;
 	private $data;
 
-	public function __construct($result=FALSE, $table_name=FALSE, $table_identifier=FALSE, $data=array()) {
-		$this->result = $result;
-		$this->table_identifier = $table_identifier;
-		$this->set_table_name($table_name);
+	public function __construct($result=FALSE, $table_identifier=FALSE, $data=array()) {
+		$this->set_result($result);
+		$this->set_table_identifier($table_identifier);
 		$this->set_data($data);
 	}
 
@@ -20,19 +18,19 @@ class Database_record {
 	}
 
 	public function id() {
-		return $this->id;
-	}
-
-	public function set_table_name($table_name) {
-		$this->table_name = $table_name;
-	}
-
-	public function table_name() {
-		return $this->table_name;
+		return $this->data[$this->pk()];
 	}
 
 	public function table_identifier() {
 		return $this->table_identifier;
+	}
+
+	public function set_table_identifier($table_identifier) {
+		$this->table_identifier = $table_identifier;
+	}
+
+	public function set_result($result) {
+		$this->result = $result;
 	}
 
 	public function set_data($key, $value=FALSE) {
@@ -41,10 +39,6 @@ class Database_record {
 				$this->set_data($key, $value);
 			}
 			return;
-		}
-
-		if ($key == $this->pk) {
-			$this->id = $value;
 		}
 
 		$this->data[$key] = $value;
@@ -56,8 +50,8 @@ class Database_record {
 
 	public function __get($key) {
 
-		if ($value = @$this->data[$key]) {
-			return $value;
+		if (isset($this->data[$key])) {
+			return $this->data[$key];
 		}
 
 		if ($related = $this->result->related($key, $this)) {

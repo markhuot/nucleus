@@ -172,7 +172,8 @@ class Database_query {
 		orset($primary_id, $this->table_identifier_for($primary_table));
 		orset($foreign_id, $this->add_table($foreign_table, $as));
 		
-		$this->joins[] = compact(self::$join_keys);
+		$key = $primary_id.'.'.$as;
+		$this->joins[$key] = compact(self::$join_keys);
 		return $this;
 	}
 
@@ -180,13 +181,13 @@ class Database_query {
 		$sql = '';
 
 		// Loop through each of our joins and build SQL for it
-		foreach ($this->joins as $join) {
+		foreach ($this->joins as $key => $join) {
 			
 			if (($config = $this->_check_has_one($join)) !== FALSE || 
 				($config = $this->_check_has_many($join)) !== FALSE) {
 				
 				// This was a successful join, store the utilized config
-				$this->join_configs[$config['foreign_id']] = $config;
+				$this->join_configs[$key] = $config;
 
 				// Finally, assemble the SQL statement
 				$sql.= ' ';
@@ -341,6 +342,11 @@ class Database_query {
 		return @$this->tables[$keys[0]]?:FALSE;
 	}
 
+	public function primary_table_identifier() {
+		$keys = array_keys($this->tables);
+		return @$keys[0]?:FALSE;
+	}
+
 	public function add_table($table, $alias=FALSE, $primary=FALSE) {
 		$key = $alias?:'t'.count($this->tables);
 		$this->tables[$key] = $table;
@@ -355,12 +361,12 @@ class Database_query {
 		return @$this->tables[$identifier];
 	}
 
-	public function join_configs($identifier=FALSE) {
-		if ($identifier === FALSE) {
-			return $this->join_configs;
-		}
+	public function join_configs() {
+		return $this->join_configs;
+	}
 
-		return @$this->join_configs[$identifier];
+	public function join_config($key=FALSE) {
+		return @$this->join_configs[$key];
 	}
 
 	// ------------------------------------------------------------------------
