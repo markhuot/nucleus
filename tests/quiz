@@ -13,11 +13,22 @@ class Quiz {
 	
 }
 
+$verbose = FALSE;
 $restrict = array();
 if (count($argv) > 1) {
 	foreach (array_slice($argv, 1) as $arg) {
-		list($class, $method) = explode('::', $arg);
-		$restrict[$class][] = $method;
+		if (substr($arg, 0, 1) == '-') {
+			switch ($arg) {
+				case '-v':
+				case '--verbose':
+					$verbose = TRUE;
+					break;
+			}
+		}
+		else if (strpos($arg, '::')) {
+			list($class, $method) = explode('::', $arg);
+			$restrict[$class][] = $method;
+		}
 	}
 }
 
@@ -41,15 +52,24 @@ if (is_dir($dir)) {
 
 $summary = (object)array('passed' => 0, 'failed' => 0, 'exceptions' => 0);
 foreach ($tests as $test) {
-	$testClass = new $test;
-	$methods = get_class_methods($testClass);
-	$backtrace = (object)array_pop(debug_backtrace());
-
 	if ($restrict && !isset($restrict[$test])) {
 		continue;
 	}
 
-	echo BOLDYELLOW.'- '.get_class($testClass).EOL;
+	echo BOLDYELLOW.'- '.$test.EOL;
+
+	$testClass = NULL;
+	$force_fail = FALSE;
+
+	try {
+		$testClass = new $test;
+	} catch (Exception $e) {
+		$summary->exceptions++;
+		echo '    '.YELLOW.'__construct: '.get_class($e).EOL;
+		$force_fail = TRUE;
+	}
+
+	$methods = get_class_methods($test);
 
 	foreach ($methods as $method) {
 
@@ -58,6 +78,12 @@ foreach ($tests as $test) {
 		}
 
 		if (in_array($method, array('__construct'))) {
+			continue;
+		}
+
+		if ($force_fail) {
+			$summary->failed++;
+			echo '    '.RED.$method.': NO'.EOL;
 			continue;
 		}
 
@@ -74,13 +100,20 @@ foreach ($tests as $test) {
 		} catch (Exception $e) {
 			$summary->exceptions++;
 			echo '    '.YELLOW.$method.': '.get_class($e).EOL;
+
+			if ($verbose) {
+				echo '    - '.preg_replace('/([\r\n])/m', '$1      ', wordwrap($e->getMessage(), 70)).EOL;
+			}
 		}
 	}
 }
 
 $color = BOLDGREEN;
-if ($summary->failed || $summary->exceptions) {
+if ($summary->failed) {
 	$color = BOLDRED;
+}
+else if ($summary->exceptions) {
+	$color = BOLDYELLOW;
 }
 
 echo $color."Test Complete: {$summary->passed} passed, {$summary->failed} failed, {$summary->exceptions} exceptions.".EOL;
