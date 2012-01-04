@@ -236,7 +236,6 @@ class Database_result implements Iterator {
 		if (!($config = $this->query->join_config($key))) {
 			return FALSE;
 		}
-
 		
 		$table = $config['table_name'];
 		$as = $config['as'];
