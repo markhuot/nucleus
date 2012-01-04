@@ -36,8 +36,14 @@ class Database_query {
 		$this->name = $name;
 
 		$this->reset();
-		$this->connect();
-		$this->select_db();
+
+		if ($host && $user && $pass) {
+			$this->connect();
+		}
+		
+		if ($name) {
+			$this->select_db();
+		}
 	}
 
 	// ------------------------------------------------------------------------
@@ -79,10 +85,14 @@ class Database_query {
 		$this->name = $name?:$this->name;
 
 		if (!$this->name) {
-			return FALSE;
+			throw new Exception('No database defined.');
 		}
 
-		return mysql_select_db($this->name);
+		if (!mysql_select_db($this->name)) {
+			throw new Exception('Error selecting database.');
+		}
+
+		return TRUE;
 	}
 
 	// ------------------------------------------------------------------------
@@ -170,10 +180,10 @@ class Database_query {
 		$sql = '';
 
 		// Loop through each of our joins and build SQL for it
-		foreach ($this->joins as $config) {
-		
-			if ($config = $this->_check_has_one($config) || 
-				$config = $this->_check_has_many($config)) {
+		foreach ($this->joins as $join) {
+			
+			if (($config = $this->_check_has_one($join)) !== FALSE || 
+				($config = $this->_check_has_many($join)) !== FALSE) {
 				
 				// This was a successful join, store the utilized config
 				$this->join_configs[$config['foreign_id']] = $config;
@@ -313,8 +323,8 @@ class Database_query {
 		$query = mysql_query($sql);
 
 		if (!$query) {
-			echo mysql_error().'<br /><br />'.$this->last_query();
-			die;
+			throw new Exception(mysql_error()."\n".$this->last_query());
+			return $rows;
 		}
 
 		while ($row = mysql_fetch_assoc($query)) {
