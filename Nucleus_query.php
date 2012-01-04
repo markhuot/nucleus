@@ -171,7 +171,7 @@ class Nucleus_query {
 	public function build_joins() {
 		$sql = '';
 
-		// Loop through each of our joins and build SQL for it
+		// Loop through each of our joins to check what kind of join it is
 		foreach ($this->joins as $key => $join) {
 			
 			if (($config = $this->_check_has_one($join)) !== FALSE || 
