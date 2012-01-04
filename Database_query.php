@@ -170,7 +170,7 @@ class Database_query {
 		orset($type, 'left');
 		orset($primary_table, $this->primary_table());
 		orset($primary_id, $this->table_identifier_for($primary_table));
-		orset($foreign_id, $this->add_table($foreign_table, $as));
+		orset($foreign_id, $this->add_table($foreign_table));
 		
 		$key = $primary_id.'.'.$as;
 		$this->joins[$key] = compact(self::$join_keys);
