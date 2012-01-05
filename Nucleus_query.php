@@ -152,23 +152,25 @@ class Nucleus_query {
 	// ------------------------------------------------------------------------
 
 	public function join($foreign_table, $config=array()) {
-		extract(array_intersect_key($config, array_flip(self::$join_keys)));
-	
 		preg_match('/^(?:(.*?)\.)?(.*)$/', $foreign_table, $matches);
-		$primary_table = $matches[1]?:$this->primary_table());;
-		$foreign_table = $matches[2];
-		orset($as, $foreign_table);
-		orset($type, 'left');
-		orset($primary_id, $this->table_identifier_for($primary_table));
-		orset($foreign_id, $this->add_table($foreign_table));
-		$join = compact(self::$join_keys);
+		$config['primary_table'] = $matches[1]?:$this->primary_table();
+		$config['foreign_table'] = $matches[2];
 
-		if (($config = $this->_check_has_one($join)) !== FALSE || 
-		    ($config = $this->_check_has_many($join)) !== FALSE || 
-		    ($config = $this->_check_many_many($join)) !== FALSE) {
+		if (($c = $this->_check_has_one($config)) !== FALSE || 
+		    ($c = $this->_check_has_many($config)) !== FALSE || 
+		    ($c = $this->_check_many_many($config)) !== FALSE) {
 
-		    $key = $primary_id.'.'.$as;
-			$this->joins[$key] = $config;
+			$primary_id = $this->table_identifier_for($c['primary_table']);
+			$foreign_id = $this->add_table($c['foreign_table']);
+			
+			$c = array_merge(array(
+				'as' => $c['foreign_table'],
+				'type' => 'left',
+				'primary_id' => $primary_id,
+				'foreign_id' => $foreign_id
+			), $c);
+
+			$this->joins[$primary_id.'.'.$as] = $c;
 		}
 
 		return $this;
