@@ -222,7 +222,7 @@ class Nucleus_query {
 			'foreign_key' => 'id'
 		), $config);
 
-		return $this->_check_join_tables($config)?$config:FALSE;
+		return $this->_check_join_columns($config)?$config:FALSE;
 	}
 
 	private function _check_has_many($config) {
@@ -231,7 +231,7 @@ class Nucleus_query {
 			'foreign_key' => Nucleus::singular($config['primary_table']).'_id'
 		), $config);
 
-		return $this->_check_join_tables($config)?$config:FALSE;
+		return $this->_check_join_columns($config)?$config:FALSE;
 	}
 
 	private function _check_many_many($config) {
@@ -241,15 +241,14 @@ class Nucleus_query {
 			'join_table' => $join_table,
 			'join_id' => $this->add_table($join_table),
 			'join_primary_key' => Nucleus::singular($config['primary_table']).'_id',
-			'join_foreign_key' => Nucleus::singular($config['foreign_table']).'_id',
 			'primary_key' => 'id',
-			'foreign_key' => 'id'
+			'foreign_key' => Nucleus::singular($config['foreign_table']).'_id'
 		), $config);
 
 		return $this->_check_join_tables($config)?$config:FALSE;
 	}
-
-	private function _check_join_tables($config) {
+	
+	private function _check_join_columns($config) {
 		if (!$this->table_has_column(
 				$config['primary_table'],
 				$config['primary_key'])) {
@@ -262,11 +261,14 @@ class Nucleus_query {
 			return FALSE;
 		}
 
-		if ($config['join_table'] &&
-		    !$this->table_has_columns(
+		return TRUE;
+	}
+
+	private function _check_join_tables($config) {
+		if (!$this->table_has_columns(
 				$config['join_table'],
 				$config['join_primary_key'],
-				$config['join_foreign_key'])) {
+				$config['foreign_key'])) {
 			return FALSE;
 		}
 
