@@ -189,11 +189,11 @@ class Nucleus_query {
 				$sql.= ' ON ';
 				$sql.= $config['foreign_id'];
 				$sql.= '.';
-				$sql.= $config['foreign_key'];
+				$sql.= 'id';
 				$sql.= '=';
 				$sql.= $config['join_id'];
 				$sql.= '.';
-				$sql.= $config['join_foreign_key'];
+				$sql.= $config['foreign_key'];
 			}
 
 			else {
