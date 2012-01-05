@@ -134,9 +134,17 @@ class Nucleus_query {
 	// ------------------------------------------------------------------------
 
 	public function join($foreign_table, $config=array()) {
+	
+		// Determine the tables we're trying to relate here
 		preg_match('/^(?:(.*?)\.)?(.*)$/', $foreign_table, $matches);
 		$config['primary_table'] = $matches[1]?:$this->primary_table();
 		$config['foreign_table'] = $matches[2];
+		
+		// Get the classes for those tables, if they exist
+		$config['primary_class'] =
+			Nucleus_table::for($config['primary_table']);
+		$config['foreign_class'] =
+			Nucleus_table::for($config['foreign_table']);
 
 		if (($c = $this->_check_has_one($config)) !== FALSE || 
 		    ($c = $this->_check_has_many($config)) !== FALSE || 
