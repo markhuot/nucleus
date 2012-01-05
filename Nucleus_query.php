@@ -15,24 +15,6 @@ class Nucleus_query {
 	private $where = array();         // Any defined where statements
 	private $orderby = array();       // The requested order
 
-	private static $join_keys = array(
-		'as',                         // How we'll refer to the related entries
-		'type',                       // The type of join
-		'primary_class',              // The primary class name
-		'primary_table',              // The primary table name
-		'primary_key',                // The primary table key
-		'primary_id',                 // The primary table identifier
-		'foreign_class',              // The related class name
-		'foreign_table',              // The related table name
-		'foreign_key',                // The related table key
-		'foreign_id',                 // The related table identifier
-		'join_class',                 // The relating class name
-		'join_table',                 // The relating table name
-		'join_primary_key',           // The relating table key
-		'join_foreign_key',           // The relating table key
-		'join_id',                    // The relating table identifier
-	);
-
 	// ------------------------------------------------------------------------
 
 	public function __construct($host=NULL, $user=NULL, $pass=NULL, $name=NULL) {
