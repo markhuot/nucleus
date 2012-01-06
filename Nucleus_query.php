@@ -314,11 +314,9 @@ class Nucleus_join {
 	protected $type;
 	protected $primary_class;
 	protected $primary_table;
-	protected $primary_id;
 	protected $primary_key;
 	protected $foreign_class;
 	protected $foreign_table;
-	protected $foreign_id;
 	protected $foreign_key;
 	
 	public function __construct($config=array()) {
