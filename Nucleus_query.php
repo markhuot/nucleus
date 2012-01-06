@@ -133,16 +133,18 @@ class Nucleus_query {
 
 	// ------------------------------------------------------------------------
 
-	public function join($foreign_table, $config=array()) {
+	public function join($foreign_table, $c=array()) {
 	
 		// Determine the tables we're trying to relate here
 		preg_match('/^(?:(.*?)\.)?(.*)$/', $foreign_table, $matches);
-		$config['primary_table'] = $matches[1]?:$this->primary_table();
-		$config['foreign_table'] = $matches[2];
+		$c['primary_table'] = $matches[1]?:$this->primary_table();
+		$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
+		$c['foreign_table'] = $matches[2];
+		$c['foreign_id'] = $this->add_table($c['foreign_table']);
 
-		if (($join = Nucleus_join_one::check($config)) !== FALSE || 
-		    ($join = Nucleus_join_many::check($config)) !== FALSE || 
-		    ($join = Nucleus_join_many_many::check($config)) !== FALSE) {
+		if (($join = Nucleus_join_one::check($c)) !== FALSE || 
+		    ($join = Nucleus_join_many::check($c)) !== FALSE || 
+		    ($join = Nucleus_join_many_many::check($c)) !== FALSE) {
 		    
 			$this->joins[$join->primary_id().'.'.$join->as()] = $join;
 		}
@@ -323,18 +325,9 @@ class Nucleus_join {
 		foreach ($config as $key => $value) {
 			$this->{$key} = $value;
 		}
-	}
-	
-	public static check($config=array()) {
 		
-		
-		$primary_id = $this->table_identifier_for($join->primary_table());
-		$foreign_id = $this->add_table($join->foreign_table());
-			
-		$join->set_default('as', $join->foreign_table());
-		$join->set_default('type', 'left');
-		$join->set_default('primary_id', $primary_id);
-		$join->set_default('foreign_id', $foreign_id);
+		$this->set_default('as', $this->foreign_table());
+		$this->set_default('type', 'left');
 	}
 	
 	protected function _check_join_columns() {
@@ -367,19 +360,19 @@ class Nucleus_join {
 	}
 	
 	protected function sql() {
-		$sql = ' '.strtoupper($config['type']);
+		$sql = ' '.strtoupper($this->type);
 		$sql.= ' JOIN ';
-		$sql.= $config['foreign_table'];
+		$sql.= $this->foreign_table;
 		$sql.= ' AS ';
-		$sql.= $config['foreign_id'];
+		$sql.= $this->foreign_id;
 		$sql.= ' ON ';
-		$sql.= $config['foreign_id'];
+		$sql.= $this->foreign_id;
 		$sql.= '.';
-		$sql.= $config['foreign_key'];
+		$sql.= $this->foreign_key;
 		$sql.= '=';
-		$sql.= $config['primary_id'];
+		$sql.= $this->primary_id;
 		$sql.= '.';
-		$sql.= $config['primary_key'];
+		$sql.= $this->primary_key;
 		return $sql
 	}
 }
