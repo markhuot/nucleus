@@ -140,21 +140,11 @@ class Nucleus_query {
 		$config['primary_table'] = $matches[1]?:$this->primary_table();
 		$config['foreign_table'] = $matches[2];
 
-		if (($c = $this->_check_has_one($config)) !== FALSE || 
-		    ($c = $this->_check_has_many($config)) !== FALSE || 
-		    ($c = $this->_check_many_many($config)) !== FALSE) {
-
-			$primary_id = $this->table_identifier_for($c['primary_table']);
-			$foreign_id = $this->add_table($c['foreign_table']);
-			
-			$c = array_merge(array(
-				'as' => $c['foreign_table'],
-				'type' => 'left',
-				'primary_id' => $primary_id,
-				'foreign_id' => $foreign_id
-			), $c);
-
-			$this->joins[$primary_id.'.'.$as] = $c;
+		if (($join = Nucleus_join_one::check($config)) !== FALSE || 
+		    ($join = Nucleus_join_many::check($config)) !== FALSE || 
+		    ($join = Nucleus_join_many_many::check($config)) !== FALSE) {
+		    
+			$this->joins[$join->primary_id().'.'.$join->as()] = $join;
 		}
 
 		return $this;
@@ -163,118 +153,11 @@ class Nucleus_query {
 	public function build_joins() {
 		$sql = '';
 
-		// Loop through each of our joins to check what kind of join it is
 		foreach ($this->joins as $key => $config) {
-			$sql.= ' ';
-
-			// Assemble the SQL statement
-			if ($config['join_table']) {
-				$sql.= strtoupper($config['type']);
-				$sql.= ' JOIN ';
-				$sql.= $config['join_table'];
-				$sql.= ' AS ';
-				$sql.= $config['join_id'];
-				$sql.= ' ON ';
-				$sql.= $config['join_id'];
-				$sql.= '.';
-				$sql.= $config['join_primary_key'];
-				$sql.= '=';
-				$sql.= $config['primary_id'];
-				$sql.= '.';
-				$sql.= $config['primary_key'];
-				$sql.= ' ';
-				$sql.= strtoupper($config['type']);
-				$sql.= ' JOIN ';
-				$sql.= $config['foreign_table'];
-				$sql.= ' AS ';
-				$sql.= $config['foreign_id'];
-				$sql.= ' ON ';
-				$sql.= $config['foreign_id'];
-				$sql.= '.';
-				$sql.= 'id';
-				$sql.= '=';
-				$sql.= $config['join_id'];
-				$sql.= '.';
-				$sql.= $config['foreign_key'];
-			}
-
-			else {
-				$sql.= strtoupper($config['type']);
-				$sql.= ' JOIN ';
-				$sql.= $config['foreign_table'];
-				$sql.= ' AS ';
-				$sql.= $config['foreign_id'];
-				$sql.= ' ON ';
-				$sql.= $config['foreign_id'];
-				$sql.= '.';
-				$sql.= $config['foreign_key'];
-				$sql.= '=';
-				$sql.= $config['primary_id'];
-				$sql.= '.';
-				$sql.= $config['primary_key'];
-			}
+			$sql.= $join->sql();
 		}
 
 		return $sql;
-	}
-
-	private function _check_has_one($config) {
-		$config = array_merge(array(
-			'primary_key' => Nucleus::singular($config['foreign_table']).'_id',
-			'foreign_key' => 'id'
-		), $config);
-
-		return $this->_check_join_columns($config)?$config:FALSE;
-	}
-
-	private function _check_has_many($config) {
-		$config = array_merge(array(
-			'primary_key' => 'id',
-			'foreign_key' => Nucleus::singular($config['primary_table']).'_id'
-		), $config);
-
-		return $this->_check_join_columns($config)?$config:FALSE;
-	}
-
-	private function _check_many_many($config) {
-		$join_table = join_table_name($config['primary_table'], $config['foreign_table']);
-
-		$config = array_merge(array(
-			'join_table' => $join_table,
-			'join_id' => $this->add_table($join_table),
-			'join_primary_key' => Nucleus::singular($config['primary_table']).'_id',
-			'primary_key' => 'id',
-			'foreign_key' => Nucleus::singular($config['foreign_table']).'_id'
-		), $config);
-
-		return $this->_check_join_tables($config)?$config:FALSE;
-	}
-	
-	private function _check_join_columns($config) {
-		if (!$this->table_has_column(
-				$config['primary_table'],
-				$config['primary_key'])) {
-			return FALSE;
-		}
-
-		if (!$this->table_has_column(
-			    $config['foreign_table'],
-			    $config['foreign_key'])) {
-			return FALSE;
-		}
-
-		return TRUE;
-	}
-
-	private function _check_join_tables($config) {
-		if (!$this->table_has_columns(
-				$config['join_table'],
-				$config['join_primary_key'],
-				$config['foreign_key'])) {
-			return FALSE;
-		}
-
-		return TRUE;
 	}
 
 	// ------------------------------------------------------------------------
@@ -423,16 +306,162 @@ class Nucleus_query {
 
 	// ------------------------------------------------------------------------
 
-	public function table_has_column($table, $column) {
+	
+}
+
+class Nucleus_join {
+	protected $as;
+	protected $type;
+	protected $primary_class;
+	protected $primary_table;
+	protected $primary_id;
+	protected $primary_key;
+	protected $foreign_class;
+	protected $foreign_table;
+	protected $foreign_id;
+	protected $foreign_key;
+	
+	public function __construct($config=array()) {
+		foreach ($config as $key => $value) {
+			$this->{$key} = $value;
+		}
+	}
+	
+	public static check($config=array()) {
+		
+		
+		$primary_id = $this->table_identifier_for($join->primary_table());
+		$foreign_id = $this->add_table($join->foreign_table());
+			
+		$join->set_default('as', $join->foreign_table());
+		$join->set_default('type', 'left');
+		$join->set_default('primary_id', $primary_id);
+		$join->set_default('foreign_id', $foreign_id);
+	}
+	
+	protected function _check_join_columns() {
+		if (!$this->table_has_column(
+			$this->primary_table,
+			$this->primary_key)) {
+			return FALSE;
+		}
+
+		if (!$this->table_has_column(
+			$this->foreign_table,
+			$this->foreign_key)) {
+			return FALSE;
+		}
+
+		return TRUE;
+	}
+	
+	protected function table_has_column($table, $column) {
 		$query = mysql_query("SHOW COLUMNS FROM {$table} WHERE Field='{$column}'");
 		return mysql_num_rows($query);
 	}
 
-	public function table_has_columns($table, $column) {
+	protected function table_has_columns($table, $column) {
 		$columns = array_slice(func_get_args(), 1);
 		$sql = "'".implode("','", $columns)."'";
 
 		$query = mysql_query("SHOW COLUMNS FROM {$table} WHERE Field IN ({$sql})");
 		return mysql_num_rows($query) == count($columns);
+	}
+	
+	protected function sql() {
+		$sql = ' '.strtoupper($config['type']);
+		$sql.= ' JOIN ';
+		$sql.= $config['foreign_table'];
+		$sql.= ' AS ';
+		$sql.= $config['foreign_id'];
+		$sql.= ' ON ';
+		$sql.= $config['foreign_id'];
+		$sql.= '.';
+		$sql.= $config['foreign_key'];
+		$sql.= '=';
+		$sql.= $config['primary_id'];
+		$sql.= '.';
+		$sql.= $config['primary_key'];
+		return $sql
+	}
+}
+
+class Nucleus_join_one extends Nucleus_join {
+	public static check($config=array()) {
+		$join = new Nucleus_join_one(array_merge(array(
+			'primary_key' => $config['foreign_table'].'_id',
+			'foreign_key' => 'id'
+		), $config));
+
+		return $join->_check_join_columns()?$join:FALSE;
+	}
+}
+
+class Nucleus_join_many extends Nucleus_join {
+	public static check($config=array()) {
+		$join = new Nucleus_join_many(array_merge(array(
+			'primary_key' => 'id',
+			'foreign_key' => Nucleus::singular($config['primary_table']).'_id'
+		), $config));
+
+		return $join->_check_join_columns()?$join:FALSE;
+	}
+}
+
+class Nucleus_join_many_many extends Nucleus_join {
+	public static check($config=array()) {
+		$join_table = join_table_name($config['primary_table'], $config['foreign_table']);
+
+		$join = new Nucleus_join_many_many(array_merge(array(
+			'join_table' => $join_table,
+			'join_id' => $this->add_table($join_table),
+			'join_primary_key' => Nucleus::singular($config['primary_table']).'_id',
+			'primary_key' => 'id',
+			'foreign_key' => Nucleus::singular($config['foreign_table']).'_id'
+		), $config));
+
+		return $join->_check_join_columns()?$join:FALSE;
+	}
+	
+	protected function _check_join_columns() {
+		if (!$this->table_has_columns(
+			$this->join_table,
+			$this->join_primary_key,
+			$this->foreign_key)) {
+			return FALSE;
+		}
+
+		return TRUE;
+	}
+	
+	protected function sql() {
+		$sql = ' '.strtoupper($config['type']);
+		$sql.= ' JOIN ';
+		$sql.= $config['join_table'];
+		$sql.= ' AS ';
+		$sql.= $config['join_id'];
+		$sql.= ' ON ';
+		$sql.= $config['join_id'];
+		$sql.= '.';
+		$sql.= $config['join_primary_key'];
+		$sql.= '=';
+		$sql.= $config['primary_id'];
+		$sql.= '.';
+		$sql.= $config['primary_key'];
+		$sql.= ' ';
+		$sql.= strtoupper($config['type']);
+		$sql.= ' JOIN ';
+		$sql.= $config['foreign_table'];
+		$sql.= ' AS ';
+		$sql.= $config['foreign_id'];
+		$sql.= ' ON ';
+		$sql.= $config['foreign_id'];
+		$sql.= '.';
+		$sql.= 'id';
+		$sql.= '=';
+		$sql.= $config['join_id'];
+		$sql.= '.';
+		$sql.= $config['foreign_key'];
+		return $sql;
 	}
 }
