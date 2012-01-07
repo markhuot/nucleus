@@ -17,14 +17,16 @@ class Connection {
 			return FALSE;
 		}
 
-		$this->connection = new \PDO($this->dsn, $this->user, $this->pass);
+		$connection = new \PDO($this->dsn, $this->user, $this->pass);
 
-		if (!$this->connection) {
+		if (!$connection) {
 			throw new \Exception('Connection error.');
 		}
+
+		return $this->connections[] = $connection;
 	}
 
 	public function connection() {
-		return $this->connection;
+		return $this->connection[count($this->connections)-1];
 	}
 }
