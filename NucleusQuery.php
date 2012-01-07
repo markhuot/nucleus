@@ -17,16 +17,10 @@ class Query {
 	// ------------------------------------------------------------------------
 
 	public function __construct($dsn=NULL) {
-		$this->dsn = $dsn;
-
 		$this->reset();
 
-		if ($host && $user && $pass) {
+		if ($this->dsn = $dsn) {
 			$this->connect();
-		}
-		
-		if ($name) {
-			$this->select_db();
 		}
 	}
 
