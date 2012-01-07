@@ -1,7 +1,7 @@
 <?php
 
 class Nucleus_join {
-  protected $as;
+	protected $as;
 	protected $type;
 	protected $primary_class;
 	protected $primary_table;
