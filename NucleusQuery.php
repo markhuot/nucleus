@@ -18,9 +18,6 @@ class Query {
 	public function __construct($connection=FALSE) {
 		$this->connection = $connection;
 		$this->reset();
-		if ($dsn) {
-			$this->connect();
-		}
 	}
 
 	// ------------------------------------------------------------------------
