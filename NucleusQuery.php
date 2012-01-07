@@ -122,9 +122,9 @@ class Query {
 		$c['foreign_table'] = $matches[2];
 		$c['foreign_id'] = $this->add_table($c['foreign_table']);
 
-		if (($join = \Nucleus\Join_one::check($c)) !== FALSE || 
-		    ($join = \Nucleus\Join_many::check($c)) !== FALSE || 
-		    ($join = \Nucleus\Join_many_many::check($c)) !== FALSE) {
+		if (($join = \Nucleus\JoinOne::check($c)) !== FALSE || 
+		    ($join = \Nucleus\JoinMany::check($c)) !== FALSE || 
+		    ($join = \Nucleus\JoinManyMany::check($c)) !== FALSE) {
 		    
 			$this->joins[$join->primary_id().'.'.$join->as()] = $join;
 		}
