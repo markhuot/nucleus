@@ -15,10 +15,8 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function __construct($dsn=NULL, $user=NULL, $pass=NULL) {
-		$this->dsn = $dsn;
-		$this->user = $user;
-		$this->pass = $pass;
+	public function __construct($connection=FALSE) {
+		$this->connection = $connection;
 		$this->reset();
 		if ($dsn) {
 			$this->connect();
@@ -36,10 +34,6 @@ class Query {
 		$this->where = $defaults->where;
 		$this->orderby = $defaults->orderby;
 	}
-
-	// ------------------------------------------------------------------------
-
-	
 
 	// ------------------------------------------------------------------------
 
