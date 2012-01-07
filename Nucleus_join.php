@@ -1,6 +1,8 @@
 <?php
 
-class Nucleus_join {
+class Nucleus;
+
+class Join {
 	protected $as;
 	protected $type;
 	protected $primary_class;
