@@ -79,13 +79,13 @@ class Query {
 	public function build_select() {
 		$columns = array();
 		foreach ($this->tables as $identifier => $table) {
-			$query = mysql_query("DESCRIBE {$table}");
+			$rows = $this->connection->query("DESCRIBE {$table}");
 			
 			if (!$query) {
 				throw new Exception('Could not build SELECT, invalid table specified');
 			}
 
-			while($row = mysql_fetch_assoc($query)) {
+			foreach($rows as $row) {
 				$field = $row['Field'];
 				if (in_array($field, $this->select) || !$this->select) {
 					$columns[] = "{$identifier}.{$field} AS `{$identifier}.{$field}`";
