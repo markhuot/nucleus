@@ -1,6 +1,8 @@
 <?php
 
-class Nucleus_result implements Iterator {
+namespace Nucelus;
+
+class Result implements Iterator {
 	/**
 	 * Index
 	 * The index of the iterator as we loop over the records.
@@ -14,7 +16,7 @@ class Nucleus_result implements Iterator {
 	 * $records = array(
 	 *     [t0] = array(                              // The table name
 	 *         [id] = array(                          // The related table key
-	 *             [null] = Nucleus_result Object     // The related table id
+	 *             [null] = array(                    // The related table id
 	 *                 [12] = Nucleus_record Object,  // The related object
 	 *                 [9] = Nucleus_record Object,   // The key maps to the...
 	 *                 [2] = Nucleus_record Object,   // ..object's primary key
@@ -126,7 +128,7 @@ class Nucleus_result implements Iterator {
 			// If this is the first column from the determined table create
 			// a new database record to hold it.
 			if (!@$records[$table_identifier]) {
-				$records[$table_identifier] = new Nucleus_record($this, $table_identifier);
+				$records[$table_identifier] = new \Nucleus\Record($this, $table_identifier);
 			}
 
 			// Finally, add the column and its value to the appropriate
