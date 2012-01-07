@@ -70,6 +70,6 @@ class Join {
 		$sql.= $this->primary_id;
 		$sql.= '.';
 		$sql.= $this->primary_key;
-		return $sql
+		return $sql;
 	}
 }
