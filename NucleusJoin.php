@@ -17,7 +17,7 @@ class Join {
 			$this->{$key} = $value;
 		}
 		
-		$this->set_default('as', $this->foreign_table());
+		$this->set_default('as', $this->foreign_table);
 		$this->set_default('type', 'left');
 	}
 
