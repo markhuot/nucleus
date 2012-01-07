@@ -3,10 +3,14 @@
 namespace Nucleus;
 
 class Connection {
-	static $connections;
+	static $connections = array();
 	private $dsn;
 	private $user;
 	private $pass;
+
+	public function __construct($dsn=NULL, $user=NULL, $pass=NULL) {
+		$this->connect($dsn, $user, $pass);
+	}
 
 	public function connect($dsn=NULL, $user=NULL, $pass=NULL) {
 		$this->dsn = $dsn?:$this->dsn;
