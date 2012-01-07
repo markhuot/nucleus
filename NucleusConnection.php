@@ -3,6 +3,7 @@
 namespace Nucleus;
 
 class Connection {
+	static $connections;
 	private $dsn;
 	private $user;
 	private $pass;
