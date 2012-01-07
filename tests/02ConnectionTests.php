@@ -14,9 +14,4 @@ class ConnectionTests extends Quiz {
 		return $this->db->connection();
 	}
 
-	public function testData() {
-		$sql = file_get_contents(dirname(__FILE__).'/data.sql');
-		$this->db->query($sql);
-	}
-
 }

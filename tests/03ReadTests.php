@@ -5,7 +5,7 @@ class ReadTests extends Quiz {
 	private $db;
 
 	public function __construct() {
-		$this->db = new \Nucleus\Query('sqlite::memory:');
+		$this->db = new \Nucleus\Query('mysql:host=192.168.94.31;dbname=tmp', 'root', 'root');
 	}
 
 	public function readPosts() {
