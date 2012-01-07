@@ -9,15 +9,15 @@ class AutoloadTests extends Quiz {
 	}
 
 	public function queryDefined() {
-		return class_exists('Nucleus_query');
+		return class_exists('\Nucleus\Query');
 	}
 
 	public function resultDefined() {
-		return class_exists('Nucleus_result');
+		return class_exists('\Nucleus\Result');
 	}
 
 	public function recordDefined() {
-		return class_exists('Nucleus_record');
+		return class_exists('\Nucleus\Record');
 	}
 
 }
