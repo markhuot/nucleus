@@ -3,9 +3,6 @@
 namespace Nucleus;
 
 class Query {
-	private $dsn;
-	private $user;
-	private $pass;
 	private $connection;
 
 	private $queries = array();       // Each query run by this object
