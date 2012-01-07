@@ -3,7 +3,7 @@
 namespace Nucleus;
 
 class JoinManyMany extends Join {
-	public static check($config=array()) {
+	public static function check($config=array()) {
 		$join_table = join_table_name($config['primary_table'], $config['foreign_table']);
 
 		$join = new JoinManyMany(array_merge(array(
