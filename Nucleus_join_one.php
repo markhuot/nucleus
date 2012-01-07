@@ -1,8 +1,10 @@
 <?php
 
-class Nucleus_join_one extends Nucleus_join {
+namespace Nucleus;
+
+class Join_one extends Join {
 	public static check($config=array()) {
-		$join = new Nucleus_join_one(array_merge(array(
+		$join = new Join_one(array_merge(array(
 			'primary_key' => $config['foreign_table'].'_id',
 			'foreign_key' => 'id'
 		), $config));
