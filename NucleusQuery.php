@@ -18,7 +18,6 @@ class Query {
 
 	public function __construct($dsn=NULL) {
 		$this->reset();
-
 		if ($this->dsn = $dsn) {
 			$this->connect();
 		}
