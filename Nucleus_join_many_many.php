@@ -1,3 +1,5 @@
+<?php
+
 class Nucleus_join_many_many extends Nucleus_join {
 	public static check($config=array()) {
 		$join_table = join_table_name($config['primary_table'], $config['foreign_table']);
