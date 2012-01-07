@@ -3,8 +3,9 @@
 require_once 'Nucleus_helper.php';
 
 spl_autoload_register(function($class_name) {
-	if (substr($class_name, 0, 8) === 'Nucleus_') {
-		require_once dirname(__FILE__).'/'.$class_name.'.php';
+	if (substr($class_name, 0, 8) === 'Nucleus') {
+		$file_name = str_replace('\', '_', $class_name);
+		require_once dirname(__FILE__).'/'.$file_name.'.php';
 	}
 });
 
