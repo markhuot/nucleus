@@ -6,7 +6,7 @@ class Nucleus_join_many_many extends Nucleus_join {
 
 		$join = new Nucleus_join_many_many(array_merge(array(
 			'join_table' => $join_table,
-			'join_id' => $this->add_table($join_table),
+			'join_id' => $config['foreign_id'].'j',
 			'join_primary_key' => Nucleus::singular($config['primary_table']).'_id',
 			'primary_key' => 'id',
 			'foreign_key' => Nucleus::singular($config['foreign_table']).'_id'
