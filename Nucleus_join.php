@@ -18,6 +18,12 @@ class Nucleus_join {
 		$this->set_default('as', $this->foreign_table());
 		$this->set_default('type', 'left');
 	}
+
+	public function set_default($key, $value) {
+		if (!$this->{$key}) {
+			$this->$key = $value;
+		}
+	}
 	
 	protected function _check_join_columns() {
 		if (!$this->table_has_column(
