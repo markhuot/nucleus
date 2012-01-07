@@ -4,6 +4,8 @@ namespace Nucleus;
 
 class Query {
 	private $dsn;
+	private $user;
+	private $pass;
 	private $connection;
 
 	private $queries = array();       // Each query run by this object
@@ -16,9 +18,12 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function __construct($dsn=NULL) {
+	public function __construct($dsn=NULL, $user=NULL, $pass=NULL) {
+		$this->dsn = $dsn;
+		$this->user = $user;
+		$this->pass = $pass;
 		$this->reset();
-		if ($this->dsn = $dsn) {
+		if ($dsn) {
 			$this->connect();
 		}
 	}
@@ -37,14 +42,16 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function connect($dsn=NULL) {
+	public function connect($dsn=NULL, $user=NULL, $pass=NULL) {
 		$this->dsn = $dsn?:$this->dsn;
+		$this->user = $user?:$this->user;
+		$this->pass = $pass?:$this->pass;
 
 		if (!$this->dsn) {
 			return FALSE;
 		}
 
-		$this->connection = new PDO($this->dsn);
+		$this->connection = new PDO($this->dsn, $this->user, $this->pass);
 
 		if (!$this->connection) {
 			throw new Exception('Connection error.');
