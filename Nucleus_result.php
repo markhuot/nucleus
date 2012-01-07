@@ -2,7 +2,7 @@
 
 namespace Nucelus;
 
-class Result implements Iterator {
+class Result implements \Iterator {
 	/**
 	 * Index
 	 * The index of the iterator as we loop over the records.
