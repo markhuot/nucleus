@@ -2,11 +2,11 @@
 
 namespace Nucleus;
 
-class Join_many_many extends Join {
+class JoinManyMany extends Join {
 	public static check($config=array()) {
 		$join_table = join_table_name($config['primary_table'], $config['foreign_table']);
 
-		$join = new Join_many_many(array_merge(array(
+		$join = new JoinManyMany(array_merge(array(
 			'join_table' => $join_table,
 			'join_id' => $config['foreign_id'].'j',
 			'join_primary_key' => singular($config['primary_table']).'_id',
