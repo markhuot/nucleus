@@ -1,6 +1,8 @@
 <?php
 
-class Nucleus_query {
+namespace Nucleus;
+
+class Query {
 	private $connection;
 	private $host;
 	private $user;
@@ -37,7 +39,7 @@ class Nucleus_query {
 	// ------------------------------------------------------------------------
 
 	public function reset() {
-		$defaults = (object)get_class_vars('Nucleus_query');
+		$defaults = (object)get_class_vars('\Nucleus\Query');
 		$this->select = $defaults->select;
 		$this->from = $defaults->from;
 		$this->tables = $defaults->tables;
@@ -222,7 +224,7 @@ class Nucleus_query {
 	public function go() {
 		$this->queries[] = ($sql = $this->_build_query());
 		$rows = $this->_fetch_rows($sql);
-		$result = new Nucleus_result(
+		$result = new \Nucleus\Result(
 			clone $this,
 			$rows
 		);
