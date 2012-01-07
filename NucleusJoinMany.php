@@ -1,6 +1,6 @@
 <?php
 
-class Nucleus;
+namespace Nucleus;
 
 class JoinMany extends Join {
 	public static check($config=array()) {
