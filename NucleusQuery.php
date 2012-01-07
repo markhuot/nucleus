@@ -201,7 +201,7 @@ class Query {
 
 	public function go() {
 		$this->queries[] = ($sql = $this->_build_query());
-		$rows = $this->_fetch_rows($sql);
+		$rows = $this->_execute_query($sql, $this->build_where_vars());
 		$result = new \Nucleus\Result(
 			clone $this,
 			$rows
@@ -220,9 +220,10 @@ class Query {
 		return trim($sql);
 	}
 
-	private function _fetch_rows($sql) {
+	private function _execute_query($sql, $vars=array()) {
 		$rows = array();
-		$query = mysql_query($sql);
+		$statement = $this->connection->prepare($sql);
+		$statement->execute();
 
 		if (!$query) {
 			throw new Exception(mysql_error()."\n".$this->last_query());
