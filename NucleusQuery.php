@@ -77,22 +77,23 @@ class Query {
 	}
 
 	public function build_select() {
-		$columns = array();
-		foreach ($this->tables as $identifier => $table) {
-			$rows = $this->connection->query("DESCRIBE {$table}");
-			
-			if (!$query) {
+		$select = array();
+		foreach ($this->from as $identifier => $table) {
+			$statement = $this->connection->prepare("DESCRIBE {$table}");
+			$result = $statement->execute();
+
+			if (!$result) {
 				throw new \Exception('Could not build SELECT, invalid table specified');
 			}
 
-			foreach($rows as $row) {
-				$field = $row['Field'];
+			foreach($statement->fetchAll() as $column) {
+				$field = $column['Field'];
 				if (in_array($field, $this->select) || !$this->select) {
-					$columns[] = "{$identifier}.{$field} AS `{$identifier}.{$field}`";
+					$select[] = "{$identifier}.{$field} AS `{$identifier}.{$field}`";
 				}
 			}
 		}
-		return ' SELECT '.implode(', ', $columns);
+		return ' SELECT '.implode(', ', $select);
 	}
 
 	// ------------------------------------------------------------------------
@@ -161,6 +162,7 @@ class Query {
 		if ($value === NULL) { $operator = 'IS'; $value = 'NULL'; }
 
 		$this->where[] = "{$key} {$operator} {$value}";
+		$this->where_vars[$key] = $value;
 		return $this;
 	}
 
@@ -171,6 +173,10 @@ class Query {
 			$sql.= implode(' AND ', $this->where);
 		}
 		return $sql;
+	}
+
+	public function build_where_vars() {
+		return $this->where_vars;
 	}
 
 	// ------------------------------------------------------------------------
@@ -199,6 +205,16 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
+	public function query($sql=FALSE) {
+		$statement = $this->connection->prepare($sql);
+		
+		if (!$statement->execute()) {
+			throw new \Exception(implode(' ', $statement->errorInfo()));
+		}
+
+		return $statement->fetchAll();
+	}
+
 	public function go() {
 		$this->queries[] = ($sql = $this->_build_query());
 		$rows = $this->_execute_query($sql, $this->build_where_vars());
@@ -221,20 +237,13 @@ class Query {
 	}
 
 	private function _execute_query($sql, $vars=array()) {
-		$rows = array();
 		$statement = $this->connection->prepare($sql);
-		$statement->execute();
 
-		if (!$query) {
-			throw new Exception(mysql_error()."\n".$this->last_query());
-			return $rows;
+		if (!$statement->execute()) {
+			throw new \Exception($statement->errorInfo()."\n".$this->last_query());
 		}
 
-		while ($row = mysql_fetch_assoc($query)) {
-			$rows[] = $row;
-		}
-
-		return $rows;
+		return $statement->fetchAll();
 	}
 
 	// ------------------------------------------------------------------------
@@ -279,7 +288,7 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function query() {
+	public function current_query() {
 		return $this->_build_query();
 	}
 
