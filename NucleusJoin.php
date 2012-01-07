@@ -1,6 +1,6 @@
 <?php
 
-class Nucleus;
+namespace Nucleus;
 
 class Join {
 	protected $as;
