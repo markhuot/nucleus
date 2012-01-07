@@ -15,7 +15,7 @@ class Nucleus {
 	private $query;
 
 	public function __construct($host=NULL, $user=NULL, $pass=NULL, $name=NULL) {
-		$this->query = new Nucleus_query($host=NULL, $user=NULL, $pass=NULL, $name=NULL);
+		$this->query = new \Nucleus\Query($host=NULL, $user=NULL, $pass=NULL, $name=NULL);
 	}
 
 	public function __call($method, $args) {
