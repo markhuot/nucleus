@@ -3,7 +3,7 @@
 namespace Nucleus;
 
 class JoinOne extends Join {
-	public static check($config=array()) {
+	public static function check($config=array()) {
 		$join = new JoinOne(array_merge(array(
 			'primary_key' => $config['foreign_table'].'_id',
 			'foreign_key' => 'id'
