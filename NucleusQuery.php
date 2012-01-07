@@ -51,7 +51,7 @@ class Query {
 			return FALSE;
 		}
 
-		$this->connection = new PDO($this->dsn, $this->user, $this->pass);
+		$this->connection = new \PDO($this->dsn, $this->user, $this->pass);
 
 		if (!$this->connection) {
 			throw new Exception('Connection error.');
