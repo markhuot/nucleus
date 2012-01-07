@@ -5,19 +5,18 @@ class RelationTests extends Quiz {
 	private $db;
 
 	public function __construct() {
-		$this->db = new Nucleus_query('192.168.94.31', 'root', 'root');
-		$this->db->select_db('tmp');
+		$this->db = new \Nucleus\Query('sqlite::memory:');
 	}
 
 	public function hasManyClass() {
 		$result = $this->db->from('posts')->join('comments')->go();
 		$class = get_class($result->record(0)->comments);
-		return $class == 'Nucleus_result';
+		return $class == '\Nucleus\Result';
 	}
 
 	public function hasManyEntryClass() {
 		$class = get_class($this->db->from('posts')->join('comments')->go()->record(0)->comments->record(0));
-		return $class == 'Nucleus_record';
+		return $class == '\Nucleus\Record';
 	}
 
 	public function hasManyEntryData() {
@@ -33,13 +32,13 @@ class RelationTests extends Quiz {
 	public function hasOneClass() {
 		$result = $this->db->from('comments')->join('posts')->go();
 		$class = @get_class($result->record(0)->posts);
-		return $class == 'Nucleus_result';
+		return $class == '\Nucleus\Result';
 	}
 
 	public function hasOneEntryClass() {
 		$result = $this->db->from('comments')->join('posts')->go();
 		$class = @get_class($result->record(0)->posts->record(0));
-		return $class == 'Nucleus_record';
+		return $class == '\Nucleus\Record';
 	}
 
 	public function hasOneEntryData() {
@@ -104,7 +103,7 @@ class RelationTests extends Quiz {
 			->join('categories')
 			->go();
 		$class = get_class($result->record(0)->categories);
-		return $class == 'Nucleus_result';
+		return $class == '\Nucleus\Result';
 	}
 
 }
