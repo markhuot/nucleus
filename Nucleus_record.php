@@ -1,6 +1,8 @@
 <?php
 
-class Nucleus_record {
+namespace Nucleus;
+
+class Record {
 	private $result;
 	private $table_name;
 	private $table_identifier;
