@@ -7,7 +7,7 @@ class ConnectionTests extends Quiz {
 	private $db;
 
 	public function __construct() {
-		$this->db = new Nucleus_query('192.168.94.31', 'root', 'root');
+		$this->db = new Nucleus\Query('192.168.94.31', 'root', 'root');
 	}
 
 	public function canConnect() {
