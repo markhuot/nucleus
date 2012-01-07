@@ -13,7 +13,7 @@ class ReadTests extends Quiz {
 	}
 
 	public function recordByIndex() {
-		return get_class($this->db->get('posts')->record(0)) == 'Nucleus_record';
+		return get_class($this->db->get('posts')->record(0)) == 'Nucleus\Record';
 	}
 
 	public function firstRecordByIndex() {
