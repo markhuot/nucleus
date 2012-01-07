@@ -3,11 +3,8 @@
 namespace Nucleus;
 
 class Query {
+	private $dsn;
 	private $connection;
-	private $host;
-	private $user;
-	private $pass;
-	private $name;
 
 	private $queries = array();       // Each query run by this object
 	private $select = array();        // The requested selections
@@ -19,11 +16,8 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function __construct($host=NULL, $user=NULL, $pass=NULL, $name=NULL) {
-		$this->host = $host;
-		$this->user = $user;
-		$this->pass = $pass;
-		$this->name = $name;
+	public function __construct($dsn=NULL) {
+		$this->dsn = $dsn;
 
 		$this->reset();
 
@@ -50,16 +44,14 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function connect($host=NULL, $user=NULL, $pass=NULL) {
-		$this->host = $host?:$this->host;
-		$this->user = $user?:$this->user;
-		$this->pass = $pass?:$this->pass;
+	public function connect($dsn=NULL) {
+		$this->dsn = $dsn?:$this->dsn;
 
-		if (!$this->host || !$this->user || !$this->pass) {
+		if (!$this->dsn) {
 			return FALSE;
 		}
 
-		$this->connection = @mysql_connect($this->host, $this->user, $this->pass);
+		$this->connection = new PDO($this->dsn);
 
 		if (!$this->connection) {
 			throw new Exception('Connection error.');
@@ -68,20 +60,6 @@ class Query {
 
 	public function connection() {
 		return $this->connection;
-	}
-
-	public function select_db($name=NULL) {
-		$this->name = $name?:$this->name;
-
-		if (!$this->name) {
-			throw new Exception('No database defined.');
-		}
-
-		if (!mysql_select_db($this->name)) {
-			throw new Exception('Error selecting database.');
-		}
-
-		return TRUE;
 	}
 
 	// ------------------------------------------------------------------------
