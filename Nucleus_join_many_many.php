@@ -1,15 +1,17 @@
 <?php
 
-class Nucleus_join_many_many extends Nucleus_join {
+namespace Nucleus;
+
+class Join_many_many extends Join {
 	public static check($config=array()) {
 		$join_table = join_table_name($config['primary_table'], $config['foreign_table']);
 
-		$join = new Nucleus_join_many_many(array_merge(array(
+		$join = new Join_many_many(array_merge(array(
 			'join_table' => $join_table,
 			'join_id' => $config['foreign_id'].'j',
-			'join_primary_key' => Nucleus::singular($config['primary_table']).'_id',
+			'join_primary_key' => singular($config['primary_table']).'_id',
 			'primary_key' => 'id',
-			'foreign_key' => Nucleus::singular($config['foreign_table']).'_id'
+			'foreign_key' => singular($config['foreign_table']).'_id'
 		), $config));
 
 		return $join->_check_join_columns()?$join:FALSE;
