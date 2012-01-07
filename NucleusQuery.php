@@ -54,7 +54,7 @@ class Query {
 		$this->connection = new \PDO($this->dsn, $this->user, $this->pass);
 
 		if (!$this->connection) {
-			throw new Exception('Connection error.');
+			throw new \Exception('Connection error.');
 		}
 	}
 
@@ -82,7 +82,7 @@ class Query {
 			$rows = $this->connection->query("DESCRIBE {$table}");
 			
 			if (!$query) {
-				throw new Exception('Could not build SELECT, invalid table specified');
+				throw new \Exception('Could not build SELECT, invalid table specified');
 			}
 
 			foreach($rows as $row) {
