@@ -3,6 +3,10 @@
 namespace Nucleus;
 
 class Connection {
+	private $dsn;
+	private $user;
+	private $pass;
+
 	public function connect($dsn=NULL, $user=NULL, $pass=NULL) {
 		$this->dsn = $dsn?:$this->dsn;
 		$this->user = $user?:$this->user;
