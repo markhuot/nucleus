@@ -22,6 +22,8 @@ class Nucleus {
 	}
 }
 
+namespace Nucleus;
+
 function singular($str)
 {
 	$result = strval($str);
