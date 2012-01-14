@@ -16,10 +16,7 @@ class Query {
 	// ------------------------------------------------------------------------
 
 	public function __construct($connection=FALSE) {
-		if (!$connection) {
-			$connection = Connection::active();
-		}
-		$this->connection = $connection;
+		$this->connection = $connection ?: Connection::active();
 		$this->reset();
 	}
 
