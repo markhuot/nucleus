@@ -31,7 +31,12 @@ class Model {
 	 * matching the requested name.
 	 */
 	public function join_named($name) {
-		foreach (array('has_one', 'has_many', 'habtm', 'has_and_belongs_to_many') as $key) {
+		foreach (array(
+			'has_one',
+			'has_many',
+			'habtm',
+			'has_and_belongs_to_many'
+		) as $key) {
 			if (isset($this->{$key})) {
 				$keys = array_keys($this->{$key});
 				if (!is_numeric($keys[0])) {
