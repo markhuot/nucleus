@@ -56,6 +56,13 @@ class Connection extends \PDO {
 
 	// ------------------------------------------------------------------------
 
+	public function table_exists($table) {
+		$sql = "SHOW TABLES LIKE :table";
+		return $this->query($sql, array(
+			'table' => $table
+		))->rowCount()==1;
+	}
+
 	public function table_has_column($table, $column) {
 		$sql = "SHOW COLUMNS FROM {$table} WHERE Field='{$column}'";
 		return $this->query($sql)->rowCount();
