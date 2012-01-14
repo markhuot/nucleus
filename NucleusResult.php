@@ -97,7 +97,7 @@ class Result implements \Iterator {
 	 * want to make sure certain properties are reset.
 	 */
 	public function __clone() {
-		$defaults = (object)get_class_vars('Result');
+		$defaults = (object)get_class_vars('Nucleus\Result');
 		$this->index = $defaults->index;
 	}
 
