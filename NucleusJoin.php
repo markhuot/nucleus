@@ -46,7 +46,7 @@ class Join {
 	
 	protected function table_has_column($table, $column) {
 		$statement = $this->connection->prepare("SHOW COLUMNS FROM {$table} WHERE Field='{$column}'");
-		if (!$statement->execute($this->build_where_hash())) {
+		if (!$statement->execute()) {
 			throw new \Exception(
 				$statement->errorInfo()."\n".$this->last_query(),
 				500
@@ -59,8 +59,14 @@ class Join {
 		$columns = array_slice(func_get_args(), 1);
 		$sql = "'".implode("','", $columns)."'";
 
-		$query = mysql_query("SHOW COLUMNS FROM {$table} WHERE Field IN ({$sql})");
-		return mysql_num_rows($query) == count($columns);
+		$statement = $this->connection->prepare("SHOW COLUMNS FROM {$table} WHERE Field IN ({$sql})");
+		if (!$statement->execute()) {
+			throw new \Exception(
+				$statement->errorInfo()."\n".$this->last_query(),
+				500
+			);
+		}
+		return $statement->rowCount() == count($columns);
 	}
 	
 	protected function sql() {
