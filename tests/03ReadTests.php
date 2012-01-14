@@ -34,4 +34,13 @@ class ReadTests extends Quiz {
 		return $i == $posts->size();
 	}
 
+	public function selectionTest() {
+		$this->db->select('posts.title');
+		$this->db->select('comments.comment');
+		$this->db->from('posts');
+		$this->db->join('comments');
+		$result = $this->db->go();
+		return !$result->record('user_id') && !$result->record(0)->comments->record('user_id');
+	}
+
 }
