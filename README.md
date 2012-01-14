@@ -1,4 +1,11 @@
-Nucleus is a zero-conf ORM for PHP. Favoring convention over configuration writing a complex join statement is as simple as:
+Nucleus is a zero-conf ORM for PHP. Once loaded into your framework of choice its easy to pull back objects:
+
+```php
+<?php
+$post = $this->nucleus->get('posts');
+```
+
+Favoring convention over configuration writing a complex join statement is as simple as:
 
 ```php
 <?php
