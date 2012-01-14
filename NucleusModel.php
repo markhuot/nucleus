@@ -32,6 +32,11 @@ class Model {
 		$this->identifier = $identifier;
 	}
 
+	/**
+	 * SQL Select
+	 *
+	 * Generates the SQL string to identify this record.
+	 */
 	public function sql_select() {
 		$pk = $this->pk();
 		$identifier = $this->identifier();

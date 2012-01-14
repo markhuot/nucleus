@@ -65,7 +65,8 @@ class Query {
 		// First we'll build a list of tables in this query.
 		$tables = $this->from;
 		foreach ($this->joins as $join) {
-			$tables[$join->foreign_id] = $join->foreign_table;
+			$id = $join->foreign_table->identifier();
+			$tables[$id] = $join->foreign_table;
 		}
 
 		// Now we'll go through and identify which columns to select.
