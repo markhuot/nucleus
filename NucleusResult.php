@@ -61,7 +61,7 @@ class Result implements \Iterator {
 	 * table would be the `posts` table. This is passed into the constructor
 	 * and must be passed with every result.
 	 */
-	private $table_identifier;
+	private $table_identifier = 't0';
 
 	/**
 	 * Key
@@ -84,7 +84,6 @@ class Result implements \Iterator {
 	 */
 	public function __construct($query=FALSE, $rows=array()) {
 		$this->query = $query;
-		$this->table_identifier = $this->query->primary_table_identifier();
 		foreach ($rows as $row) {
 			foreach ($this->parse_row_to_records($row) as $record) {
 				$this->add_record($record);
