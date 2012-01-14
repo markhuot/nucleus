@@ -105,10 +105,16 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function join($foreign_table, $config=array()) {
-		$this->joins[] = array_merge(array(
-			'foreign_table' => $foreign_table
-		), $config);
+	public function join($params) {
+		if (is_array($params)) {
+			$this->joins[] = $params;
+		}
+		else if (is_string($params)) {
+			$this->joins[] = array(
+				'foreign_table' => $params
+			);
+		}
+
 		return $this;
 	}
 
