@@ -134,7 +134,6 @@ class Query {
 			$c['primary_table'] = $matches[1]?:$this->primary_table();
 			$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
 			$c['foreign_table'] = $matches[2];
-			$c['foreign_id'] = $this->add_table($c['foreign_table']);
 			$c['connection'] = $this->connection;
 
 			// If the foreign table doesn't exist we'll check if we're
@@ -145,6 +144,10 @@ class Query {
 					$c = array_merge($c, $config);
 				}
 			}
+
+			// By now we have to have a foreign table, or we've got big
+			// trouble.
+			$c['foreign_id'] = $this->add_table($c['foreign_table']);
 
 			if (($join = JoinOne::check($c)) !== FALSE || 
 			    ($join = JoinMany::check($c)) !== FALSE || 
