@@ -3,11 +3,11 @@
 namespace Nucleus;
 
 class Record {
-	private $result;
-	private $table_name;
-	private $table_identifier;
-	private $pk = 'id';
-	private $data;
+	private $_result;
+	private $_table_name;
+	private $_table_identifier;
+	private $_pk = 'id';
+	private $_data;
 
 	public function __construct($result=FALSE, $id=FALSE, $data=array()) {
 		$this->set_result($result);
@@ -16,23 +16,23 @@ class Record {
 	}
 
 	public function pk() {
-		return $this->pk;
+		return $this->_pk;
 	}
 
 	public function id() {
-		return $this->data[$this->pk()];
+		return $this->_data[$this->pk()];
 	}
 
 	public function table_identifier() {
-		return $this->table_identifier;
+		return $this->_table_identifier;
 	}
 
 	public function set_table_identifier($table_identifier) {
-		$this->table_identifier = $table_identifier;
+		$this->_table_identifier = $table_identifier;
 	}
 
 	public function set_result($result) {
-		$this->result = $result;
+		$this->_result = $result;
 	}
 
 	public function set_data($key, $value=FALSE) {
@@ -43,20 +43,25 @@ class Record {
 			return;
 		}
 
-		$this->data[$key] = $value;
+		$this->{$key} = $value;
+		$this->_data[$key] = $value;
 	}
 
-	public function data() {
-		return $this->data;
+	public function data($key=FALSE) {
+		if ($key) {
+			return @$this->_data[$key];
+		}
+
+		return $this->_data;
 	}
 
 	public function __get($key) {
 
-		if (isset($this->data[$key])) {
-			return $this->data[$key];
+		if (isset($this->_data[$key])) {
+			return $this->_data[$key];
 		}
 
-		if ($related = $this->result->related($key, $this)) {
+		if ($related = $this->_result->related($key, $this)) {
 			return $related;
 		}
 
