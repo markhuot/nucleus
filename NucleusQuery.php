@@ -184,28 +184,6 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function query($sql=FALSE) {
-		$statement = $this->connection->prepare($sql);
-		
-		if (!$statement->execute()) {
-			throw new \Exception(implode(' ', $statement->errorInfo()));
-		}
-
-		return $statement->fetchAll();
-	}
-
-	public function go() {
-		$this->queries[] = ($sql = $this->_build_query());
-		$rows = $this->_execute_query($sql);
-		$result = new \Nucleus\Result(
-			clone $this,
-			$rows
-		);
-
-		$this->reset();
-		return $result;
-	}
-
 	private function _build_query() {
 		$sql = $this->build_select();
 		$sql.= $this->build_from();
@@ -215,7 +193,20 @@ class Query {
 		return trim($sql);
 	}
 
-	private function _execute_query($sql) {
+	public function go() {
+		$result = new \Nucleus\Result(
+			clone $this,
+			$this->query()
+		);
+		$this->reset();
+		return $result;
+	}
+
+	private function query($sql=FALSE) {
+		if (!$sql) {
+			$sql = $this->_build_query();
+		}
+		$this->queries[] = $sql;
 		$statement = $this->connection->prepare($sql);
 		if (!$statement->execute($this->build_where_hash())) {
 			throw new \Exception(
@@ -223,7 +214,6 @@ class Query {
 				500
 			);
 		}
-
 		return $statement->fetchAll();
 	}
 
