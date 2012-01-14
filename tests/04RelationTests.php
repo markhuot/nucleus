@@ -126,4 +126,9 @@ class RelationTests extends Quiz {
 		return $class1 == 'Nucleus\Result' && $class2 == 'Nucleus\Record';
 	}
 
+	public function multiFrom() {
+		$result = $this->db->get('posts, comments');
+		return $result->record(0)->comments;
+	}
+
 }

@@ -90,8 +90,18 @@ class Query {
 	// ------------------------------------------------------------------------
 
 	public function from($table, $alias=FALSE) {
+		if (strpos($table, ',')) {
+			$tables = preg_split('/\s*,\s*/', $table);
+			$this->from($tables[0]);
+			foreach (array_slice($tables, 1) as $table) {
+				$this->join($table);
+			}
+			return $this;
+		}
+
 		$key = $this->add_table($table, $alias, TRUE);
 		$this->from[$key] = $table;
+
 		return $this;
 	}
 
