@@ -121,6 +121,7 @@ class Query {
 		}
 
 		// If we're here we know we're dealing with a vanilla table. Add it.
+		$table = Model::for_table($table);
 		$key = $this->add_table($table, $alias, TRUE);
 		$this->from[$key] = $table;
 
@@ -129,7 +130,8 @@ class Query {
 
 	public function build_from() {
 		$sql = ' FROM ';
-		foreach ($this->from as $key => $table) {
+		foreach ($this->from as $key => $model) {
+			$table = $model->table_name();
 			$sql.= "{$table} AS {$key}";
 		}
 		return $sql;
@@ -137,8 +139,7 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function join() {
-		if (func_num_args() == 1 && is_array(func_get_arg(0))) {
+	public function join() {if (func_num_args() == 1 && is_array(func_get_arg(0))) {
 			$this->joins[] = func_get_arg(0);
 		}
 		else if (func_num_args() == 1 && is_string(func_get_arg(0))) {
@@ -157,6 +158,9 @@ class Query {
 
 	public function prep_joins() {
 		foreach ($this->joins as &$c) {
+
+			// Check that the join hasn't already been converted to an
+			// object. If it has, bail out, no need to do it again.
 			if (!is_array($c)) {
 				continue;
 			}
@@ -167,8 +171,12 @@ class Query {
 			
 			// Determine the tables we're trying to relate here
 			preg_match('/^(?:(.*?)\.)?(.*?)(?:\s+?as\s+(.*))?$/i', $c['foreign_table'], $matches);
-			$c['primary_table'] = $matches[1]?:$this->primary_table();
-			$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
+
+			// Check if we define the primary table in the string, if so
+			// convert it to a model before we do anything with it.
+			$c['primary_table'] = $matches[1]?:(string)$this->primary_table();
+
+			// Set the foreign table
 			$c['foreign_table'] = $matches[2];
 
 			// If we're passing in an alias via the string, set it here
@@ -184,6 +192,13 @@ class Query {
 					$c = array_merge($c, $config);
 				}
 			}
+
+			// Get the models for our tables
+			$c['primary_table'] = Model::for_table($c['primary_table']);
+			$c['foreign_table'] = Model::for_table($c['foreign_table']);
+
+			// Get the identifier for the primary table
+			$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
 
 			// By now we have to have a foreign table, or we've got big
 			// trouble.

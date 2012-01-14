@@ -4,6 +4,25 @@ namespace Nucleus;
 
 class Model {
 
+	protected $table_name;
+	protected $pk = 'id';
+
+	public function __toString() {
+		return $this->table_name;
+	}
+
+	public function pk() {
+		return $this->pk;
+	}
+
+	public function table_name() {
+		return $this->table_name;
+	}
+
+	public function set_table_name($table) {
+		$this->table_name = $table;
+	}
+
 	/**
 	 * Load Model for Table
 	 *
@@ -16,12 +35,16 @@ class Model {
 		$model_path = "{$model_base_path}/".$model_name.'.php';
 		if (file_exists($model_path)) {
 			require_once $model_path;
-			return new $model_name;
+			$model = new $model_name;
 		}
 
 		else {
-			return new AnonymousModel;
+			$model = new AnonymousModel;
 		}
+
+		$model->set_table_name($table);
+
+		return $model;
 	}
 
 	/**

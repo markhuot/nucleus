@@ -8,7 +8,11 @@ class JoinManyMany extends Join {
 			return FALSE;
 		}
 
-		$join_table = join_table_name($config['primary_table'], $config['foreign_table']);
+		// Determine the default, alphabetical, join_table.
+		$join_table = join_table_name(
+			$config['primary_table']->table_name(),
+			$config['foreign_table']->table_name()
+		);
 
 		$join = new JoinManyMany(array_merge(array(
 			'join_table' => $join_table,
