@@ -43,6 +43,6 @@ class Connection extends \PDO {
 				500
 			);
 		}
-		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+		return $statement;
 	}
 }

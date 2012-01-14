@@ -229,7 +229,7 @@ class Query {
 		return $this->connection->query(
 			$this->queries[] = $sql,
 			$this->build_where_parameters()
-		);
+		)->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
 	// ------------------------------------------------------------------------
