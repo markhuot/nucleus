@@ -6,6 +6,7 @@ class Join {
 	protected $connection;
 	public $as;
 	public $type;
+	public $join_type;
 	public $primary_class;
 	public $primary_table;
 	public $primary_key;
@@ -18,7 +19,7 @@ class Join {
 	public function __construct($config=array()) {
 		$config = array_merge(array(
 			'as' => $config['foreign_table'],
-			'type' => 'left'
+			'join_type' => 'left'
 		), $config);
 
 		foreach ($config as $key => $value) {
@@ -64,7 +65,7 @@ class Join {
 	}
 	
 	public function sql_join() {
-		$sql = ' '.strtoupper($this->type);
+		$sql = ' '.strtoupper($this->join_type);
 		$sql.= ' JOIN ';
 		$sql.= $this->foreign_table;
 		$sql.= ' AS ';

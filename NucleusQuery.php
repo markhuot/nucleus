@@ -105,14 +105,19 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function join($params) {
-		if (is_array($params)) {
-			$this->joins[] = $params;
+	public function join() {
+		if (func_num_args() == 1 && is_array(func_get_arg(0))) {
+			$this->joins[] = func_get_arg(0);
 		}
-		else if (is_string($params)) {
+		else if (func_num_args() == 1 && is_string(func_get_arg(0))) {
 			$this->joins[] = array(
-				'foreign_table' => $params
+				'foreign_table' => func_get_arg(0)
 			);
+		}
+		else if (func_num_args() == 2) {
+			$this->joins[] = array_merge(array(
+				'foreign_table' => func_get_arg(0)
+			), func_get_arg(1));
 		}
 
 		return $this;

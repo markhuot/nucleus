@@ -4,6 +4,10 @@ namespace Nucleus;
 
 class JoinManyMany extends Join {
 	public static function check($config=array()) {
+		if (isset($config['type']) && !in_array($config['type'], array('habtm'))) {
+			return FALSE;
+		}
+
 		$join_table = join_table_name($config['primary_table'], $config['foreign_table']);
 
 		$join = new JoinManyMany(array_merge(array(
@@ -37,7 +41,7 @@ class JoinManyMany extends Join {
 	}
 	
 	public function sql_join() {
-		$sql = ' '.strtoupper($this->type);
+		$sql = ' '.strtoupper($this->join_type);
 		$sql.= ' JOIN ';
 		$sql.= $this->join_table;
 		$sql.= ' AS ';
@@ -51,7 +55,7 @@ class JoinManyMany extends Join {
 		$sql.= '.';
 		$sql.= $this->primary_key;
 		$sql.= ' ';
-		$sql.= strtoupper($this->type);
+		$sql.= strtoupper($this->join_type);
 		$sql.= ' JOIN ';
 		$sql.= $this->foreign_table;
 		$sql.= ' AS ';
