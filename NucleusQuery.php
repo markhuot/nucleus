@@ -122,10 +122,18 @@ class Query {
 
 	public function prep_joins() {
 		foreach ($this->joins as &$join_config) {
-			if (is_array($join_config) && (
-			    ($join = JoinOne::check($join_config)) !== FALSE || 
+			if (!is_array($join_config)) {
+				continue;
+			}
+
+			if (!$join_config['primary_table']) {
+				$join_config['primary_table'] = $this->primary_table();
+				$join_config['primary_id'] = $this->table_identifier_for($this->primary_table());
+			}
+
+			if (($join = JoinOne::check($join_config)) !== FALSE || 
 			    ($join = JoinMany::check($join_config)) !== FALSE || 
-			    ($join = JoinManyMany::check($join_config)) !== FALSE)) {
+			    ($join = JoinManyMany::check($join_config)) !== FALSE) {
 
 				$join_config = $join;
 			}
@@ -217,11 +225,13 @@ class Query {
 
 	private function _build_query() {
 		$this->prep_joins();
+
 		$sql = $this->build_select();
 		$sql.= $this->build_from();
 		$sql.= $this->build_joins();
 		$sql.= $this->build_where();
 		$sql.= $this->build_orderby();
+		
 		return trim($sql);
 	}
 
@@ -252,9 +262,24 @@ class Query {
 		return @$this->tables[$keys[0]]?:FALSE;
 	}
 
+	public function primary_table_identifier() {
+		$keys = array_keys($this->tables);
+		return @$keys[0]?:FALSE;
+	}
+
 	public function add_table($table, $alias=FALSE, $primary=FALSE) {
 		$key = $alias?:'t'.count($this->tables);
-		$this->tables[$key] = $table;
+
+		if ($primary) {
+			$this->tables = array_merge(array(
+				$key => $table
+			), $this->tables);
+		}
+
+		else {
+			$this->tables[$key] = $table;
+		}
+		
 		return $key;
 	}
 

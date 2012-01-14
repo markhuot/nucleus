@@ -83,6 +83,7 @@ class Result implements \Iterator {
 	 */
 	public function __construct($query=FALSE, $rows=array()) {
 		$this->query = $query;
+		$this->table_identifier = $query->primary_table_identifier();
 		foreach ($rows as $row) {
 			$records_in_row = $this->parse_row_to_records($row);
 			foreach ($records_in_row as $record) {
