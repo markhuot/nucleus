@@ -97,7 +97,7 @@ class Query {
 		    ($join = \Nucleus\JoinMany::check($c)) !== FALSE || 
 		    ($join = \Nucleus\JoinManyMany::check($c)) !== FALSE) {
 		    
-			$this->joins[$join->primary_id().'.'.$join->as()] = $join;
+			$this->joins[$join->primary_id.'.'.$join->as] = $join;
 		}
 
 		return $this;

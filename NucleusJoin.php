@@ -4,14 +4,14 @@ namespace Nucleus;
 
 class Join {
 	protected $connection;
-	protected $as;
-	protected $type;
-	protected $primary_class;
-	protected $primary_table;
-	protected $primary_key;
-	protected $foreign_class;
-	protected $foreign_table;
-	protected $foreign_key;
+	public $as;
+	public $type;
+	public $primary_class;
+	public $primary_table;
+	public $primary_key;
+	public $foreign_class;
+	public $foreign_table;
+	public $foreign_key;
 	
 	public function __construct($config=array()) {
 		foreach ($config as $key => $value) {
