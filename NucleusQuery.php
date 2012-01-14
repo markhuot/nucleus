@@ -54,7 +54,7 @@ class Query {
 			$select[] = "{$identifier}.id AS `{$identifier}.id`";
 		}
 		foreach ($this->joins as $join) {
-			$select+= $join->sql_select();
+			$select = array_merge($join->sql_select(), $select);
 		}
 
 		// User defined selects
