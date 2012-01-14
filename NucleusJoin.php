@@ -62,7 +62,7 @@ class Join {
 		$statement = $this->connection->prepare("SHOW COLUMNS FROM {$table} WHERE Field IN ({$sql})");
 		if (!$statement->execute()) {
 			throw new \Exception(
-				$statement->errorInfo()."\n".$this->last_query(),
+				$statement->errorInfo()."\n".$sql,
 				500
 			);
 		}
