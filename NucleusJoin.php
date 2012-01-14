@@ -69,7 +69,7 @@ class Join {
 		return $statement->rowCount() == count($columns);
 	}
 	
-	protected function sql() {
+	public function sql() {
 		$sql = ' '.strtoupper($this->type);
 		$sql.= ' JOIN ';
 		$sql.= $this->foreign_table;

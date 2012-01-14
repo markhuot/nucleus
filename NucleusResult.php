@@ -214,9 +214,9 @@ class Result implements \Iterator {
 			return FALSE;
 		}
 		
-		$table_identifier = $config['foreign_id'];
-		$pk = $config['primary_key'];
-		$fk = $config['foreign_key'];
+		$table_identifier = $config->foreign_id;
+		$pk = $config->primary_key;
+		$fk = $config->foreign_key;
 		$id = $record->{$pk};
 
 		if ($this->records[$table_identifier][$fk][$id]) {

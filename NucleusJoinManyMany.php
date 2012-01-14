@@ -28,7 +28,7 @@ class JoinManyMany extends Join {
 		return TRUE;
 	}
 	
-	protected function sql() {
+	public function sql() {
 		$sql = ' '.strtoupper($config['type']);
 		$sql.= ' JOIN ';
 		$sql.= $config['join_table'];

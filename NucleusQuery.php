@@ -106,7 +106,7 @@ class Query {
 	public function build_joins() {
 		$sql = '';
 
-		foreach ($this->joins as $key => $config) {
+		foreach ($this->joins as $key => $join) {
 			$sql.= $join->sql();
 		}
 
@@ -213,8 +213,7 @@ class Query {
 				500
 			);
 		}
-		$r = $statement->fetchAll(\PDO::FETCH_ASSOC);
-		return $r;
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
 	// ------------------------------------------------------------------------
@@ -245,7 +244,7 @@ class Query {
 
 	public function join_for_foreign_id($identifier) {
 		foreach ($this->joins as $join) {
-			if ($join['foreign_id'] == $identifier) {
+			if ($join->foreign_id == $identifier) {
 				return $join;
 			}
 		}
