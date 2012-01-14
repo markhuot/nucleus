@@ -51,12 +51,12 @@ class Join {
 		$foreign_pk = $this->foreign_table->pk();
 		$foreign_key = $this->foreign_key;
 
-		return array(
+		return implode(',', array(
 			"{$primary_id}.{$primary_pk} AS `{$primary_id}.{$primary_pk}`",
 			"{$primary_id}.{$primary_key} AS `{$primary_id}.{$primary_key}`",
 			"{$foreign_id}.{$foreign_pk} AS `{$foreign_id}.{$foreign_pk}`",
 			"{$foreign_id}.{$foreign_key} AS `{$foreign_id}.{$foreign_key}`"
-		);
+		));
 	}
 	
 	public function sql_join() {

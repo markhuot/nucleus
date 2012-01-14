@@ -58,7 +58,7 @@ class Query {
 			$select[] = "{$identifier}.{$pk} AS `{$identifier}.{$pk}`";
 		}
 		foreach ($this->joins as $join) {
-			$select = array_merge($join->sql_select(), $select);
+			$select[] = $join->sql_select();
 		}
 
 		// User defined selects can either be * or an array of fields. We

@@ -44,11 +44,11 @@ class JoinManyMany extends Join {
 		$foreign_key = $this->foreign_key;
 		$foreign_pk = $this->foreign_table->pk();
 
-		return array(
+		return implode(',', array(
 			"{$join_id}.{$foreign_key} AS `{$foreign_id}.{$foreign_key}`",
 			"{$foreign_id}.{$foreign_pk} AS `{$foreign_id}.{$foreign_pk}`",
 			"{$primary_id}.{$primary_key} AS `{$primary_id}.{$primary_key}`"
-		);
+		));
 	}
 	
 	public function sql_join() {
