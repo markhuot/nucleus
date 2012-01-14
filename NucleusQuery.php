@@ -58,7 +58,12 @@ class Query {
 		}
 
 		// User defined selects
-		foreach ($this->from as $identifier => $table) {
+		$tables = $this->from;
+		foreach ($this->joins as $join) {
+			$tables[$join->foreign_id] = $join->foreign_table;
+		}
+
+		foreach ($tables as $identifier => $table) {
 			$columns = $this->query("DESCRIBE {$table}");
 
 			if (!$columns) {
@@ -69,21 +74,6 @@ class Query {
 				$field = $column['Field'];
 				if (in_array($field, $this->select) || !$this->select) {
 					$select[] = "{$identifier}.{$field} AS `{$identifier}.{$field}`";
-				}
-			}
-		}
-
-		foreach ($this->joins as $join) {
-			$columns = $this->query("DESCRIBE {$join->foreign_table}");
-
-			if (!$columns) {
-				throw new \Exception('Could not build SELECT, invalid table specified', 500);
-			}
-
-			foreach($columns as $column) {
-				$field = $column['Field'];
-				if (in_array($field, $this->select) || !$this->select) {
-					$select[] = "{$join->foreign_id}.{$field} AS `{$join->foreign_id}.{$field}`";
 				}
 			}
 		}
