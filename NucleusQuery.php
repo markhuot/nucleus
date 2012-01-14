@@ -91,6 +91,7 @@ class Query {
 		$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
 		$c['foreign_table'] = $matches[2];
 		$c['foreign_id'] = $this->add_table($c['foreign_table']);
+		$c['connection'] = $this->connection;
 
 		if (($join = \Nucleus\JoinOne::check($c)) !== FALSE || 
 		    ($join = \Nucleus\JoinMany::check($c)) !== FALSE || 
