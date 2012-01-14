@@ -12,12 +12,10 @@ spl_autoload_register(function($class_name) {
 });
 
 class Nucleus {
-	private $connection;
 	private $query;
 
-	public function __construct($dsn=NULL, $user=NULL, $pass=NULL) {
-		$this->connection = new \Nucleus\Connection($dsn, $user, $pass);
-		$this->query = new \Nucleus\Query($this->connection);
+	public function __construct() {
+		$this->query = new \Nucleus\Query();
 	}
 
 	public function __call($method, $args) {
