@@ -13,6 +13,9 @@ spl_autoload_register(function($class_name) {
 
 class Nucleus {
 	private $query;
+	private static $config = array(
+		'model_path' => FALSE
+	);
 
 	public function __construct() {
 		$this->query = new \Nucleus\Query();
@@ -23,5 +26,18 @@ class Nucleus {
 			array($this->query, $method),
 			$args
 		);
+	}
+
+	public static function config($key=FALSE) {
+		if ($config = self::guess_codeigniter_config()) {
+			self::$config = array_merge(self::$config, $config);
+		}
+		return @self::$config[$key];
+	}
+
+	public static function guess_codeigniter_config() {
+		if (!defined('APPPATH')) { return FALSE; }
+		include APPPATH.'config/nucleus'.EXT;
+		return $config;
 	}
 }
