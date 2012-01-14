@@ -5,6 +5,7 @@ namespace Nucleus;
 class Model {
 
 	protected $table_name;
+	protected $identifier;
 	protected $pk = 'id';
 
 	public function __toString() {
@@ -21,6 +22,14 @@ class Model {
 
 	public function set_table_name($table) {
 		$this->table_name = $table;
+	}
+
+	public function identifier() {
+		return $this->identifier;
+	}
+
+	public function set_identifier($identifier) {
+		$this->identifier = $identifier;
 	}
 
 	/**

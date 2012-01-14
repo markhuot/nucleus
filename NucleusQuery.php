@@ -213,7 +213,7 @@ class Query {
 			$c['foreign_table'] = Model::for_table($c['foreign_table']);
 
 			// Get the sidentifier
-			$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
+			$c['primary_id'] = $this->table_identifier_for($c['primary_table']->table_name());
 			$c['foreign_id'] = $this->add_table($c['foreign_table']);
 
 			// Finally, check if this is actually a valid join?
@@ -355,17 +355,18 @@ class Query {
 		return @$keys[0]?:FALSE;
 	}
 
-	public function add_table($table, $alias=FALSE, $primary=FALSE) {
+	public function add_table($model, $alias=FALSE, $primary=FALSE) {
 		$key = $alias?:'t'.count($this->tables);
+		$model->set_identifier($key);
 
 		if ($primary) {
 			$this->tables = array_merge(array(
-				$key => $table
+				$key => $model
 			), $this->tables);
 		}
 
 		else {
-			$this->tables[$key] = $table;
+			$this->tables[$key] = $model;
 		}
 		
 		return $key;

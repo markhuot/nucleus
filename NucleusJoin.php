@@ -18,7 +18,7 @@ class Join {
 	
 	public function __construct($config=array()) {
 		$config = array_merge(array(
-			'as' => $config['foreign_table'],
+			'as' => $config['foreign_table']->table_name(),
 			'join_type' => 'left'
 		), $config);
 
