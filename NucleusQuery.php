@@ -167,12 +167,10 @@ class Query {
 
 	public function build_orderby() {
 		$sql = '';
-
 		if ($this->orderby) {
 			$sql.= ' ORDER BY ';
 			$sql.= implode(', ', $this->orderby);
 		}
-
 		return $sql;
 	}
 
