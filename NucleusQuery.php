@@ -63,7 +63,11 @@ class Query {
 		// really don't care what they're selecting since we know the preious
 		// section has us covered.
 		// First we'll build a list of tables in this query.
-		$tables = $this->from;
+		$tables = array();
+		foreach ($this->from as $model) {
+			$id = $model->identifier();
+			$tables[$id] = $model;
+		}
 		foreach ($this->joins as $join) {
 			$id = $join->foreign_table->identifier();
 			$tables[$id] = $join->foreign_table;
