@@ -69,7 +69,7 @@ class Record {
 			return $this->data[$key];
 		}
 
-		if ($related = $this->result->related($key, $this)) {
+		if ($related = $this->result->related($this, $key)) {
 			return $related;
 		}
 
@@ -91,7 +91,7 @@ class Record {
 			return $this->data[$key];
 		}
 
-		if ($related = $this->result->related($key, $this)) {
+		if ($related = $this->result->related($this, $key)) {
 			return $related;
 		}
 
