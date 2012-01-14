@@ -55,14 +55,7 @@ class Join {
 		$columns = array_slice(func_get_args(), 1);
 		$sql = "'".implode("','", $columns)."'";
 
-		$statement = $this->connection->prepare("SHOW COLUMNS FROM {$table} WHERE Field IN ({$sql})");
-		if (!$statement->execute()) {
-			throw new \Exception(
-				implode(' ', $statement->errorInfo())."\n".$sql,
-				500
-			);
-		}
-		return $statement->rowCount() == count($columns);
+		return $this->connection->query("SHOW COLUMNS FROM {$table} WHERE Field IN ({$sql})")->rowCount() == count($columns);
 	}
 
 	public function sql_select() {
