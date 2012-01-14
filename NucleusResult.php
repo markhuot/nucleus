@@ -58,8 +58,7 @@ class Result implements \Iterator {
 	 * Each relation has one, and only one, primary table. It is this table
 	 * that we iterate over and this table that drives all the relations. In
 	 * the sample query `SELECT * FROM posts LEFT JOIN post_data…` the primary
-	 * table would be the `posts` table. This is passed into the constructor
-	 * and must be passed with every result.
+	 * table would be the `posts` table.
 	 */
 	private $table_identifier = 't0';
 
