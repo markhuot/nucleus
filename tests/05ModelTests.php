@@ -29,7 +29,8 @@ class ModelTests extends Quiz {
 		$this->db->from('posts');
 		$this->db->join('tagged');
 		$posts = $this->db->go();
-		return $posts->record(0)->tagged->size() == 2;
+		return $posts->record(0)->tagged->size() == 2 &&
+		       $posts->record(0)->tagged->record('name') == 'tag1';
 	}
 
 }
