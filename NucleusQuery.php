@@ -226,8 +226,10 @@ class Query {
 		if (!$sql) {
 			$sql = $this->_build_query();
 		}
-		$this->queries[] = $sql;
-		return $this->connection->query($sql, $this->build_where_parameters());
+		return $this->connection->query(
+			$this->queries[] = $sql,
+			$this->build_where_parameters()
+		);
 	}
 
 	// ------------------------------------------------------------------------
