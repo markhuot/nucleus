@@ -48,14 +48,7 @@ class Join {
 	
 	protected function table_has_column($table, $column) {
 		$sql = "SHOW COLUMNS FROM {$table} WHERE Field='{$column}'";
-		$statement = $this->connection->prepare($sql);
-		if (!$statement->execute()) {
-			throw new \Exception(
-				implode(' ', $statement->errorInfo())."\n".$sql,
-				500
-			);
-		}
-		return $statement->rowCount();
+		return $this->connection->query($sql)->rowCount();
 	}
 
 	protected function table_has_columns($table, $column) {
