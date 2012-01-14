@@ -36,6 +36,11 @@ class Record {
 		return $this->data;
 	}
 
+	public function id() {
+		$model = Model::for_table($this->result->query()->table_name_for($this->table_identifier));
+		return $this->data($model->pk());
+	}
+
 	/**
 	 * Call
 	 *

@@ -178,6 +178,14 @@ class Result implements \Iterator {
 	}
 
 	/**
+	 * Query
+	 * Access to the query that generated this result
+	 */
+	public function query() {
+		return $this->query;
+	}
+
+	/**
 	 * Records
 	 * Returns the currently focused collection.
 	 */

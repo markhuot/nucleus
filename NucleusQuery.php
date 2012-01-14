@@ -53,7 +53,8 @@ class Query {
 		// us identify how tables are related. These are added in no
 		// matter what.
 		foreach ($this->from as $identifier => $model) {
-			$select[] = "{$identifier}.id AS `{$identifier}.{$model->pk()}`";
+			$pk = $model->pk();
+			$select[] = "{$identifier}.{$pk} AS `{$identifier}.{$pk}`";
 		}
 		foreach ($this->joins as $join) {
 			$select = array_merge($join->sql_select(), $select);
@@ -368,6 +369,10 @@ class Query {
 		}
 		
 		return $key;
+	}
+
+	public function table_name_for($table_identifier) {
+		return @$this->tables[$table_identifier];
 	}
 
 	public function table_identifier_for($table_name) {

@@ -18,7 +18,7 @@ class JoinManyMany extends Join {
 			'join_table' => $join_table,
 			'join_id' => $config['foreign_id'].'j',
 			'join_primary_key' => singular($config['foreign_table']).'_id',
-			'primary_key' => 'id',
+			'primary_key' => $config['primary_table']->pk(),
 			'foreign_key' => singular($config['primary_table']).'_id'
 		), $config));
 
@@ -42,10 +42,11 @@ class JoinManyMany extends Join {
 		$primary_key = $this->primary_key;
 		$foreign_id = $this->foreign_id;
 		$foreign_key = $this->foreign_key;
+		$foreign_pk = $this->foreign_table->pk();
 
 		return array(
 			"{$join_id}.{$foreign_key} AS `{$foreign_id}.{$foreign_key}`",
-			"{$foreign_id}.{$primary_key} AS `{$foreign_id}.{$primary_key}`",
+			"{$foreign_id}.{$foreign_pk} AS `{$foreign_id}.{$foreign_pk}`",
 			"{$primary_id}.{$primary_key} AS `{$primary_id}.{$primary_key}`"
 		);
 	}
