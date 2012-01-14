@@ -35,7 +35,7 @@ class Model {
 			if (isset($this->{$key})) {
 				$keys = array_keys($this->{$key});
 				if (!is_numeric($keys[0])) {
-					$this->{$key} = array($key);
+					$this->{$key} = array($this->{$key});
 				}
 				foreach ($this->{$key} as $join) {
 					if (isset($join['as']) && $join['as'] == $name) {
