@@ -33,13 +33,13 @@ class RelationTests extends Quiz {
 	public function hasOneClass() {
 		$result = $this->db->from('comments')->join('posts')->go();
 		$class = @get_class($result->record(0)->posts);
-		return $class == '\Nucleus\Result';
+		return $class == 'Nucleus\Result';
 	}
 
 	public function hasOneEntryClass() {
 		$result = $this->db->from('comments')->join('posts')->go();
 		$class = @get_class($result->record(0)->posts->record(0));
-		return $class == '\Nucleus\Record';
+		return $class == 'Nucleus\Record';
 	}
 
 	public function hasOneEntryData() {
