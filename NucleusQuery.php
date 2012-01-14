@@ -52,8 +52,9 @@ class Query {
 		// Required selects are the primary and foreign key fields which help
 		// us identify how tables are related. These are added in no
 		// matter what.
-		foreach ($this->from as $identifier => $model) {
+		foreach ($this->from as $model) {
 			$pk = $model->pk();
+			$identifier = $model->identifier();
 			$select[] = "{$identifier}.{$pk} AS `{$identifier}.{$pk}`";
 		}
 		foreach ($this->joins as $join) {
