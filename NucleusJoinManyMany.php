@@ -22,7 +22,7 @@ class JoinManyMany extends Join {
 	}
 	
 	protected function _check_join_columns() {
-		if (!$this->table_has_columns(
+		if (!$this->connection->table_has_columns(
 			$this->join_table,
 			$this->join_primary_key,
 			$this->foreign_key)) {

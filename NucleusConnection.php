@@ -53,4 +53,18 @@ class Connection extends \PDO {
 		}
 		return $statement;
 	}
+
+	// ------------------------------------------------------------------------
+
+	public function table_has_column($table, $column) {
+		$sql = "SHOW COLUMNS FROM {$table} WHERE Field='{$column}'";
+		return $this->query($sql)->rowCount();
+	}
+
+	public function table_has_columns($table, $column) {
+		$columns = array_slice(func_get_args(), 1);
+		$sql = "'".implode("','", $columns)."'";
+
+		return $this->query("SHOW COLUMNS FROM {$table} WHERE Field IN ({$sql})")->rowCount() == count($columns);
+	}
 }
