@@ -44,10 +44,12 @@ class Join {
 	}
 
 	public function sql_select() {
+		$pk = $this->primary_table->pk();
+		$fk = $this->foreign_table->pk();
 		return array(
-			"{$this->primary_id}.id AS `{$this->primary_id}.id`",
+			"{$this->primary_id}.{$pk} AS `{$this->primary_id}.{$pk}`",
 			"{$this->primary_id}.{$this->primary_key} AS `{$this->primary_id}.{$this->primary_key}`",
-			"{$this->foreign_id}.id AS `{$this->foreign_id}.id`",
+			"{$this->foreign_id}.{$fk} AS `{$this->foreign_id}.{$fk}`",
 			"{$this->foreign_id}.{$this->foreign_key} AS `{$this->foreign_id}.{$this->foreign_key}`"
 		);
 	}

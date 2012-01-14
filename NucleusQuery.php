@@ -139,19 +139,22 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function join() {if (func_num_args() == 1 && is_array(func_get_arg(0))) {
-			$this->joins[] = func_get_arg(0);
+	public function join() {
+		if (func_num_args() == 1 && is_array(func_get_arg(0))) {
+			$join = func_get_arg(0);
 		}
 		else if (func_num_args() == 1 && is_string(func_get_arg(0))) {
-			$this->joins[] = array(
+			$join = array(
 				'foreign_table' => func_get_arg(0)
 			);
 		}
 		else if (func_num_args() == 2) {
-			$this->joins[] = array_merge(array(
+			$join = array_merge(array(
 				'foreign_table' => func_get_arg(0)
 			), func_get_arg(1));
 		}
+
+		$this->joins[] = $join;
 
 		return $this;
 	}
@@ -174,17 +177,15 @@ class Query {
 			//     [primary_table].[foreign_table] as [alias]
 			preg_match('/^(?:(.*?)\.)?(.*?)(?:\s+?as\s+(.*))?$/i', $c['foreign_table'], $matches);
 
-			// Check if we define the primary table in the string. If not,
-			// don't worry, it'll get set to the primary table of the query
-			// a little later on.
+			// Check if we define the primary table in the string.
 			if ($matches[1]) {
-				$c['primary_table'] = Model::for_table($matches[1]);
+				$c['primary_table'] = $matches[1];
 			}
 
 			// If the primary table isn't set in the string, set it to the
 			// primary table of this query
 			else {
-				$c['primary_table'] = $this->primary_table();
+				$c['primary_table'] = $this->primary_table()->table_name();
 			}
 
 			// Set the foreign table. There has to be a foreign table or there
@@ -200,21 +201,21 @@ class Query {
 			// referring to a defined relationship on the primary table
 			// instead.
 			if (!$this->connection->table_exists($c['foreign_table'])) {
-				if ($config = $c['primary_table']->join_named($c['foreign_table'])) {
+				$model = Model::for_table($c['primary_table']);
+				if ($config = $model->join_named($c['foreign_table'])) {
 					$c = array_merge($c, $config);
 				}
 			}
 
-			// Get the models for our foreign table
+			// Get the models for our tables
+			$c['primary_table'] = Model::for_table($c['primary_table']);
 			$c['foreign_table'] = Model::for_table($c['foreign_table']);
 
-			// Get the identifier for the primary table
+			// Get the sidentifier
 			$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
-
-			// By now we have to have a foreign table, or we've got big
-			// trouble.
 			$c['foreign_id'] = $this->add_table($c['foreign_table']);
 
+			// Finally, check if this is actually a valid join?
 			if (($join = JoinOne::check($c)) !== FALSE || 
 			    ($join = JoinMany::check($c)) !== FALSE || 
 			    ($join = JoinManyMany::check($c)) !== FALSE) {
@@ -226,6 +227,8 @@ class Query {
 				$c = NULL;
 			}
 		}
+
+		// Clear out invalid joins
 		$this->joins = array_filter($this->joins);
 	}
 
