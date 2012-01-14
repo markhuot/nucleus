@@ -5,7 +5,8 @@ class RelationTests extends Quiz {
 	private $db;
 
 	public function __construct() {
-		$this->db = new \Nucleus\Query('mysql:host=192.168.94.31;dbname=tmp', 'root', 'root');
+		$this->conn = new Nucleus\Connection('mysql:host=192.168.94.31;dbname=tmp', 'root', 'root');
+		$this->db = new \Nucleus\Query();
 	}
 
 	public function hasManyClass() {
