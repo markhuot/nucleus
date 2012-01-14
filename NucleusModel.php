@@ -34,8 +34,7 @@ class Model {
 		foreach (array(
 			'has_one',
 			'has_many',
-			'habtm',
-			'has_and_belongs_to_many'
+			'habtm'
 		) as $key) {
 			if (isset($this->{$key})) {
 				$keys = array_keys($this->{$key});
@@ -44,6 +43,7 @@ class Model {
 				}
 				foreach ($this->{$key} as $join) {
 					if (isset($join['as']) && $join['as'] == $name) {
+						$join['type'] = $key;
 						return $join;
 					}
 				}
