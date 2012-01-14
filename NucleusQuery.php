@@ -227,14 +227,7 @@ class Query {
 			$sql = $this->_build_query();
 		}
 		$this->queries[] = $sql;
-		$statement = $this->connection->prepare($sql);
-		if (!$statement->execute($this->build_where_parameters())) {
-			throw new \Exception(
-				implode(' ', $statement->errorInfo())."\n".$this->last_query(),
-				500
-			);
-		}
-		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+		return $this->connection->query($sql, $this->build_where_parameters());
 	}
 
 	// ------------------------------------------------------------------------
