@@ -105,41 +105,36 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
-	public function join($foreign_table, $c=array()) {
-	
-		// Determine the tables we're trying to relate here
-		preg_match('/^(?:(.*?)\.)?(.*)$/', $foreign_table, $matches);
-		$c['primary_table'] = $matches[1]?:$this->primary_table();
-		$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
-		$c['foreign_table'] = $matches[2];
-		$c['foreign_id'] = $this->add_table($c['foreign_table']);
-		$c['connection'] = $this->connection;
-
-		$this->joins[] = $c;
-
+	public function join($foreign_table, $config=array()) {
+		$this->joins[] = array_merge(array(
+			'foreign_table' => $foreign_table
+		), $config);
 		return $this;
 	}
 
 	public function prep_joins() {
-		foreach ($this->joins as &$join_config) {
-			if (!is_array($join_config)) {
+		foreach ($this->joins as &$c) {
+			if (!is_array($c)) {
 				continue;
 			}
+			
+			// Determine the tables we're trying to relate here
+			preg_match('/^(?:(.*?)\.)?(.*)$/', $c['foreign_table'], $matches);
+			$c['primary_table'] = $matches[1]?:$this->primary_table();
+			$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
+			$c['foreign_table'] = $matches[2];
+			$c['foreign_id'] = $this->add_table($c['foreign_table']);
+			$c['connection'] = $this->connection;
 
-			if (!$join_config['primary_table']) {
-				$join_config['primary_table'] = $this->primary_table();
-				$join_config['primary_id'] = $this->table_identifier_for($this->primary_table());
-			}
+			if (($join = JoinOne::check($c)) !== FALSE || 
+			    ($join = JoinMany::check($c)) !== FALSE || 
+			    ($join = JoinManyMany::check($c)) !== FALSE) {
 
-			if (($join = JoinOne::check($join_config)) !== FALSE || 
-			    ($join = JoinMany::check($join_config)) !== FALSE || 
-			    ($join = JoinManyMany::check($join_config)) !== FALSE) {
-
-				$join_config = $join;
+				$c = $join;
 			}
 
 			else {
-				$join_config = NULL;
+				$c = NULL;
 			}
 		}
 		$this->joins = array_filter($this->joins);
