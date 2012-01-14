@@ -14,7 +14,7 @@ class Connection extends \PDO {
 	}
 
 	private static function guess_codeigniter_connection() {
-		if (!constant('APPPATH')) { return FALSE; }
+		if (!defined('APPPATH')) { return FALSE; }
 		include APPPATH.'config/database'.EXT;
 		extract($db[$active_group]);
 		return new Connection(
