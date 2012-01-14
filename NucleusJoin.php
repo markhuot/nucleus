@@ -3,6 +3,7 @@
 namespace Nucleus;
 
 class Join {
+	protected $connection;
 	protected $as;
 	protected $type;
 	protected $primary_class;
@@ -44,8 +45,14 @@ class Join {
 	}
 	
 	protected function table_has_column($table, $column) {
-		$query = mysql_query("SHOW COLUMNS FROM {$table} WHERE Field='{$column}'");
-		return mysql_num_rows($query);
+		$statement = $this->connection->prepare("SHOW COLUMNS FROM {$table} WHERE Field='{$column}'");
+		if (!$statement->execute($this->build_where_hash())) {
+			throw new \Exception(
+				$statement->errorInfo()."\n".$this->last_query(),
+				500
+			);
+		}
+		return $statement->rowCount();
 	}
 
 	protected function table_has_columns($table, $column) {
