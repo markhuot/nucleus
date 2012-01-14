@@ -10,7 +10,26 @@ class Connection extends \PDO {
 		Connection::$connections[] = $this;
 	}
 
+	private static function guess_connection() {
+		if ($conn = self::guess_codeigniter_connection()) {
+			return $conn;
+		}
+	}
+
+	private static function guess_codeigniter_connection() {
+		if (!constant('APPPATH')) { return FALSE; }
+		include APPPATH.'config/database'.EXT;
+		extract($db[$active_group]);
+
+		$dsn = "{$dbdriver}:host={$hostname};table={$database}";
+		return new Connection($dsn, $username, $password);
+	}
+
 	public static function active() {
+		if (!count(self::$connections)) {
+			return self::guess_connection();
+		}
+
 		return self::$connections[count(self::$connections)-1];
 	}
 }
