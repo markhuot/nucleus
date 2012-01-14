@@ -28,7 +28,7 @@ class JoinManyMany extends Join {
 		return TRUE;
 	}
 	
-	public function sql() {
+	public function sql_join() {
 		$sql = ' '.strtoupper($this->type);
 		$sql.= ' JOIN ';
 		$sql.= $this->join_table;

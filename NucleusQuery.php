@@ -143,7 +143,7 @@ class Query {
 		$sql = '';
 
 		foreach ($this->joins as $key => $join) {
-			$sql.= $join->sql();
+			$sql.= $join->sql_join();
 		}
 
 		return $sql;
