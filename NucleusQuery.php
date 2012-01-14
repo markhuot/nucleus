@@ -89,7 +89,22 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
+	/**
+	 * From
+	 *
+	 * Sets the FROM part of the SQL query. Input can be accepted in a number
+	 * of ways:
+	 *   1. from('posts') passing in, simply, the table you're looking for
+	 *   2. from('users', 'assigned') with two parameters, passing in an
+	 *      optional table alias
+	 *   3. from('posts as p') with the alias assigned within the string
+	 *   4. from('posts, users, comments') passing in the primary table first,
+	 *      followed by optional join tables
+	 */
 	public function from($table, $alias=FALSE) {
+
+		// Check if we're passing in multiple tables. If so split it out and
+		// join on any subsequent tables.
 		if (strpos($table, ',')) {
 			$tables = preg_split('/\s*,\s*/', $table);
 			$this->from($tables[0]);
@@ -99,6 +114,13 @@ class Query {
 			return $this;
 		}
 
+		// Check if we're setting the alias within the string
+		if (preg_match('/^(.*)\s+as\s+(.*)$/i', $table, $matches)) {
+			$table = $matches[1];
+			$alias = $matches[2];
+		}
+
+		// If we're here we know we're dealing with a vanilla table. Add it.
 		$key = $this->add_table($table, $alias, TRUE);
 		$this->from[$key] = $table;
 
@@ -144,10 +166,15 @@ class Query {
 			$c['connection'] = $this->connection;
 			
 			// Determine the tables we're trying to relate here
-			preg_match('/^(?:(.*?)\.)?(.*)$/', $c['foreign_table'], $matches);
+			preg_match('/^(?:(.*?)\.)?(.*?)(?:\s+?as\s+(.*))?$/i', $c['foreign_table'], $matches);
 			$c['primary_table'] = $matches[1]?:$this->primary_table();
 			$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
 			$c['foreign_table'] = $matches[2];
+
+			// If we're passing in an alias via the string, set it here
+			if (isset($matches[3])) {
+				$c['as'] = @$matches[3];
+			}
 
 			// If the foreign table doesn't exist we'll check if we're
 			// referring to a defined relationship on the primary table

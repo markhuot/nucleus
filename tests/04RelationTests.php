@@ -130,5 +130,10 @@ class RelationTests extends Quiz {
 		$result = $this->db->get('posts, comments');
 		return $result->record(0)->comments;
 	}
+	
+	public function aliased() {
+		$result = $this->db->get('posts as p, comments as c');
+		return $result->record(0)->c;
+	}
 
 }
