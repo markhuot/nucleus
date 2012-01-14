@@ -12,6 +12,8 @@ class Join {
 	public $foreign_class;
 	public $foreign_table;
 	public $foreign_key;
+	public $join_table;
+	public $join_id;
 	
 	public function __construct($config=array()) {
 		foreach ($config as $key => $value) {

@@ -9,9 +9,9 @@ class JoinManyMany extends Join {
 		$join = new JoinManyMany(array_merge(array(
 			'join_table' => $join_table,
 			'join_id' => $config['foreign_id'].'j',
-			'join_primary_key' => singular($config['primary_table']).'_id',
+			'join_primary_key' => singular($config['foreign_table']).'_id',
 			'primary_key' => 'id',
-			'foreign_key' => singular($config['foreign_table']).'_id'
+			'foreign_key' => singular($config['primary_table']).'_id'
 		), $config));
 
 		return $join->_check_join_columns()?$join:FALSE;
@@ -37,7 +37,7 @@ class JoinManyMany extends Join {
 		$sql.= ' ON ';
 		$sql.= $this->join_id;
 		$sql.= '.';
-		$sql.= $this->join_primary_key;
+		$sql.= $this->foreign_key;
 		$sql.= '=';
 		$sql.= $this->primary_id;
 		$sql.= '.';
@@ -55,7 +55,7 @@ class JoinManyMany extends Join {
 		$sql.= '=';
 		$sql.= $this->join_id;
 		$sql.= '.';
-		$sql.= $this->foreign_key;
+		$sql.= $this->join_primary_key;
 		return $sql;
 	}
 }

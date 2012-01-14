@@ -104,7 +104,7 @@ class RelationTests extends Quiz {
 			->join('categories')
 			->go();
 		$class = get_class($result->record(0)->categories);
-		return $class == '\Nucleus\Result';
+		return $class == 'Nucleus\Result';
 	}
 
 }

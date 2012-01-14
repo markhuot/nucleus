@@ -213,13 +213,13 @@ class Result implements \Iterator {
 		if (!($config = $this->query->join_config($key))) {
 			return FALSE;
 		}
-		
+
 		$table_identifier = $config->foreign_id;
 		$pk = $config->primary_key;
 		$fk = $config->foreign_key;
 		$id = $record->{$pk};
 
-		if ($this->records[$table_identifier][$fk][$id]) {
+		if (isset($this->records[$table_identifier][$fk][$id])) {
 			$result = clone $this;
 			$result->table_identifier = $table_identifier;
 			$result->key = $fk;
