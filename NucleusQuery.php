@@ -53,7 +53,7 @@ class Query {
 			$result = $statement->execute();
 
 			if (!$result) {
-				throw new \Exception('Could not build SELECT, invalid table specified');
+				throw new \Exception('Could not build SELECT, invalid table specified', 500);
 			}
 
 			foreach($statement->fetchAll() as $column) {
@@ -210,7 +210,7 @@ class Query {
 		$statement = $this->connection->prepare($sql);
 
 		if (!$statement->execute()) {
-			throw new \Exception($statement->errorInfo()."\n".$this->last_query());
+			throw new \Exception($statement->errorInfo()."\n".$this->last_query(), 500);
 		}
 
 		return $statement->fetchAll();
