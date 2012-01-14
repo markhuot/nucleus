@@ -45,10 +45,11 @@ class Join {
 	}
 	
 	protected function table_has_column($table, $column) {
-		$statement = $this->connection->prepare("SHOW COLUMNS FROM {$table} WHERE Field='{$column}'");
+		$sql = "SHOW COLUMNS FROM {$table} WHERE Field='{$column}'";
+		$statement = $this->connection->prepare($sql);
 		if (!$statement->execute()) {
 			throw new \Exception(
-				$statement->errorInfo()."\n".$this->last_query(),
+				implode(' ', $statement->errorInfo())."\n".$sql,
 				500
 			);
 		}
@@ -62,7 +63,7 @@ class Join {
 		$statement = $this->connection->prepare("SHOW COLUMNS FROM {$table} WHERE Field IN ({$sql})");
 		if (!$statement->execute()) {
 			throw new \Exception(
-				$statement->errorInfo()."\n".$sql,
+				implode(' ', $statement->errorInfo())."\n".$sql,
 				500
 			);
 		}
