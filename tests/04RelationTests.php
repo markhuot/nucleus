@@ -12,12 +12,12 @@ class RelationTests extends Quiz {
 	public function hasManyClass() {
 		$result = $this->db->from('posts')->join('comments')->go();
 		$class = get_class($result->record(0)->comments);
-		return $class == '\Nucleus\Result';
+		return $class == 'Nucleus\Result';
 	}
 
 	public function hasManyEntryClass() {
 		$class = get_class($this->db->from('posts')->join('comments')->go()->record(0)->comments->record(0));
-		return $class == '\Nucleus\Record';
+		return $class == 'Nucleus\Record';
 	}
 
 	public function hasManyEntryData() {
