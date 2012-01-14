@@ -32,19 +32,19 @@ class RelationTests extends Quiz {
 
 	public function hasOneClass() {
 		$result = $this->db->from('comments')->join('posts')->go();
-		$class = @get_class($result->record(0)->posts);
+		$class = @get_class($result->record(0)->post);
 		return $class == 'Nucleus\Record';
 	}
 
 	public function hasOneEntryClass() {
 		$result = $this->db->from('comments')->join('posts')->go();
-		$class = @get_class($result->record(0)->posts);
+		$class = @get_class($result->record(0)->post);
 		return $class == 'Nucleus\Record';
 	}
 
 	public function hasOneEntryData() {
 		$result = $this->db->from('comments')->join('posts')->go();
-		$title = $result->record(0)->posts->title;
+		$title = $result->record(0)->post->title;
 		return $title == 'Let\'s save the world';
 	}
 
@@ -54,8 +54,8 @@ class RelationTests extends Quiz {
 			->join('posts')
 			->join('users')
 			->go();
-		$title = $result->record(0)->posts->title;
-		$user = $result->record(0)->users->name;
+		$title = $result->record(0)->post->title;
+		$user = $result->record(0)->user->name;
 		return $title == 'Let\'s save the world' && $user == 'Nina Myers';
 	}
 
@@ -65,8 +65,8 @@ class RelationTests extends Quiz {
 			->join('comments.posts')
 			->join('comments.users')
 			->go();
-		$title = $result->record(0)->posts->title;
-		$user = $result->record(0)->users->name;
+		$title = $result->record(0)->post->title;
+		$user = $result->record(0)->user->name;
 		return $title == 'Let\'s save the world' && $user == 'Nina Myers';
 	}
 
@@ -76,8 +76,8 @@ class RelationTests extends Quiz {
 			->join('comments.posts')
 			->join('posts.users')
 			->go();
-		$title = $result->record(0)->posts->title;
-		$user = $result->record(0)->posts->users->name;
+		$title = $result->record(0)->post->title;
+		$user = $result->record(0)->post->user->name;
 		return $title == 'Let\'s save the world' && $user == 'Jack Bauer';
 	}
 
@@ -89,9 +89,9 @@ class RelationTests extends Quiz {
 			->join('posts.users')
 			->go();
 		$comment = $result->record(0);
-		$comment_user = $comment->users->name;
-		$post_title = $comment->posts->title;
-		$post_user = $comment->posts->users->name;
+		$comment_user = $comment->user->name;
+		$post_title = $comment->post->title;
+		$post_user = $comment->post->user->name;
 
 		return $post_title == "Let's save the world" && 
 		       $comment_user == 'Nina Myers' &&
