@@ -109,14 +109,14 @@ class Result implements \Iterator {
 	 * This is called from the __constructor and probably won't need to be
 	 * called publically on the object.
 	 */
-	private function parse_row_to_records($record) {
+	private function parse_row_to_records($row) {
 
 		// We'll store each record contained in this row here
 		$records = array();
 
 		// Loop through each column in the row to determine which table
 		// it belongs to.
-		foreach ($record as $key => $value) {
+		foreach ($row as $key => $value) {
 
 			// Explode the column name to determine the table name. So, a
 			// column name of `posts.title` will be from the table `posts` and
