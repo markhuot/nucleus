@@ -137,6 +137,15 @@ class Query {
 			$c['foreign_id'] = $this->add_table($c['foreign_table']);
 			$c['connection'] = $this->connection;
 
+			// If the foreign table doesn't exist we'll check if we're
+			// referring to a defined relationship on the primary table
+			if (!$this->connection->table_exists($c['foreign_table'])) {
+				$model = Model::for_table($c['primary_table']);
+				if ($config = $model->join_named($c['foreign_table'])) {
+					$c = array_merge($c, $config);
+				}
+			}
+
 			if (($join = JoinOne::check($c)) !== FALSE || 
 			    ($join = JoinMany::check($c)) !== FALSE || 
 			    ($join = JoinManyMany::check($c)) !== FALSE) {
