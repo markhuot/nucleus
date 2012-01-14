@@ -165,8 +165,8 @@ class Query {
 				continue;
 			}
 
-			// Pass our connection through to the Join, it'll need it to
-			// confirm whether joins are valid or not.
+			// Pass our connection through to the Join. It'll need it to
+			// confirm whether the join fields are valid.
 			$c['connection'] = $this->connection;
 			
 			// Determine the tables we're trying to relate here. This parses
@@ -174,11 +174,21 @@ class Query {
 			//     [primary_table].[foreign_table] as [alias]
 			preg_match('/^(?:(.*?)\.)?(.*?)(?:\s+?as\s+(.*))?$/i', $c['foreign_table'], $matches);
 
-			// Check if we define the primary table in the string, if so
-			// convert it to a model before we do anything with it.
-			$c['primary_table'] = $matches[1]?:(string)$this->primary_table();
+			// Check if we define the primary table in the string. If not,
+			// don't worry, it'll get set to the primary table of the query
+			// a little later on.
+			if ($matches[1]) {
+				$c['primary_table'] = Model::for_table($matches[1]);
+			}
 
-			// Set the foreign table
+			// If the primary table isn't set in the string, set it to the
+			// primary table of this query
+			else {
+				$c['primary_table'] = $this->primary_table();
+			}
+
+			// Set the foreign table. There has to be a foreign table or there
+			// isn't really a join, is there?
 			$c['foreign_table'] = $matches[2];
 
 			// If we're passing in an alias via the string, set it here
@@ -188,15 +198,14 @@ class Query {
 
 			// If the foreign table doesn't exist we'll check if we're
 			// referring to a defined relationship on the primary table
+			// instead.
 			if (!$this->connection->table_exists($c['foreign_table'])) {
-				$model = Model::for_table($c['primary_table']);
-				if ($config = $model->join_named($c['foreign_table'])) {
+				if ($config = $c['primary_table']->join_named($c['foreign_table'])) {
 					$c = array_merge($c, $config);
 				}
 			}
 
-			// Get the models for our tables
-			$c['primary_table'] = Model::for_table($c['primary_table']);
+			// Get the models for our foreign table
 			$c['foreign_table'] = Model::for_table($c['foreign_table']);
 
 			// Get the identifier for the primary table
