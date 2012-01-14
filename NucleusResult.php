@@ -84,7 +84,8 @@ class Result implements \Iterator {
 	public function __construct($query=FALSE, $rows=array()) {
 		$this->query = $query;
 		foreach ($rows as $row) {
-			foreach ($this->parse_row_to_records($row) as $record) {
+			$records_in_row = $this->parse_row_to_records($row);
+			foreach ($records_in_row as $record) {
 				$this->add_record($record);
 			}
 		}
