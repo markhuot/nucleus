@@ -9,14 +9,13 @@ Favoring convention over configuration writing a complex join statement is as si
 
 ```php
 <?php
-$q = new Nucleus\Query();
-$q->from('posts')
-$q->join('weblogs')
-$q->join('categories')
-$q->join('tags')
-$q->join('assets')
-$q->join('comments')
-$posts = $q->go();
+$this->nucleus->from('posts')
+$this->nucleus->join('weblogs')
+$this->nucleus->join('categories')
+$this->nucleus->join('tags')
+$this->nucleus->join('assets')
+$this->nucleus->join('comments')
+$posts = $this->nucleus->go();
 ```
 
 Once you've run a query you have full access to its properties and related objects through standard PHP OOP practices. For example:
