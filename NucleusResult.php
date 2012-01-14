@@ -127,7 +127,10 @@ class Result implements \Iterator {
 			// If this is the first column from the determined table create
 			// a new database record to hold it.
 			if (!@$records[$table_identifier]) {
-				$records[$table_identifier] = new \Nucleus\Record($this, $table_identifier);
+				$records[$table_identifier] = new Record(
+					$this,
+					$table_identifier
+				);
 			}
 
 			// Finally, add the column and its value to the appropriate

@@ -122,9 +122,9 @@ class Query {
 		$c['foreign_id'] = $this->add_table($c['foreign_table']);
 		$c['connection'] = $this->connection;
 
-		if (($join = \Nucleus\JoinOne::check($c)) !== FALSE || 
-		    ($join = \Nucleus\JoinMany::check($c)) !== FALSE || 
-		    ($join = \Nucleus\JoinManyMany::check($c)) !== FALSE) {
+		if (($join = JoinOne::check($c)) !== FALSE || 
+		    ($join = JoinMany::check($c)) !== FALSE || 
+		    ($join = JoinManyMany::check($c)) !== FALSE) {
 		    
 			$this->joins[$join->primary_id.'.'.$join->as] = $join;
 		}
@@ -222,7 +222,7 @@ class Query {
 	}
 
 	public function go() {
-		$result = new \Nucleus\Result(
+		$result = new Result(
 			clone $this,
 			$this->query()
 		);
