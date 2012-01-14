@@ -225,11 +225,21 @@ class Result implements \Iterator {
 		$id = $record->{$pk};
 
 		if (isset($this->records[$table_identifier][$fk][$id])) {
-			$result = clone $this;
-			$result->table_identifier = $table_identifier;
-			$result->key = $fk;
-			$result->id = $id;
-			return $result;
+			if (get_class($config) == 'Nucleus\JoinOne') {
+				$result = clone $this;
+				$result->table_identifier = $table_identifier;
+				$result->key = $fk;
+				$result->id = $id;
+				return $result->record(0);
+			}
+
+			else {
+				$result = clone $this;
+				$result->table_identifier = $table_identifier;
+				$result->key = $fk;
+				$result->id = $id;
+				return $result;
+			}
 		}
 
 		return FALSE;
