@@ -32,6 +32,12 @@ class Model {
 		$this->identifier = $identifier;
 	}
 
+	public function sql_select() {
+		$pk = $this->pk();
+		$identifier = $this->identifier();
+		return "{$identifier}.{$pk} AS `{$identifier}.{$pk}`";
+	}
+
 	/**
 	 * Load Model for Table
 	 *

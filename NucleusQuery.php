@@ -53,9 +53,7 @@ class Query {
 		// us identify how tables are related. These are added in no
 		// matter what.
 		foreach ($this->from as $model) {
-			$pk = $model->pk();
-			$identifier = $model->identifier();
-			$select[] = "{$identifier}.{$pk} AS `{$identifier}.{$pk}`";
+			$select[] = $model->sql_select();
 		}
 		foreach ($this->joins as $join) {
 			$select[] = $join->sql_select();
