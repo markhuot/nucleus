@@ -238,10 +238,6 @@ class Query {
 		return array_search($table_name, $this->tables);
 	}
 
-	public function table_name_for($identifier) {
-		return @$this->tables[$identifier];
-	}
-
 	public function join_config($key=FALSE) {
 		return @$this->joins[$key];
 	}
