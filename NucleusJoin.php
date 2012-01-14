@@ -71,6 +71,15 @@ class Join {
 		}
 		return $statement->rowCount() == count($columns);
 	}
+
+	public function sql_select() {
+		return array(
+			"{$this->primary_id}.id AS `{$this->primary_id}.id`",
+			"{$this->primary_id}.{$this->primary_key} AS `{$this->primary_id}.{$this->primary_key}`",
+			"{$this->foreign_id}.id AS `{$this->foreign_id}.id`",
+			"{$this->foreign_id}.{$this->foreign_key} AS `{$this->foreign_id}.{$this->foreign_key}`"
+		);
+	}
 	
 	public function sql_join() {
 		$sql = ' '.strtoupper($this->type);

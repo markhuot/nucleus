@@ -27,6 +27,14 @@ class JoinManyMany extends Join {
 
 		return TRUE;
 	}
+
+	public function sql_select() {
+		return array(
+			"{$this->join_id}.{$this->foreign_key} AS `{$this->foreign_id}.{$this->foreign_key}`",
+			"{$this->foreign_id}.{$this->primary_key} AS `{$this->foreign_id}.{$this->primary_key}`",
+			"{$this->primary_id}.{$this->primary_key} AS `{$this->primary_id}.{$this->primary_key}`"
+		);
+	}
 	
 	public function sql_join() {
 		$sql = ' '.strtoupper($this->type);

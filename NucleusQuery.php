@@ -54,17 +54,7 @@ class Query {
 			$select[] = "{$identifier}.id AS `{$identifier}.id`";
 		}
 		foreach ($this->joins as $join) {
-			if ($join->join_table) {
-				$select[] = "{$join->join_id}.{$join->foreign_key} AS `{$join->foreign_id}.{$join->foreign_key}`";
-				$select[] = "{$join->foreign_id}.{$join->primary_key} AS `{$join->foreign_id}.{$join->primary_key}`";
-				$select[] = "{$join->primary_id}.{$join->primary_key} AS `{$join->primary_id}.{$join->primary_key}`";
-			}
-			else {
-				$select[] = "{$join->primary_id}.id AS `{$join->primary_id}.id`";
-				$select[] = "{$join->primary_id}.{$join->primary_key} AS `{$join->primary_id}.{$join->primary_key}`";
-				$select[] = "{$join->foreign_id}.id AS `{$join->foreign_id}.id`";
-				$select[] = "{$join->foreign_id}.{$join->foreign_key} AS `{$join->foreign_id}.{$join->foreign_key}`";
-			}
+			$select = array_merge($join->sql_select(), $select);
 		}
 
 		// User defined selects
