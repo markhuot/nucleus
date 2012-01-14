@@ -48,6 +48,26 @@ class Query {
 
 	public function build_select() {
 		$select = array();
+
+		// Required selects
+		foreach ($this->from as $identifier => $table) {
+			$select[] = "{$identifier}.id AS `{$identifier}.id`";
+		}
+		foreach ($this->joins as $join) {
+			if ($join->join_table) {
+				$select[] = "{$join->join_id}.{$join->foreign_key} AS `{$join->foreign_id}.{$join->foreign_key}`";
+				$select[] = "{$join->foreign_id}.{$join->primary_key} AS `{$join->foreign_id}.{$join->primary_key}`";
+				$select[] = "{$join->primary_id}.{$join->primary_key} AS `{$join->primary_id}.{$join->primary_key}`";
+			}
+			else {
+				$select[] = "{$join->primary_id}.id AS `{$join->primary_id}.id`";
+				$select[] = "{$join->primary_id}.{$join->primary_key} AS `{$join->primary_id}.{$join->primary_key}`";
+				$select[] = "{$join->foreign_id}.id AS `{$join->foreign_id}.id`";
+				$select[] = "{$join->foreign_id}.{$join->foreign_key} AS `{$join->foreign_id}.{$join->foreign_key}`";
+			}
+		}
+
+		// User defined selects
 		foreach ($this->from as $identifier => $table) {
 			$columns = $this->query("DESCRIBE {$table}");
 
@@ -62,6 +82,7 @@ class Query {
 				}
 			}
 		}
+
 		foreach ($this->joins as $join) {
 			$columns = $this->query("DESCRIBE {$join->foreign_table}");
 
@@ -75,23 +96,9 @@ class Query {
 					$select[] = "{$join->foreign_id}.{$field} AS `{$join->foreign_id}.{$field}`";
 				}
 			}
-
-			if ($join->join_table) {
-				$columns = $this->query("DESCRIBE {$join->join_table}");
-
-				if (!$columns) {
-					throw new \Exception('Could not build SELECT, invalid table specified', 500);
-				}
-
-				foreach($columns as $column) {
-					$field = $column['Field'];
-					if (in_array($field, $this->select) || !$this->select) {
-						$select[] = "{$join->join_id}.{$field} AS `{$join->foreign_id}.{$field}`";
-					}
-				}
-			}
 		}
-		return ' SELECT '.implode(', ', $select);
+
+		return ' SELECT '.implode(', ', array_unique($select));
 	}
 
 	// ------------------------------------------------------------------------
@@ -238,7 +245,7 @@ class Query {
 		$statement = $this->connection->prepare($sql);
 		if (!$statement->execute($this->build_where_parameters())) {
 			throw new \Exception(
-				$statement->errorInfo()."\n".$this->last_query(),
+				implode(' ', $statement->errorInfo())."\n".$this->last_query(),
 				500
 			);
 		}
