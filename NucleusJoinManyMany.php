@@ -73,7 +73,7 @@ class JoinManyMany extends Join {
 		$sql.= ' ON ';
 		$sql.= $this->foreign_id;
 		$sql.= '.';
-		$sql.= 'id';
+		$sql.= $this->foreign_table->pk();
 		$sql.= '=';
 		$sql.= $this->join_id;
 		$sql.= '.';
