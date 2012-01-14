@@ -29,10 +29,18 @@ class Nucleus {
 	}
 
 	public static function config($key=FALSE) {
+		if ($config = self::guess_default_config()) {
+			self::$config = array_merge(self::$config, $config);
+		}
 		if ($config = self::guess_codeigniter_config()) {
 			self::$config = array_merge(self::$config, $config);
 		}
 		return @self::$config[$key];
+	}
+
+	public static function guess_default_config() {
+		include rtrim(__DIR__, '/').'/config.php';
+		return $config;
 	}
 
 	public static function guess_codeigniter_config() {
