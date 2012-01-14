@@ -51,16 +51,7 @@ class Record {
 	 * access methodologies).
 	 */
 	public function __call($key, $args) {
-		
-		if (isset($this->data[$key])) {
-			return $this->data[$key];
-		}
-
-		if ($related = $this->result->related($this, $key)) {
-			return $related;
-		}
-
-		return FALSE;
+		return $this->__get($key);
 	}
 
 	/**
