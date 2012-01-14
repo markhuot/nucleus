@@ -49,14 +49,13 @@ class Query {
 	public function build_select() {
 		$select = array();
 		foreach ($this->from as $identifier => $table) {
-			$statement = $this->connection->prepare("DESCRIBE {$table}");
-			$result = $statement->execute();
+			$columns = $this->query("DESCRIBE {$table}");
 
-			if (!$result) {
+			if (!$columns) {
 				throw new \Exception('Could not build SELECT, invalid table specified', 500);
 			}
 
-			foreach($statement->fetchAll() as $column) {
+			foreach($columns as $column) {
 				$field = $column['Field'];
 				if (in_array($field, $this->select) || !$this->select) {
 					$select[] = "{$identifier}.{$field} AS `{$identifier}.{$field}`";
