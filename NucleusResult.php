@@ -213,8 +213,8 @@ class Result implements \Iterator {
 	 * FALSE is returned.
 	 */
 	public function related($record, $name) {
-		$key = $record->table_identifier().'.'.$name;
-		if (!($config = $this->query->join_config($key))) {
+		$table_identifier = $record->table_identifier();
+		if (!($config = $this->query->join_config($table_identifier, $name))) {
 			return FALSE;
 		}
 

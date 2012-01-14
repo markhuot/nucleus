@@ -49,8 +49,9 @@ class Query {
 	public function build_select() {
 		$select = array();
 
-		// Required selects are the primary key fields which help us identify
-		// how tables are related. These are added in no matter what.
+		// Required selects are the primary and foreign key fields which help
+		// us identify how tables are related. These are added in no
+		// matter what.
 		foreach ($this->from as $identifier => $table) {
 			$select[] = "{$identifier}.id AS `{$identifier}.id`";
 		}
@@ -249,8 +250,14 @@ class Query {
 		return array_search($table_name, $this->tables);
 	}
 
-	public function join_config($key=FALSE) {
-		return @$this->joins[$key];
+	public function join_config($table_identifier, $name) {
+		foreach ($this->joins as $join) {
+			if ($join->primary_id == $table_identifier && $join->as == $name) {
+				return $join;
+			}
+		}
+
+		return FALSE;
 	}
 
 	public function join_for_foreign_id($identifier) {
