@@ -1,6 +1,7 @@
 Nucleus is a zero-conf ORM for PHP. Favoring convention over configuration writing a complex join statement is as simple as:
 
 ```php
+<?php
 $q = new Nucleus\Query();
 $q->from('posts')
 $q->join('weblogs')
@@ -14,6 +15,7 @@ $posts = $q->go();
 Once you've run a query you have full access to its properties and related objects through standard PHP OOP practices. For example:
 
 ```php
+<?php
 foreach ($posts as $post) {
 	// The post title
 	echo $post->title;
