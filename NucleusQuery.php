@@ -169,7 +169,9 @@ class Query {
 			// confirm whether joins are valid or not.
 			$c['connection'] = $this->connection;
 			
-			// Determine the tables we're trying to relate here
+			// Determine the tables we're trying to relate here. This parses
+			// the string for the following attributes:
+			//     [primary_table].[foreign_table] as [alias]
 			preg_match('/^(?:(.*?)\.)?(.*?)(?:\s+?as\s+(.*))?$/i', $c['foreign_table'], $matches);
 
 			// Check if we define the primary table in the string, if so
