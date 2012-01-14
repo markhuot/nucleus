@@ -37,10 +37,16 @@ class JoinManyMany extends Join {
 	}
 
 	public function sql_select() {
+		$join_id = $this->join_id;
+		$primary_id = $this->primary_id;
+		$primary_key = $this->primary_key;
+		$foreign_id = $this->foreign_id;
+		$foreign_key = $this->foreign_key;
+
 		return array(
-			"{$this->join_id}.{$this->foreign_key} AS `{$this->foreign_id}.{$this->foreign_key}`",
-			"{$this->foreign_id}.{$this->primary_key} AS `{$this->foreign_id}.{$this->primary_key}`",
-			"{$this->primary_id}.{$this->primary_key} AS `{$this->primary_id}.{$this->primary_key}`"
+			"{$join_id}.{$foreign_key} AS `{$foreign_id}.{$foreign_key}`",
+			"{$foreign_id}.{$primary_key} AS `{$foreign_id}.{$primary_key}`",
+			"{$primary_id}.{$primary_key} AS `{$primary_id}.{$primary_key}`"
 		);
 	}
 	
