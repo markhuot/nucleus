@@ -107,4 +107,23 @@ class RelationTests extends Quiz {
 		return $class == 'Nucleus\Result';
 	}
 
+	public function explicitDefinition() {
+		$result = $this->db
+			->from('posts')
+			->join(array(
+				'type' => 'habtm',
+				'primary_table' => 'posts',
+				'foreign_table' => 'categories'
+			))
+			->join('users', array(
+				'type' => 'one',
+				'foreign_table' => 'users',
+				'as' => 'author'
+			))
+			->go();
+		$class1 = get_class($result->record(0)->categories);
+		$class2 = get_class($result->record(0)->author);
+		return $class1 == 'Nucleus\Result' && $class2 == 'Nucleus\Record';
+	}
+
 }
