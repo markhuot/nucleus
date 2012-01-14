@@ -212,7 +212,8 @@ class Query {
 				500
 			);
 		}
-		return $statement->fetchAll();
+		$r = $statement->fetchAll(\PDO::FETCH_ASSOC);
+		return $r;
 	}
 
 	// ------------------------------------------------------------------------
