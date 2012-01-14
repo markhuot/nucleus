@@ -12,7 +12,6 @@ spl_autoload_register(function($class_name) {
 });
 
 class Nucleus {
- 
 	private $connection;
 	private $query;
 
