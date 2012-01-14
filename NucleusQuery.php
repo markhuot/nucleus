@@ -128,13 +128,16 @@ class Query {
 			if (!is_array($c)) {
 				continue;
 			}
+
+			// Pass our connection through to the Join, it'll need it to
+			// confirm whether joins are valid or not.
+			$c['connection'] = $this->connection;
 			
 			// Determine the tables we're trying to relate here
 			preg_match('/^(?:(.*?)\.)?(.*)$/', $c['foreign_table'], $matches);
 			$c['primary_table'] = $matches[1]?:$this->primary_table();
 			$c['primary_id'] = $this->table_identifier_for($c['primary_table']);
 			$c['foreign_table'] = $matches[2];
-			$c['connection'] = $this->connection;
 
 			// If the foreign table doesn't exist we'll check if we're
 			// referring to a defined relationship on the primary table
