@@ -20,9 +20,11 @@ class Connection extends \PDO {
 		if (!constant('APPPATH')) { return FALSE; }
 		include APPPATH.'config/database'.EXT;
 		extract($db[$active_group]);
-
-		$dsn = "{$dbdriver}:host={$hostname};table={$database}";
-		return new Connection($dsn, $username, $password);
+		return new Connection(
+			"{$dbdriver}:host={$hostname};dbname={$database}",
+			$username,
+			$password
+		);
 	}
 
 	public static function active() {

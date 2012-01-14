@@ -131,8 +131,11 @@ class Query {
 		if ($value === FALSE) { $value = 0; }
 		if ($value === NULL) { $operator = 'IS'; $value = 'NULL'; }
 
-		$this->where[] = "{$key} {$operator} {$value}";
-		$this->where_vars[$key] = $value;
+		$this->where[$key] = array(
+			'operator' => $operator,
+			'value' => $value
+		);
+
 		return $this;
 	}
 
@@ -140,13 +143,20 @@ class Query {
 		$sql = '';
 		if ($this->where) {
 			$sql.= ' WHERE ';
-			$sql.= implode(' AND ', $this->where);
+
+			foreach ($this->where as $key => $w) {
+				$sql.= "{$key} {$w['operator']} :{$key}";
+			}
 		}
 		return $sql;
 	}
 
-	public function build_where_vars() {
-		return $this->where_vars;
+	public function build_where_hash() {
+		$where = array();
+		foreach ($this->where as $key => $w) {
+			$where[$key] = $w['value'];
+		}
+		return $where;
 	}
 
 	// ------------------------------------------------------------------------
@@ -187,7 +197,7 @@ class Query {
 
 	public function go() {
 		$this->queries[] = ($sql = $this->_build_query());
-		$rows = $this->_execute_query($sql, $this->build_where_vars());
+		$rows = $this->_execute_query($sql);
 		$result = new \Nucleus\Result(
 			clone $this,
 			$rows
@@ -206,11 +216,13 @@ class Query {
 		return trim($sql);
 	}
 
-	private function _execute_query($sql, $vars=array()) {
+	private function _execute_query($sql) {
 		$statement = $this->connection->prepare($sql);
-
-		if (!$statement->execute()) {
-			throw new \Exception($statement->errorInfo()."\n".$this->last_query(), 500);
+		if (!$statement->execute($this->build_where_hash())) {
+			throw new \Exception(
+				$statement->errorInfo()."\n".$this->last_query(),
+				500
+			);
 		}
 
 		return $statement->fetchAll();
