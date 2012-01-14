@@ -31,7 +31,21 @@ class Model {
 	 * matching the requested name.
 	 */
 	public function join_named($name) {
-		return $this->habtm[0];
+		foreach (array('has_one', 'has_many', 'habtm', 'has_and_belongs_to_many') as $key) {
+			if (isset($this->{$key})) {
+				$keys = array_keys($this->{$key});
+				if (!is_numeric($keys[0])) {
+					$this->{$key} = array($key);
+				}
+				foreach ($this->{$key} as $join) {
+					if (isset($join['as']) && $join['as'] == $name) {
+						return $join;
+					}
+				}
+			}
+		}
+
+		return FALSE;
 	}
 
 }
