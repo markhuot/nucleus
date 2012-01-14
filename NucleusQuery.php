@@ -40,7 +40,7 @@ class Query {
 				$this->select($k);
 			}
 		}
-		else if (is_string($key)) {
+		else if (is_string($key) && $key !== '*') {
 			$this->select[] = $key;
 		}
 		return $this;
@@ -49,7 +49,8 @@ class Query {
 	public function build_select() {
 		$select = array();
 
-		// Required selects
+		// Required selects are the primary key fields which help us identify
+		// how tables are related. These are added in no matter what.
 		foreach ($this->from as $identifier => $table) {
 			$select[] = "{$identifier}.id AS `{$identifier}.id`";
 		}
@@ -57,12 +58,16 @@ class Query {
 			$select = array_merge($join->sql_select(), $select);
 		}
 
-		// User defined selects
+		// User defined selects can either be * or an array of fields. We
+		// really don't care what they're selecting since we know the preious
+		// section has us covered.
+		// First we'll build a list of tables in this query.
 		$tables = $this->from;
 		foreach ($this->joins as $join) {
 			$tables[$join->foreign_id] = $join->foreign_table;
 		}
 
+		// Now we'll go through and identify which columns to select.
 		foreach ($tables as $identifier => $table) {
 			$columns = $this->query("DESCRIBE {$table}");
 
@@ -72,7 +77,7 @@ class Query {
 
 			foreach($columns as $column) {
 				$field = $column['Field'];
-				if (in_array($field, $this->select) || !$this->select) {
+				if (in_array($field, $this->select) || !$this->select || in_array("{$table}.*", $this->select) || in_array("{$table}.{$field}", $this->select)) {
 					$select[] = "{$identifier}.{$field} AS `{$identifier}.{$field}`";
 				}
 			}
