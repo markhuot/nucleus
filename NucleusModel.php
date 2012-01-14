@@ -24,4 +24,14 @@ class Model {
 		}
 	}
 
+	/**
+	 * Join Named
+	 *
+	 * Look through each of the joins defined on this model and check for any
+	 * matching the requested name.
+	 */
+	public function join_named($name) {
+		return $this->habtm[0];
+	}
+
 }
