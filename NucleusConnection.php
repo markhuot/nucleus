@@ -4,6 +4,8 @@ namespace Nucleus;
 
 class Connection extends \PDO {
 	static $connections = array();
+
+	// ------------------------------------------------------------------------
 	
 	private static function guess_connection() {
 		if ($conn = self::guess_codeigniter_connection()) {
@@ -22,6 +24,8 @@ class Connection extends \PDO {
 		);
 	}
 
+	// ------------------------------------------------------------------------
+
 	public static function active() {
 		if (!count(self::$connections)) {
 			return self::guess_connection();
@@ -30,10 +34,14 @@ class Connection extends \PDO {
 		return self::$connections[count(self::$connections)-1];
 	}
 
+	// ------------------------------------------------------------------------
+
 	public function __construct($dsn=NULL, $user=NULL, $pass=NULL) {
 		parent::__construct($dsn, $user, $pass);
 		Connection::$connections[] = $this;
 	}
+
+	// ------------------------------------------------------------------------
 
 	public function query($sql=FALSE, $vars=array()) {
 		$statement = $this->prepare($sql);
