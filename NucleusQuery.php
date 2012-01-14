@@ -165,7 +165,7 @@ class Query {
 		return $sql;
 	}
 
-	public function build_where_hash() {
+	public function build_where_parameters() {
 		$where = array();
 		foreach ($this->where as $key => $w) {
 			$where[$key] = $w['value'];
@@ -221,7 +221,7 @@ class Query {
 		}
 		$this->queries[] = $sql;
 		$statement = $this->connection->prepare($sql);
-		if (!$statement->execute($this->build_where_hash())) {
+		if (!$statement->execute($this->build_where_parameters())) {
 			throw new \Exception(
 				$statement->errorInfo()."\n".$this->last_query(),
 				500
