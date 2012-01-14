@@ -62,6 +62,20 @@ class Query {
 				}
 			}
 		}
+		foreach ($this->joins as $join) {
+			$columns = $this->query("DESCRIBE {$join->foreign_table}");
+
+			if (!$columns) {
+				throw new \Exception('Could not build SELECT, invalid table specified', 500);
+			}
+
+			foreach($columns as $column) {
+				$field = $column['Field'];
+				if (in_array($field, $this->select) || !$this->select) {
+					$select[] = "{$join->foreign_id}.{$field} AS `{$join->foreign_id}.{$field}`";
+				}
+			}
+		}
 		return ' SELECT '.implode(', ', $select);
 	}
 
