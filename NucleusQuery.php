@@ -119,7 +119,7 @@ class Query {
 		    ($join = JoinMany::check($c)) !== FALSE || 
 		    ($join = JoinManyMany::check($c)) !== FALSE) {
 		    
-			$this->joins[$join->primary_id.'.'.$join->as] = $join;
+			$this->joins[] = $join;
 		}
 
 		return $this;
@@ -128,7 +128,7 @@ class Query {
 	public function build_joins() {
 		$sql = '';
 
-		foreach ($this->joins as $key => $join) {
+		foreach ($this->joins as $join) {
 			$sql.= $join->sql_join();
 		}
 
