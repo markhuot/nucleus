@@ -16,20 +16,16 @@ class Join {
 	public $join_id;
 	
 	public function __construct($config=array()) {
+		$config = array_merge(array(
+			'as' => $this->foreign_table,
+			'type' => 'left'
+		), $config);
+
 		foreach ($config as $key => $value) {
 			$this->{$key} = $value;
 		}
-		
-		$this->set_default('as', $this->foreign_table);
-		$this->set_default('type', 'left');
 	}
 
-	public function set_default($key, $value) {
-		if (!$this->{$key}) {
-			$this->$key = $value;
-		}
-	}
-	
 	protected function _check_join_columns() {
 		if (!$this->table_has_column(
 			$this->primary_table,
