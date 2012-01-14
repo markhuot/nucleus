@@ -29,33 +29,33 @@ class JoinManyMany extends Join {
 	}
 	
 	public function sql() {
-		$sql = ' '.strtoupper($config['type']);
+		$sql = ' '.strtoupper($this->type);
 		$sql.= ' JOIN ';
-		$sql.= $config['join_table'];
+		$sql.= $this->join_table;
 		$sql.= ' AS ';
-		$sql.= $config['join_id'];
+		$sql.= $this->join_id;
 		$sql.= ' ON ';
-		$sql.= $config['join_id'];
+		$sql.= $this->join_id;
 		$sql.= '.';
-		$sql.= $config['join_primary_key'];
+		$sql.= $this->join_primary_key;
 		$sql.= '=';
-		$sql.= $config['primary_id'];
+		$sql.= $this->primary_id;
 		$sql.= '.';
-		$sql.= $config['primary_key'];
+		$sql.= $this->primary_key;
 		$sql.= ' ';
-		$sql.= strtoupper($config['type']);
+		$sql.= strtoupper($this->type);
 		$sql.= ' JOIN ';
-		$sql.= $config['foreign_table'];
+		$sql.= $this->foreign_table;
 		$sql.= ' AS ';
-		$sql.= $config['foreign_id'];
+		$sql.= $this->foreign_id;
 		$sql.= ' ON ';
-		$sql.= $config['foreign_id'];
+		$sql.= $this->foreign_id;
 		$sql.= '.';
 		$sql.= 'id';
 		$sql.= '=';
-		$sql.= $config['join_id'];
+		$sql.= $this->join_id;
 		$sql.= '.';
-		$sql.= $config['foreign_key'];
+		$sql.= $this->foreign_key;
 		return $sql;
 	}
 }
