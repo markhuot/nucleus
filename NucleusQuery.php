@@ -115,23 +115,33 @@ class Query {
 		$c['foreign_id'] = $this->add_table($c['foreign_table']);
 		$c['connection'] = $this->connection;
 
-		if (($join = JoinOne::check($c)) !== FALSE || 
-		    ($join = JoinMany::check($c)) !== FALSE || 
-		    ($join = JoinManyMany::check($c)) !== FALSE) {
-		    
-			$this->joins[] = $join;
-		}
+		$this->joins[] = $c;
 
 		return $this;
 	}
 
+	public function prep_joins() {
+		foreach ($this->joins as &$join_config) {
+			if (is_array($join_config) && (
+			    ($join = JoinOne::check($join_config)) !== FALSE || 
+			    ($join = JoinMany::check($join_config)) !== FALSE || 
+			    ($join = JoinManyMany::check($join_config)) !== FALSE)) {
+
+				$join_config = $join;
+			}
+
+			else {
+				$join_config = NULL;
+			}
+		}
+		$this->joins = array_filter($this->joins);
+	}
+
 	public function build_joins() {
 		$sql = '';
-
 		foreach ($this->joins as $join) {
 			$sql.= $join->sql_join();
 		}
-
 		return $sql;
 	}
 
@@ -206,6 +216,7 @@ class Query {
 	// ------------------------------------------------------------------------
 
 	private function _build_query() {
+		$this->prep_joins();
 		$sql = $this->build_select();
 		$sql.= $this->build_from();
 		$sql.= $this->build_joins();
@@ -215,9 +226,10 @@ class Query {
 	}
 
 	public function go() {
+		$rows = $this->query();
 		$result = new Result(
 			clone $this,
-			$this->query()
+			$rows
 		);
 		$this->reset();
 		return $result;
