@@ -237,11 +237,6 @@ class Query {
 		return @$this->tables[$keys[0]]?:FALSE;
 	}
 
-	public function primary_table_identifier() {
-		$keys = array_keys($this->tables);
-		return @$keys[0]?:FALSE;
-	}
-
 	public function add_table($table, $alias=FALSE, $primary=FALSE) {
 		$key = $alias?:'t'.count($this->tables);
 		$this->tables[$key] = $table;
