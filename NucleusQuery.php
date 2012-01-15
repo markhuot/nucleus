@@ -22,6 +22,12 @@ class Query {
 
 	// ------------------------------------------------------------------------
 
+	public function connection() {
+		return $this->connection;
+	}
+
+	// ------------------------------------------------------------------------
+
 	public function reset() {
 		$defaults = (object)get_class_vars('\Nucleus\Query');
 		$this->select = $defaults->select;
