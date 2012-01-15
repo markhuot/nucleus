@@ -214,7 +214,10 @@ class Query {
 				$c = array_merge($c, $config);
 			}
 
-			// Make the foreign table into model
+			// Make the foreign table into model.
+			// Note: this shouldn't use the `model_for_table_name` method
+			// because we don't ever want to "reuse" a model, specifically its // identifier. The foreign table is always a new table to this
+			// query so it should always generate a new model.
 			$c['foreign_table'] = Model::for_table($c['foreign_table']);
 			$this->add_table($c['foreign_table']);
 
