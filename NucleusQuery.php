@@ -135,9 +135,10 @@ class Query {
 
 	public function build_from() {
 		$sql = ' FROM ';
-		foreach ($this->from as $key => $model) {
+		foreach ($this->from as $model) {
 			$table = $model->table_name();
-			$sql.= "{$table} AS {$key}";
+			$identifier = $model->identifier();
+			$sql.= "{$table} AS {$identifier}";
 		}
 		return $sql;
 	}
@@ -190,7 +191,7 @@ class Query {
 			// If the primary table isn't set in the string, set it to the
 			// primary table of this query
 			else {
-				$c['primary_table'] = $this->primary_table()->table_name();
+				$c['primary_table'] = $this->primary_table();
 			}
 
 			// Set the foreign table. There has to be a foreign table or there
@@ -213,7 +214,11 @@ class Query {
 			}
 
 			// Get the models for our tables
-			$c['primary_table'] = Model::for_table($c['primary_table']);
+			if (is_string($c['primary_table'])) {
+				$c['primary_table'] = Model::for_table($c['primary_table']);
+			}
+
+			// Make the foreign table a model
 			$c['foreign_table'] = Model::for_table($c['foreign_table']);
 
 			// Get the sidentifier

@@ -35,7 +35,7 @@ class Model {
 	/**
 	 * SQL Select
 	 *
-	 * Generates the SQL string to identify this record.
+	 * Generates the required SQL string to identify this record.
 	 */
 	public function sql_select() {
 		$pk = $this->pk();
