@@ -185,7 +185,7 @@ class Query {
 
 			// Check if we define the primary table in the string.
 			if ($matches[1]) {
-				$c['primary_table'] = $matches[1];
+				$c['primary_table'] = trim($matches[1]);
 			}
 
 			// If the primary table isn't set in the string, set it to the
