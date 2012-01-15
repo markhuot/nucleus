@@ -185,40 +185,7 @@ class Query {
 
 			// Check if we define the primary table in the string.
 			if ($matches[1]) {
-				$c['primary_table'] = trim($matches[1]);
-
-				// CRAZY SHIT
-				// Check if our primary table has a period in it. If it does
-				// then we're specifying our relationship via nesting and we
-				// need to walk the object train to determine how we should
-				// relate the latest foreign table. In other words, check for
-				// this:
-				//   ->join('posts.comments.users')
-				// If we find that we'll start with `posts`, and find the
-				// `comments` model that's attached to it. That `comments`
-				// model will become our new primary table
-				if (strpos($c['primary_table'], '.')) {
-
-					// Explode out our string
-					$tables = explode('.', $c['primary_table']);
-
-					// Find the initial model for the furthese left table
-					$primary_table = $this->model_for_table_name(array_shift($tables));
-
-					// Loop through subsequent tables
-					foreach ($tables as $table) {
-
-						// Get the join specified by the two tables
-						$join = $this->join_for($primary_table, $table);
-
-						// Make the right table (the foreign_table) the new
-						// primary table in our loop
-						$primary_table = $join->foreign_table;
-					}
-
-					// Finally update the primary table
-					$c['primary_table'] = $primary_table;
-				}
+				$c['primary_table'] = $this->model_for_table_name(trim($matches[1]));
 			}
 
 			// If the primary table isn't set in the string, set it to the
@@ -420,6 +387,10 @@ class Query {
 	 * matching the requested table name. If not it will create a new model.
 	 */
 	public function model_for_table_name($table_name) {
+		if (strpos($table_name, '.')) {
+			return $this->model_for_table_path($table_name);
+		}
+
 		foreach ($this->tables as $model) {
 			if ($model->table_name() == $table_name ||
 			    $model->alias() == $table_name) {
@@ -428,6 +399,35 @@ class Query {
 		}
 
 		throw new \Exception('You\'ve specified a table that doesn\'t exist: '.$table_name, 500);
+	}
+
+	/**
+	 * Model for Table Path
+	 *
+	 * Takes a dot notation path of tables and determines the appropriate model
+	 * for the right most table.
+	 */
+	public function model_for_table_path($path) {
+
+		// Explode out our string
+		$tables = preg_split('/\./', $path);
+
+		// Find the initial model for the furthese left table
+		$primary_table = $this->model_for_table_name(array_shift($tables));
+
+		// Loop through subsequent tables
+		foreach ($tables as $table) {
+
+			// Get the join specified by the two tables
+			$join = $this->join_for($primary_table, $table);
+
+			// Make the right table (the foreign_table) the new
+			// primary table in our loop
+			$primary_table = $join->foreign_table;
+		}
+
+		// Finally update the primary table
+		return $primary_table;
 	}
 
 	/**
