@@ -9,8 +9,8 @@ class Record {
 
 	public function __construct($result=FALSE, $model=FALSE, $data=array()) {
 		$this->result = $result;
-		$this->set_data($data);
 		$this->model = $model;
+		$this->set_data($data);
 	}
 
 	public function table_identifier() {
