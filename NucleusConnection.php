@@ -8,20 +8,34 @@ class Connection extends \PDO {
 	// ------------------------------------------------------------------------
 	
 	private static function guess_connection() {
-		if ($conn = self::guess_codeigniter_connection()) {
-			return $conn;
+		if (($config = self::guess_codeigniter_connection()) ||
+		    ($config = self::guess_default_connection())) {
+			return new Connection(
+				"{$config['dbtype']}:host={$config['dbhost']};dbname={$config['dbname']}",
+				$config['dbuser'],
+				$config['dbpass']
+			);
 		}
+
+		return FALSE;
 	}
 
 	private static function guess_codeigniter_connection() {
 		if (!defined('APPPATH')) { return FALSE; }
 		include APPPATH.'config/database'.EXT;
-		extract($db[$active_group]);
-		return new Connection(
-			"{$dbdriver}:host={$hostname};dbname={$database}",
-			$username,
-			$password
+		return array(
+			'dbtype' => $db[$active_group]['dbdriver'],
+			'dbhost' => $db[$active_group]['host'],
+			'dbname' => $db[$active_group]['name'],
+			'dbuser' => $db[$active_group]['user'],
+			'dbpass' => $db[$active_group]['pass'],
+			'dbsock' => $db[$active_group]['socket']
 		);
+	}
+
+	private static function guess_default_connection() {
+		include rtrim(__DIR__, '/').'/config.php';
+		return $config;
 	}
 
 	// ------------------------------------------------------------------------
