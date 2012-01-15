@@ -18,6 +18,25 @@ $this->nucleus->join('comments')
 $posts = $this->nucleus->go();
 ```
 
+Or…
+
+```php
+<?php
+$this->nucleus->from('posts')
+$this->nucleus->join('posts.users')
+$this->nucleus->join('posts.tags')
+$this->nucleus->join('posts.comments')
+$this->nucleus->join('posts.comments.users')
+$posts = $this->nucleus->go();
+```
+
+Or…
+
+```php
+<?php
+$posts = $this->nucleus->get('posts, users, tags, comments, comments.users')
+```
+
 Once you've run a query you have full access to its properties and related objects through standard PHP OOP practices. For example:
 
 ```php
