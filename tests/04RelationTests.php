@@ -87,10 +87,16 @@ class RelationTests extends Quiz {
 			->join('posts.users')
 			->join('comments')
 			->join('comments.users')
+			->join('users.avatars')
 			->go();
 		$title = $result->record(0)->title;
-		$user = $result->record(0)->user->name;
-		return $title == 'Let\'s save the world' && $user == 'Jack Bauer';
+		$user1 = $result->record(0)->user->name;
+		$user2 = $result->record(0)->comments->record(0)->user->name;
+		$avatar = $result->record(0)->user->avatar->url;
+		return $title == 'Let\'s save the world' &&
+		       $user1 == 'Jack Bauer' &&
+		       $user2 == 'Nina Myers' &&
+		       $avatar == 'Jack\'s Avatar';
 	}
 
 	public function multiNestedJoin() {
