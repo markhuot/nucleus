@@ -123,6 +123,27 @@ class RelationTests extends Quiz {
 		       $avatar2 == 'Nina\'s Avatar';
 	}
 
+	public function overlySpecificJoin2() {
+		$result = $this->db
+			->from('posts')
+			->join('posts.users')
+			->join('posts.users.avatars')
+			->join('posts.comments')
+			->join('posts.comments.users as test')
+			->join('test.avatars')
+			->go();
+		$title = $result->record(0)->title;
+		$user1 = $result->record(0)->user->name;
+		$user2 = $result->record(0)->comments->record(0)->test->name;
+		$avatar1 = $result->record(0)->user->avatar->url;
+		$avatar2 = $result->record(0)->comments->record(0)->test->avatar->url;
+		return $title == 'Let\'s save the world' &&
+		       $user1 == 'Jack Bauer' &&
+		       $user2 == 'Nina Myers' &&
+		       $avatar1 == 'Jack\'s Avatar' &&
+		       $avatar2 == 'Nina\'s Avatar';
+	}
+
 	public function multiNestedJoin() {
 		$result = $this->db
 			->from('comments')
