@@ -84,17 +84,38 @@ class RelationTests extends Quiz {
 	public function megaNestedJoin() {
 		$result = $this->db
 			->from('posts as p')
-			->join('p.users as post_author')
+			->join('p.users as pu')
 			->join('p.comments')
-			->join('comments.users as comment_author')
-			->join('post_author.avatars')
-			->join('comment_author.avatars')
+			->join('comments.users as cu')
+			->join('pu.avatars')
+			->join('cu.avatars')
 			->go();
 		$title = $result->record(0)->title;
-		$user1 = $result->record(0)->post_author->name;
-		$user2 = $result->record(0)->comments->record(0)->comment_author->name;
-		$avatar1 = $result->record(0)->post_author->avatar->url;
-		$avatar2 = $result->record(0)->comments->record(0)->comment_author->avatar->url;
+		$user1 = $result->record(0)->pu->name;
+		$user2 = $result->record(0)->comments->record(0)->cu->name;
+		$avatar1 = $result->record(0)->pu->avatar->url;
+		$avatar2 = $result->record(0)->comments->record(0)->cu->avatar->url;
+		return $title == 'Let\'s save the world' &&
+		       $user1 == 'Jack Bauer' &&
+		       $user2 == 'Nina Myers' &&
+		       $avatar1 == 'Jack\'s Avatar' &&
+		       $avatar2 == 'Nina\'s Avatar';
+	}
+
+	public function overlySpecificJoin() {
+		$result = $this->db
+			->from('posts')
+			->join('posts.users')
+			->join('posts.users.avatars')
+			->join('posts.comments')
+			->join('posts.comments.users')
+			->join('posts.comments.users.avatars')
+			->go();
+		$title = $result->record(0)->title;
+		$user1 = $result->record(0)->user->name;
+		$user2 = $result->record(0)->comments->record(0)->user->name;
+		$avatar1 = $result->record(0)->user->avatar->url;
+		$avatar2 = $result->record(0)->comments->record(0)->user->avatar->url;
 		return $title == 'Let\'s save the world' &&
 		       $user1 == 'Jack Bauer' &&
 		       $user2 == 'Nina Myers' &&

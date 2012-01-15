@@ -181,11 +181,44 @@ class Query {
 			// Determine the tables we're trying to relate here. This parses
 			// the string for the following attributes:
 			//     [primary_table].[foreign_table] as [alias]
-			preg_match('/^(?:(.*?)\.)?(.*?)(?:\s+?as\s+(.*))?$/i', $c['foreign_table'], $matches);
+			preg_match('/^(?:(.*)\.)?(.*?)(?:\s+?as\s+(.*))?$/i', $c['foreign_table'], $matches);
 
 			// Check if we define the primary table in the string.
 			if ($matches[1]) {
 				$c['primary_table'] = trim($matches[1]);
+
+				// CRAZY SHIT
+				// Check if our primary table has a period in it. If it does
+				// then we're specifying our relationship via nesting and we
+				// need to walk the object train to determine how we should
+				// relate the latest foreign table. In other words, check for
+				// this:
+				//   ->join('posts.comments.users')
+				// If we find that we'll start with `posts`, and find the
+				// `comments` model that's attached to it. That `comments`
+				// model will become our new primary table
+				if (strpos($c['primary_table'], '.')) {
+
+					// Explode out our string
+					$tables = explode('.', $c['primary_table']);
+
+					// Find the initial model for the furthese left table
+					$primary_table = $this->model_for_table_name(array_shift($tables));
+
+					// Loop through subsequent tables
+					foreach ($tables as $table) {
+
+						// Get the join specified by the two tables
+						$join = $this->join_for($primary_table, $table);
+
+						// Make the right table (the foreign_table) the new
+						// primary table in our loop
+						$primary_table = $join->foreign_table;
+					}
+
+					// Finally update the primary table
+					$c['primary_table'] = $primary_table;
+				}
 			}
 
 			// If the primary table isn't set in the string, set it to the
@@ -398,7 +431,7 @@ class Query {
 	}
 
 	/**
-	 * Join For Foreign Id
+	 * Join For
 	 *
 	 * Returns the join config for specified parameters. Two results are
 	 * possible:
@@ -411,6 +444,17 @@ class Query {
 		$identifier = $model->identifier();
 
 		foreach ($this->joins as $join) {
+
+			// This method could be called while we're building the actual join
+			// array. In which case we would be looping over the element of the
+			// array that we're actually trying to join. Since we only really
+			// care about put together joins at this point if the element isn't
+			// an object, then continue on our way.
+			// It's all very meta.
+			if (is_array($join)) {
+				continue;
+			}
+
 			if (func_num_args() == 1) {
 				if ($join->foreign_table->identifier() == $identifier) {
 					return $join;
@@ -419,7 +463,8 @@ class Query {
 
 			else if (func_num_args() == 2) {
 				if ($join->primary_table->identifier() == $identifier &&
-				    $join->as == $name) {
+				   ($join->as == $name || 
+					$join->foreign_table->table_name() == $name)) {
 					return $join;
 				}
 			}
