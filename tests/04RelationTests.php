@@ -81,6 +81,16 @@ class RelationTests extends Quiz {
 		return $title == 'Let\'s save the world' && $user == 'Jack Bauer';
 	}
 
+	public function detailedFrom() {
+		$result = $this->db->get('posts, users, comments, users.avatars');
+		$title = $result->record(0)->title;
+		$user1 = $result->record(0)->user->name;
+		$avatar1 = $result->record(0)->user->avatar->url;
+		return $title == 'Let\'s save the world' &&
+		       $user1 == 'Jack Bauer' &&
+		       $avatar1 == 'Jack\'s Avatar';
+	}
+
 	public function megaNestedJoin() {
 		$result = $this->db
 			->from('posts as p')

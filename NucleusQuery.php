@@ -112,8 +112,8 @@ class Query {
 		// join on any subsequent tables.
 		if (strpos($table, ',')) {
 			$tables = preg_split('/\s*,\s*/', $table);
-			$this->from($tables[0]);
-			foreach (array_slice($tables, 1) as $table) {
+			$this->from(array_shift($tables));
+			foreach ($tables as $table) {
 				$this->join($table);
 			}
 			return $this;
