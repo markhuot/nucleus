@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.1.58-1ubuntu1)
 # Database: tmp
-# Generation Time: 2012-01-14 15:23:29 +0000
+# Generation Time: 2012-01-15 16:58:34 +0000
 # ************************************************************
 
 
@@ -18,6 +18,28 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+# Dump of table avatars
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `avatars`;
+
+CREATE TABLE `avatars` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `url` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+LOCK TABLES `avatars` WRITE;
+/*!40000 ALTER TABLE `avatars` DISABLE KEYS */;
+
+INSERT INTO `avatars` (`id`, `url`)
+VALUES
+	(1,'Jack\'s Avatar');
+
+/*!40000 ALTER TABLE `avatars` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table categories
@@ -120,6 +142,52 @@ VALUES
 UNLOCK TABLES;
 
 
+# Dump of table posts_tagged
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `posts_tagged`;
+
+CREATE TABLE `posts_tagged` (
+  `post_id` int(11) DEFAULT NULL,
+  `tag_id` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+LOCK TABLES `posts_tagged` WRITE;
+/*!40000 ALTER TABLE `posts_tagged` DISABLE KEYS */;
+
+INSERT INTO `posts_tagged` (`post_id`, `tag_id`)
+VALUES
+	(1,1),
+	(1,2);
+
+/*!40000 ALTER TABLE `posts_tagged` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table tags
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `tags`;
+
+CREATE TABLE `tags` (
+  `tag_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`tag_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+LOCK TABLES `tags` WRITE;
+/*!40000 ALTER TABLE `tags` DISABLE KEYS */;
+
+INSERT INTO `tags` (`tag_id`, `name`)
+VALUES
+	(1,'tag1'),
+	(2,'tag2'),
+	(3,'tag3');
+
+/*!40000 ALTER TABLE `tags` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
 # Dump of table users
 # ------------------------------------------------------------
 
@@ -130,20 +198,21 @@ CREATE TABLE `users` (
   `name` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `password` varchar(54) DEFAULT NULL,
+  `avatar_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`)
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `avatar_id`)
 VALUES
-	(1,'Sample User','sample@example.com','jdafhaus'),
-	(2,'Another User','another@example.com','89yhr8sfhnaksf'),
-	(3,'Chloe O\'Brien','chloe@ctu.gov','ashfu98ashdf'),
-	(4,'Jack Bauer','jack@ctu.gov','saduf8ahgsdyf'),
-	(5,'Nina Myers','nina@ctu.gov','j98asdhfasdfua09'),
-	(6,'Curtis','curtis@ctu.gov','23984ryg8yhr23');
+	(1,'Sample User','sample@example.com','jdafhaus',NULL),
+	(2,'Another User','another@example.com','89yhr8sfhnaksf',NULL),
+	(3,'Chloe O\'Brien','chloe@ctu.gov','ashfu98ashdf',NULL),
+	(4,'Jack Bauer','jack@ctu.gov','saduf8ahgsdyf',1),
+	(5,'Nina Myers','nina@ctu.gov','j98asdhfasdfua09',NULL),
+	(6,'Curtis','curtis@ctu.gov','23984ryg8yhr23',NULL);
 
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
