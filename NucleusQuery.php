@@ -199,7 +199,7 @@ class Query {
 			$c['foreign_table'] = $matches[2];
 
 			// If we're passing in an alias via the string, set it here
-			if (isset($matches[3])) {
+			if (isset($matches[3]) && $matches[3]) {
 				$c['as'] = @$matches[3];
 			}
 
