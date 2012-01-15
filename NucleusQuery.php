@@ -218,7 +218,7 @@ class Query {
 			// Note: this shouldn't use the `model_for_table_name` method
 			// because we don't ever want to "reuse" a model, specifically its // identifier. The foreign table is always a new table to this
 			// query so it should always generate a new model.
-			$c['foreign_table'] = Model::for_table($c['foreign_table']);
+			$c['foreign_table'] = Model::for_table($c['foreign_table'], $c['as']);
 			$this->add_table($c['foreign_table']);
 
 			// Finally, check if this is actually a valid join?
@@ -389,7 +389,7 @@ class Query {
 	public function model_for_table_name($table_name) {
 		foreach ($this->tables as $model) {
 			if ($model->table_name() == $table_name ||
-			    $model->identifier() == $table_name) {
+			    $model->alias() == $table_name) {
 				return $model;
 			}
 		}
