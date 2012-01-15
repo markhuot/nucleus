@@ -222,7 +222,6 @@ class Result implements \Iterator {
 	 * FALSE is returned.
 	 */
 	public function related($record, $name) {
-		$table_identifier = $record->table_identifier();
 		if (!($config = $this->query->join_for($record->model(), $name))) {
 			return FALSE;
 		}
