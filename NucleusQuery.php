@@ -213,12 +213,12 @@ class Query {
 				}
 			}
 
-			// Get the models for our tables
+			// If our primary table is still a string turn it into a model
 			if (is_string($c['primary_table'])) {
 				$c['primary_table'] = Model::for_table($c['primary_table']);
 			}
 
-			// Make the foreign table a model
+			// Make the foreign table into model
 			$c['foreign_table'] = Model::for_table($c['foreign_table']);
 
 			// Get the sidentifier
