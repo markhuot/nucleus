@@ -208,9 +208,8 @@ class Query {
 				$c['primary_table'] = Model::for_table($c['primary_table']);
 			}
 
-			// If the foreign table doesn't exist we'll check if we're
-			// referring to a defined relationship on the primary table
-			// instead.
+			// Check if we're referring to a defined relationship on the
+			// primary table.
 			if ($config = $c['primary_table']->join_named($c['foreign_table'])) {
 				$c = array_merge($c, $config);
 			}
