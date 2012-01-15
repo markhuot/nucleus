@@ -133,7 +133,7 @@ class Query {
 
 		// If we're here we know we're dealing with a vanilla table. Add it.
 		$table = Model::for_table($table, $alias);
-		$key = $this->add_table($table, $alias, TRUE);
+		$this->add_table($table, $alias, TRUE);
 		$this->from[] = $table;
 
 		return $this;
