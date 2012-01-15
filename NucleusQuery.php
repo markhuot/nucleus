@@ -390,10 +390,6 @@ class Query {
 		return @$this->tables[$table_identifier];
 	}
 
-	public function table_name_for($table_identifier) {
-		return @$this->tables[$table_identifier];
-	}
-
 	public function table_identifier_for($table_name) {
 		return array_search($table_name, $this->tables);
 	}
