@@ -391,14 +391,15 @@ class Query {
 	 *
 	 * Returns the join config for specified parameters. Two results are
 	 * possible:
-	 *   1. Passed a single $identifier the method returns the join config
-	 *      used to attach the table represented by $identifier
+	 *   1. Passed a $model the method returns the join config used to attach
+	 *      the table represented by $model
 	 *   2. Passed a $name as well, the method returns the join used to attach
 	 *      the table represented by $name.
 	 */
-	public function join_for($identifier, $name=FALSE) {
+	public function join_for($model, $name=FALSE) {
+		$identifier = $model->identifier();
+		
 		foreach ($this->joins as $join) {
-
 			if (func_num_args() == 1) {
 				if ($join->foreign_table->identifier() == $identifier) {
 					return $join;
