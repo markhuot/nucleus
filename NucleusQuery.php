@@ -394,7 +394,7 @@ class Query {
 			}
 		}
 
-		throw new Exception('You\'ve specified a table that doesn\'t exist.', 500);
+		throw new \Exception('You\'ve specified a table that doesn\'t exist.', 500);
 	}
 
 	/**
