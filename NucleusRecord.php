@@ -13,6 +13,10 @@ class Record {
 		$this->set_data($data);
 	}
 
+	public function model() {
+		return $this->model;
+	}
+
 	public function table_identifier() {
 		return $this->model->identifier();
 	}

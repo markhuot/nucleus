@@ -60,7 +60,7 @@ class Result implements \Iterator {
 	 * the sample query `SELECT * FROM posts LEFT JOIN post_data…` the primary
 	 * table would be the `posts` table.
 	 */
-	private $table_identifier = 't0';
+	private $table = 't0';
 
 	/**
 	 * Key
@@ -83,7 +83,7 @@ class Result implements \Iterator {
 	 */
 	public function __construct($query=FALSE, $rows=array()) {
 		$this->query = $query;
-		$this->table_identifier = $query->primary_table()->identifier();
+		$this->table = $query->primary_table();
 		foreach ($rows as $row) {
 			$records_in_row = $this->parse_row_to_records($row);
 			foreach ($records_in_row as $record) {
@@ -191,7 +191,7 @@ class Result implements \Iterator {
 	 */
 	public function records() {
 		return @$this->records
-			[$this->table_identifier]
+			[$this->table->identifier()]
 			[$this->key]
 			[$this->id];
 	}
@@ -235,7 +235,7 @@ class Result implements \Iterator {
 		if (isset($this->records[$table_identifier][$fk][$id])) {
 			if (get_class($config) == 'Nucleus\JoinOne') {
 				$result = clone $this;
-				$result->table_identifier = $table_identifier;
+				$result->table = $config->foreign_table;
 				$result->key = $fk;
 				$result->id = $id;
 				return $result->record(0);
@@ -243,7 +243,7 @@ class Result implements \Iterator {
 
 			else {
 				$result = clone $this;
-				$result->table_identifier = $table_identifier;
+				$result->table = $config->foreign_table;
 				$result->key = $fk;
 				$result->id = $id;
 				return $result;
