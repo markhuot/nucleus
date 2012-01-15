@@ -20,13 +20,15 @@ foreach ($posts as $post) {
 	// The post title
 	echo $post->title;
 
-	// The related categories
-	foreach ($post->categories as $category) {
-		$category->name;
-	}
+	// The related comments
+	foreach ($post->comments as $comment) {
 
-	// The related weblog
-	echo $post->weblog->name;
+		// Comment data
+		echo $comment->text;
+
+		// Nested data
+		echo $comment->user->name;
+	}
 }
 ```
 
