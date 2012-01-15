@@ -231,19 +231,16 @@ class Result implements \Iterator {
 		$id = $record->{$config->primary_key};
 
 		if (isset($this->records[$table->identifier()][$key][$id])) {
+			$result = clone $this;
+			$result->table = $config->foreign_table;
+			$result->key = $key;
+			$result->id = $id;
+
 			if (get_class($config) == 'Nucleus\JoinOne') {
-				$result = clone $this;
-				$result->table = $config->foreign_table;
-				$result->key = $key;
-				$result->id = $id;
 				return $result->record(0);
 			}
 
 			else {
-				$result = clone $this;
-				$result->table = $config->foreign_table;
-				$result->key = $key;
-				$result->id = $id;
 				return $result;
 			}
 		}
