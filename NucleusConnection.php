@@ -10,8 +10,14 @@ class Connection extends \PDO {
 	private static function guess_connection() {
 		if (($config = self::guess_codeigniter_connection()) ||
 		    ($config = self::guess_default_connection())) {
+
+			$dsn = "{$config['dbtype']}:";
+			$dsn.= ($config['dbhost']) ? "host={$config['dbhost']};" : '';
+			$dsn.= ($config['dbsock']) ? "unix_socket={$config['dbsock']};" : '';
+			$dsn.= ($config['dbname']) ? "dbname={$config['dbname']};" : '';
+
 			return new Connection(
-				"{$config['dbtype']}:host={$config['dbhost']};dbname={$config['dbname']}",
+				$dsn,
 				$config['dbuser'],
 				$config['dbpass']
 			);
