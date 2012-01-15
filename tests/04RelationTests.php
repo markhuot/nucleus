@@ -116,7 +116,7 @@ class RelationTests extends Quiz {
 				'foreign_table' => 'categories'
 			))
 			->join('users', array(
-				'type' => 'one',
+				'type' => 'has_one',
 				'foreign_table' => 'users',
 				'as' => 'author'
 			))

@@ -4,7 +4,7 @@ namespace Nucleus;
 
 class JoinMany extends Join {
 	public static function check($config=array()) {
-		if (isset($config['type']) && !in_array($config['type'], array('many'))) {
+		if (isset($config['type']) && !in_array($config['type'], array('has_many'))) {
 			return FALSE;
 		}
 

@@ -203,19 +203,16 @@ class Query {
 				$c['as'] = @$matches[3];
 			}
 
-			// If the foreign table doesn't exist we'll check if we're
-			// referring to a defined relationship on the primary table
-			// instead.
-			if (!$this->connection->table_exists($c['foreign_table'])) {
-				$model = Model::for_table($c['primary_table']);
-				if ($config = $model->join_named($c['foreign_table'])) {
-					$c = array_merge($c, $config);
-				}
-			}
-
 			// If our primary table is still a string turn it into a model
 			if (is_string($c['primary_table'])) {
 				$c['primary_table'] = Model::for_table($c['primary_table']);
+			}
+
+			// If the foreign table doesn't exist we'll check if we're
+			// referring to a defined relationship on the primary table
+			// instead.
+			if ($config = $c['primary_table']->join_named($c['foreign_table'])) {
+				$c = array_merge($c, $config);
 			}
 
 			// If our primary table doesn't have an identifier, set one
@@ -398,7 +395,7 @@ class Query {
 	 */
 	public function join_for($model, $name=FALSE) {
 		$identifier = $model->identifier();
-		
+
 		foreach ($this->joins as $join) {
 			if (func_num_args() == 1) {
 				if ($join->foreign_table->identifier() == $identifier) {

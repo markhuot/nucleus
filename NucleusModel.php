@@ -79,13 +79,29 @@ class Model {
 			'has_many',
 			'habtm'
 		) as $key) {
+
+			// Check that there are joins defined for this key
 			if (isset($this->{$key})) {
+
+				// Check that the join has numerical indexes. If it doesn't
+				// then our author forgot to nest the join witin an arry so
+				// we'll fix that for them.
 				$keys = array_keys($this->{$key});
 				if (!is_numeric($keys[0])) {
 					$this->{$key} = array($this->{$key});
 				}
+
+				// Loop through each join.
 				foreach ($this->{$key} as $join) {
+
+					// If it's a match return it.
 					if (isset($join['as']) && $join['as'] == $name) {
+						$join['type'] = $key;
+						return $join;
+					}
+
+					// If no :as is defined, check the table name
+					else if (!isset($join['as']) && $join['foreign_table'] == $name) {
 						$join['type'] = $key;
 						return $join;
 					}

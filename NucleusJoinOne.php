@@ -4,7 +4,7 @@ namespace Nucleus;
 
 class JoinOne extends Join {
 	public static function check($config=array()) {
-		if (isset($config['type']) && !in_array($config['type'], array('one'))) {
+		if (isset($config['type']) && !in_array($config['type'], array('has_one'))) {
 			return FALSE;
 		}
 
