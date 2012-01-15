@@ -227,9 +227,6 @@ class Query {
 			$c['foreign_table'] = Model::for_table($c['foreign_table']);
 			$this->add_table($c['foreign_table']);
 
-			// Get the identifier
-			$this->table_identifier_for($c['primary_table']->table_name());
-
 			// Finally, check if this is actually a valid join?
 			if (($join = JoinOne::check($c)) !== FALSE || 
 			    ($join = JoinMany::check($c)) !== FALSE || 
