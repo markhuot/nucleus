@@ -386,26 +386,30 @@ class Query {
 		return array_search($table_name, $this->tables);
 	}
 
-	public function join_config($table_identifier, $name) {
-		foreach ($this->joins as $join) {
-			if ($join->primary_table->identifier() == $table_identifier && $join->as == $name) {
-				return $join;
-			}
-		}
-
-		return FALSE;
-	}
-
 	/**
 	 * Join For Foreign Id
 	 *
-	 * Returns the join config for specified identifier. This tells you the
-	 * configuration used to join on the table specified in $identifier.
+	 * Returns the join config for specified parameters. Two results are
+	 * possible:
+	 *   1. Passed a single $identifier the method returns the join config
+	 *      used to attach the table represented by $identifier
+	 *   2. Passed a $name as well, the method returns the join used to attach
+	 *      the table represented by $name.
 	 */
-	public function join_for($identifier) {
+	public function join_for($identifier, $name=FALSE) {
 		foreach ($this->joins as $join) {
-			if ($join->foreign_table->identifier() == $identifier) {
-				return $join;
+
+			if (func_num_args() == 1) {
+				if ($join->foreign_table->identifier() == $identifier) {
+					return $join;
+				}
+			}
+
+			else if (func_num_args() == 2) {
+				if ($join->primary_table->identifier() == $identifier &&
+				    $join->as == $name) {
+					return $join;
+				}
 			}
 		}
 

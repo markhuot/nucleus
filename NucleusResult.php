@@ -223,7 +223,7 @@ class Result implements \Iterator {
 	 */
 	public function related($record, $name) {
 		$table_identifier = $record->table_identifier();
-		if (!($config = $this->query->join_config($table_identifier, $name))) {
+		if (!($config = $this->query->join_for($table_identifier, $name))) {
 			return FALSE;
 		}
 
