@@ -83,8 +83,8 @@ class RelationTests extends Quiz {
 
 	public function megaNestedJoin() {
 		$result = $this->db
-			->from('posts')
-			->join('posts.users as post_author')
+			->from('posts as p')
+			->join('p.users as post_author')
 			->join('comments')
 			->join('comments.users as comment_author')
 			->join('post_author.avatars')
