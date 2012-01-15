@@ -130,7 +130,7 @@ class Result implements \Iterator {
 			if (!@$records[$table_identifier]) {
 				$records[$table_identifier] = new Record(
 					$this,
-					$table_identifier
+					$this->query->model_for_identifier($table_identifier)
 				);
 			}
 

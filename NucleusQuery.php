@@ -386,6 +386,10 @@ class Query {
 		return $key;
 	}
 
+	public function model_for_identifier($table_identifier) {
+		return @$this->tables[$table_identifier];
+	}
+
 	public function table_name_for($table_identifier) {
 		return @$this->tables[$table_identifier];
 	}

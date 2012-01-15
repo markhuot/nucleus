@@ -4,17 +4,17 @@ namespace Nucleus;
 
 class Record {
 	private $result;
-	private $table_identifier;
+	private $model;
 	private $data;
 
-	public function __construct($result=FALSE, $id=FALSE, $data=array()) {
+	public function __construct($result=FALSE, $model=FALSE, $data=array()) {
 		$this->result = $result;
-		$this->table_identifier = $id;
 		$this->set_data($data);
+		$this->model = $model;
 	}
 
 	public function table_identifier() {
-		return $this->table_identifier;
+		return $this->model->identifier();
 	}
 
 	public function set_data($key, $value=FALSE) {
@@ -36,9 +36,13 @@ class Record {
 		return $this->data;
 	}
 
+	/**
+	 * ID
+	 *
+	 * Get the value of the primary key
+	 */
 	public function id() {
-		$model = Model::for_table($this->result->query()->table_name_for($this->table_identifier));
-		return $this->data($model->pk());
+		return $this->data($this->model->pk());
 	}
 
 	/**
