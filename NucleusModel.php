@@ -5,6 +5,7 @@ namespace Nucleus;
 class Model {
 
 	protected $table_name;
+	protected $alias;
 	protected $identifier;
 	protected $pk = 'id';
 
@@ -32,6 +33,14 @@ class Model {
 		$this->identifier = $identifier;
 	}
 
+	public function alias() {
+		return $this->alias;
+	}
+
+	public function set_alias($alias) {
+		$this->alias = $alias;
+	}
+
 	/**
 	 * SQL Select
 	 *
@@ -49,7 +58,7 @@ class Model {
 	 * Takes a table name and loads the corresponding model file. If no model 
 	 * is defined we'll create an anomyous model on the author's behalf.
 	 */
-	public static function for_table($table) {
+	public static function for_table($table, $alias=FALSE) {
 		$model_base_path = \Nucleus::config('model_path');
 		$model_name = ucfirst(singular($table)).'Model';
 		$model_path = "{$model_base_path}/".$model_name.'.php';
@@ -63,6 +72,7 @@ class Model {
 		}
 
 		$model->set_table_name($table);
+		$model->set_alias($alias);
 
 		return $model;
 	}
