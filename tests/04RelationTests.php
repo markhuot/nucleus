@@ -85,7 +85,7 @@ class RelationTests extends Quiz {
 		$result = $this->db
 			->from('posts as p')
 			->join('p.users as post_author')
-			->join('comments')
+			->join('p.comments')
 			->join('comments.users as comment_author')
 			->join('post_author.avatars')
 			->join('comment_author.avatars')
