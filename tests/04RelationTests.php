@@ -84,19 +84,22 @@ class RelationTests extends Quiz {
 	public function megaNestedJoin() {
 		$result = $this->db
 			->from('posts')
-			->join('posts.users')
+			->join('posts.users as post_author')
 			->join('comments')
-			->join('comments.users')
-			->join('users.avatars')
+			->join('comments.users as comment_author')
+			->join('post_author.avatars')
+			->join('comment_author.avatars')
 			->go();
 		$title = $result->record(0)->title;
-		$user1 = $result->record(0)->user->name;
-		$user2 = $result->record(0)->comments->record(0)->user->name;
-		$avatar1 = $result->record(0)->user->avatar->url;
+		$user1 = $result->record(0)->post_author->name;
+		$user2 = $result->record(0)->comments->record(0)->comment_author->name;
+		$avatar1 = $result->record(0)->post_author->avatar->url;
+		$avatar2 = $result->record(0)->comments->record(0)->comment_author->avatar->url;
 		return $title == 'Let\'s save the world' &&
 		       $user1 == 'Jack Bauer' &&
 		       $user2 == 'Nina Myers' &&
-		       $avatar1 == 'Jack\'s Avatar';
+		       $avatar1 == 'Jack\'s Avatar' &&
+		       $avatar2 == 'Nina\'s Avatar';
 	}
 
 	public function multiNestedJoin() {
