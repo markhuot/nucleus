@@ -81,6 +81,18 @@ class RelationTests extends Quiz {
 		return $title == 'Let\'s save the world' && $user == 'Jack Bauer';
 	}
 
+	public function megaNestedJoin() {
+		$result = $this->db
+			->from('posts')
+			->join('posts.users')
+			->join('comments')
+			->join('comments.users')
+			->go();
+		$title = $result->record(0)->title;
+		$user = $result->record(0)->user->name;
+		return $title == 'Let\'s save the world' && $user == 'Jack Bauer';
+	}
+
 	public function multiNestedJoin() {
 		$result = $this->db
 			->from('comments')

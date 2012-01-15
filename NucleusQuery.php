@@ -205,18 +205,13 @@ class Query {
 
 			// If our primary table is still a string turn it into a model
 			if (is_string($c['primary_table'])) {
-				$c['primary_table'] = Model::for_table($c['primary_table']);
+				$c['primary_table'] = $this->model_for_table_name($c['primary_table']);
 			}
 
 			// Check if we're referring to a defined relationship on the
 			// primary table.
 			if ($config = $c['primary_table']->join_named($c['foreign_table'])) {
 				$c = array_merge($c, $config);
-			}
-
-			// If our primary table doesn't have an identifier, set one
-			if (!$c['primary_table']->identifier()) {
-				$c['primary_table']->set_identifier($this->table_identifier_for($c['primary_table']->table_name()));
 			}
 
 			// Make the foreign table into model
@@ -380,6 +375,23 @@ class Query {
 
 	public function table_identifier_for($table_name) {
 		return array_search($table_name, $this->tables);
+	}
+
+	/**
+	 * Model for Table Name
+	 *
+	 * Checks through all the existing models to see if there is a model
+	 * matching the requested table name. If not it will create a new model.
+	 */
+	public function model_for_table_name($table_name) {
+		foreach ($this->tables as $model) {
+			if ($model->table_name() == $table_name ||
+			    $model->identifier() == $table_name) {
+				return $model;
+			}
+		}
+
+		throw new Exception('You\'ve specified a table that doesn\'t exist.', 500);
 	}
 
 	/**
