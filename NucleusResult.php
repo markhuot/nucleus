@@ -227,7 +227,7 @@ class Result implements \Iterator {
 			return FALSE;
 		}
 
-		$table_identifier = $config->foreign_id;
+		$table_identifier = $config->foreign_table->identifier();
 		$pk = $config->primary_key;
 		$fk = $config->foreign_key;
 		$id = $record->{$pk};

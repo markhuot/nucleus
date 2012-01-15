@@ -218,12 +218,17 @@ class Query {
 				$c['primary_table'] = Model::for_table($c['primary_table']);
 			}
 
+			// If our primary table doesn't have an identifier, set one
+			if (!$c['primary_table']->identifier()) {
+				$c['primary_table']->set_identifier($this->table_identifier_for($c['primary_table']->table_name()));
+			}
+
 			// Make the foreign table into model
 			$c['foreign_table'] = Model::for_table($c['foreign_table']);
+			$this->add_table($c['foreign_table']);
 
-			// Get the sidentifier
-			$c['primary_id'] = $this->table_identifier_for($c['primary_table']->table_name());
-			$c['foreign_id'] = $this->add_table($c['foreign_table']);
+			// Get the identifier
+			$this->table_identifier_for($c['primary_table']->table_name());
 
 			// Finally, check if this is actually a valid join?
 			if (($join = JoinOne::check($c)) !== FALSE || 
@@ -391,7 +396,7 @@ class Query {
 
 	public function join_config($table_identifier, $name) {
 		foreach ($this->joins as $join) {
-			if ($join->primary_id == $table_identifier && $join->as == $name) {
+			if ($join->primary_table->identifier() == $table_identifier && $join->as == $name) {
 				return $join;
 			}
 		}
@@ -401,7 +406,7 @@ class Query {
 
 	public function join_for_foreign_id($identifier) {
 		foreach ($this->joins as $join) {
-			if ($join->foreign_id == $identifier) {
+			if ($join->foreign_table->identifier() == $identifier) {
 				return $join;
 			}
 		}

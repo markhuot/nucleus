@@ -16,7 +16,7 @@ class JoinManyMany extends Join {
 
 		$join = new JoinManyMany(array_merge(array(
 			'join_table' => $join_table,
-			'join_id' => $config['foreign_id'].'j',
+			'join_id' => $config['foreign_table']->identifier().'j',
 			'join_primary_key' => singular($config['foreign_table']).'_id',
 			'primary_key' => $config['primary_table']->pk(),
 			'foreign_key' => singular($config['primary_table']).'_id'
@@ -38,9 +38,9 @@ class JoinManyMany extends Join {
 
 	public function sql_select() {
 		$join_id = $this->join_id;
-		$primary_id = $this->primary_id;
+		$primary_id = $this->primary_table->identifier();
 		$primary_key = $this->primary_key;
-		$foreign_id = $this->foreign_id;
+		$foreign_id = $this->foreign_table->identifier();
 		$foreign_key = $this->foreign_key;
 		$foreign_pk = $this->foreign_table->pk();
 
@@ -62,7 +62,7 @@ class JoinManyMany extends Join {
 		$sql.= '.';
 		$sql.= $this->foreign_key;
 		$sql.= '=';
-		$sql.= $this->primary_id;
+		$sql.= $this->primary_table->identifier();
 		$sql.= '.';
 		$sql.= $this->primary_key;
 		$sql.= ' ';
@@ -70,9 +70,9 @@ class JoinManyMany extends Join {
 		$sql.= ' JOIN ';
 		$sql.= $this->foreign_table;
 		$sql.= ' AS ';
-		$sql.= $this->foreign_id;
+		$sql.= $this->foreign_table->identifier();
 		$sql.= ' ON ';
-		$sql.= $this->foreign_id;
+		$sql.= $this->foreign_table->identifier();
 		$sql.= '.';
 		$sql.= $this->foreign_table->pk();
 		$sql.= '=';

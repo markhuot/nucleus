@@ -44,10 +44,10 @@ class Join {
 	}
 
 	public function sql_select() {
-		$primary_id = $this->primary_id;
+		$primary_id = $this->primary_table->identifier();
 		$primary_pk = $this->primary_table->pk();
 		$primary_key = $this->primary_key;
-		$foreign_id = $this->foreign_id;
+		$foreign_id = $this->foreign_table->identifier();
 		$foreign_pk = $this->foreign_table->pk();
 		$foreign_key = $this->foreign_key;
 
@@ -64,13 +64,13 @@ class Join {
 		$sql.= ' JOIN ';
 		$sql.= $this->foreign_table;
 		$sql.= ' AS ';
-		$sql.= $this->foreign_id;
+		$sql.= $this->foreign_table->identifier();
 		$sql.= ' ON ';
-		$sql.= $this->foreign_id;
+		$sql.= $this->foreign_table->identifier();
 		$sql.= '.';
 		$sql.= $this->foreign_key;
 		$sql.= '=';
-		$sql.= $this->primary_id;
+		$sql.= $this->primary_table->identifier();
 		$sql.= '.';
 		$sql.= $this->primary_key;
 		return $sql;
