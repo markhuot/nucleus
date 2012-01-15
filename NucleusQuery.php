@@ -396,7 +396,13 @@ class Query {
 		return FALSE;
 	}
 
-	public function join_for_foreign_id($identifier) {
+	/**
+	 * Join For Foreign Id
+	 *
+	 * Returns the join config for specified identifier. This tells you the
+	 * configuration used to join on the table specified in $identifier.
+	 */
+	public function join_for($identifier) {
 		foreach ($this->joins as $join) {
 			if ($join->foreign_table->identifier() == $identifier) {
 				return $join;

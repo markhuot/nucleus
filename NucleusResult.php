@@ -168,7 +168,7 @@ class Result implements \Iterator {
 
 		// Check if this record is the primary record or joined on via a
 		// relationship.
-		if ($config = $this->query->join_for_foreign_id($table_identifier)) {
+		if ($config = $this->query->join_for($table_identifier)) {
 			$key = $config->foreign_key;
 			$id = $record->{$key};
 		}
