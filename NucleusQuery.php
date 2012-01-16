@@ -263,6 +263,7 @@ class Query {
 		if ($value === NULL) { $value = 'NULL'; }
 
 		$this->where[$key] = array(
+			'key' => $key,
 			'operator' => $operator,
 			'value' => $value
 		);
