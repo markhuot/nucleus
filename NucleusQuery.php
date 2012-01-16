@@ -132,9 +132,7 @@ class Query {
 		}
 
 		// If we're here we know we're dealing with a vanilla table. Add it.
-		$table = Model::for_table($table, $alias);
-		$this->add_table($table, $alias, TRUE);
-		$this->from[] = $table;
+		$this->from[] = $this->add_table($table, $alias, TRUE);;
 
 		return $this;
 	}
@@ -362,6 +360,10 @@ class Query {
 	}
 
 	public function add_table($model, $alias=FALSE, $primary=FALSE) {
+		if (is_string($model)) {
+			$model = Model::for_table($model, $alias);
+		}
+
 		$key = $alias?:'t'.count($this->tables);
 		$model->set_identifier($key);
 
@@ -375,7 +377,7 @@ class Query {
 			$this->tables[$key] = $model;
 		}
 		
-		return $key;
+		return $model;
 	}
 
 	public function model_for_identifier($table_identifier) {
