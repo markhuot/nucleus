@@ -372,18 +372,32 @@ class Query {
 		return $model;
 	}
 
+	public function tables() {
+		$tables = array();
+
+		foreach ($this->from as $model) {
+			$tables[] = $model;
+		}
+
+		foreach ($this->joins as $join) {
+			$tables[] = $join->foreign_table;
+		}
+
+		return $tables;
+	}
+
 	/**
 	 * Model for Table Name
 	 *
 	 * Checks through all the existing models to see if there is a model
-	 * matching the requested table name. If not it will create a new model.
+	 * matching the requested table name.
 	 */
 	public function model_for_table_name($table_name) {
 		if (strpos($table_name, '.')) {
 			return $this->model_for_table_path($table_name);
 		}
 
-		foreach ($this->tables as $model) {
+		foreach ($this->tables() as $model) {
 			if ($model->table_name() == $table_name ||
 			    $model->alias() == $table_name) {
 				return $model;
