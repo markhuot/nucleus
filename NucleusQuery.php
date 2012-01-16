@@ -389,10 +389,6 @@ class Query {
 		return FALSE;
 	}
 
-	public function table_identifier_for($table_name) {
-		return array_search($table_name, $this->tables);
-	}
-
 	/**
 	 * Model for Table Name
 	 *
