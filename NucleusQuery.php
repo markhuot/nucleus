@@ -220,7 +220,8 @@ class Query {
 
 			// Make the foreign table into model.
 			// Note: this shouldn't use the `model_for_table_name` method
-			// because we don't ever want to "reuse" a model, specifically its // identifier. The foreign table is always a new table to this
+			// because we don't ever want to "reuse" a model, specifically its
+			// identifier. The foreign table is always a new table to this
 			// query so it should always generate a new model.
 			$c['foreign_table'] = Model::for_table($c['foreign_table'], $c['as']);
 			$this->add_table($c['foreign_table'], $c['as']);
@@ -355,8 +356,8 @@ class Query {
 	// ------------------------------------------------------------------------
 
 	public function primary_table() {
-		$keys = array_keys($this->tables);
-		return @$this->tables[$keys[0]]?:FALSE;
+		$keys = array_keys($this->from);
+		return @$this->from[$keys[0]]?:FALSE;
 	}
 
 	public function add_table($model, $alias=FALSE, $primary=FALSE) {
@@ -365,7 +366,6 @@ class Query {
 		}
 
 		$key = $alias?:'t'.count($this->tables);
-		$model->set_identifier($key);
 
 		if ($primary) {
 			$this->tables = array_merge(array(
@@ -381,7 +381,12 @@ class Query {
 	}
 
 	public function model_for_identifier($table_identifier) {
-		return @$this->tables[$table_identifier];
+		foreach ($this->tables as $model) {
+			if ($model->identifier() == $table_identifier) {
+				return $model;
+			}
+		}
+		return FALSE;
 	}
 
 	public function table_identifier_for($table_name) {

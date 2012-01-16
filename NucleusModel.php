@@ -4,10 +4,16 @@ namespace Nucleus;
 
 class Model {
 
+	private static $identifier_index = 0;
+
 	protected $table_name;
 	protected $alias;
 	protected $identifier;
 	protected $pk = 'id';
+
+	public function __construct() {
+		$this->set_identifier('t'.Model::$identifier_index++);
+	}
 
 	public function __toString() {
 		return $this->table_name;
