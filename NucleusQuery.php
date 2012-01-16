@@ -66,19 +66,9 @@ class Query {
 		// User defined selects can either be * or an array of fields. We
 		// really don't care what they're selecting since we know the preious
 		// section has us covered.
-		// First we'll build a list of tables in this query.
-		$tables = array();
-		foreach ($this->from as $model) {
-			$id = $model->identifier();
-			$tables[$id] = $model;
-		}
-		foreach ($this->joins as $join) {
-			$id = $join->foreign_table->identifier();
-			$tables[$id] = $join->foreign_table;
-		}
-
-		// Now we'll go through and identify which columns to select.
-		foreach ($tables as $identifier => $table) {
+		foreach ($this->tables() as $model) {
+			$table = $model->table_name();
+			$identifier = $model->identifier();
 			$columns = $this->query("DESCRIBE {$table}");
 
 			if (!$columns) {
@@ -87,7 +77,10 @@ class Query {
 
 			foreach($columns as $column) {
 				$field = $column['Field'];
-				if (in_array($field, $this->select) || !$this->select || in_array("{$table}.*", $this->select) || in_array("{$table}.{$field}", $this->select)) {
+				if (!$this->select ||
+				    in_array($field, $this->select) ||
+				    in_array("{$table}.*", $this->select) ||
+				    in_array("{$table}.{$field}", $this->select)) {
 					$select[] = "{$identifier}.{$field} AS `{$identifier}.{$field}`";
 				}
 			}
