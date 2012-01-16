@@ -207,16 +207,16 @@ class Query {
 			}
 
 			// Check if we're referring to a defined relationship on the
-			// primary table.
+			// primary model.
 			if ($config = $c['primary_table']->join_named($c['foreign_table'])) {
 				$c = array_merge($c, $config);
 			}
 
-			// Make the foreign table into model.
+			// Turn our foreign_table string into a model.
 			// Note: this shouldn't use the `model_for_table_name` method
-			// because we don't ever want to "reuse" a model, specifically its
-			// identifier. The foreign table is always a new table to this
-			// query so it should always generate a new model.
+			// because we don't ever want to "reuse" a model. The foreign
+			// table is always a new table to this query so it should always
+			// generate a new model.
 			$c['foreign_table'] = $this->add_table($c['foreign_table'], $c['as']);
 
 			// Finally, check if this is actually a valid join?
@@ -260,7 +260,7 @@ class Query {
 
 		if ($value === TRUE) { $value = 1; }
 		if ($value === FALSE) { $value = 0; }
-		if ($value === NULL) { $operator = 'IS'; $value = 'NULL'; }
+		if ($value === NULL) { $value = 'NULL'; }
 
 		$this->where[$key] = array(
 			'operator' => $operator,
