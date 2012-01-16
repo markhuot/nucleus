@@ -2,6 +2,10 @@ Nucleus is a zero-conf ORM for PHP. Once loaded into your framework of choice it
 
 ```php
 <?php
+// Instantiate Nucleus.
+$nucleus = new Nucleus\Query();
+
+// Run the query.
 $posts = $nucleus->get('posts');
 ```
 
