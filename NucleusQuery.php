@@ -365,16 +365,14 @@ class Query {
 			$model = Model::for_table($model, $alias);
 		}
 
-		$key = $alias?:'t'.count($this->tables);
-
 		if ($primary) {
 			$this->tables = array_merge(array(
-				$key => $model
+				$model
 			), $this->tables);
 		}
 
 		else {
-			$this->tables[$key] = $model;
+			$this->tables[] = $model;
 		}
 		
 		return $model;
