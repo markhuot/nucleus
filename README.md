@@ -1,4 +1,4 @@
-Nucleus is a zero-conf ORM for PHP. Simple to install, without any dependencies, Nucleus makes it easy to white queries without touching SQL.
+Nucleus is a zero-conf ORM for PHP. Simple to install, without any dependencies, Nucleus makes it easy to write queries without touching SQL.
 
 ```php
 <?php
