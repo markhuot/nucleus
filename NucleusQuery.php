@@ -140,9 +140,7 @@ class Query {
 	public function build_from() {
 		$sql = ' FROM ';
 		foreach ($this->from as $model) {
-			$table = $model->table_name();
-			$identifier = $model->identifier();
-			$sql.= "{$table} AS {$identifier}";
+			$sql.= "{$model->table_name()} AS {$model->identifier()}";
 		}
 		return $sql;
 	}
