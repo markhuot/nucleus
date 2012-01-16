@@ -8,7 +8,6 @@ class Query {
 	private $queries = array();       // Each query run by this object
 	private $select = array();        // The requested selections
 	private $from = array();          // The primary table to pull from
-	private $tables = array();        // Every table referenced in this query
 	private $joins = array();         // The requested joins (indexed by name)
 	private $where = array();         // Any defined where statements
 	private $orderby = array();       // The requested order
@@ -32,7 +31,6 @@ class Query {
 		$defaults = (object)get_class_vars('\Nucleus\Query');
 		$this->select = $defaults->select;
 		$this->from = $defaults->from;
-		$this->tables = $defaults->tables;
 		$this->joins = $defaults->joins;
 		$this->where = $defaults->where;
 		$this->orderby = $defaults->orderby;
@@ -132,7 +130,7 @@ class Query {
 		}
 
 		// Convert the table to a model and add it to our array of from tables
-		$this->from[] = $this->add_table($table, $alias, TRUE);
+		$this->from[] = Model::for_table($table, $alias, TRUE);
 
 		return $this;
 	}
@@ -217,7 +215,7 @@ class Query {
 			// because we don't ever want to "reuse" a model. The foreign
 			// table is always a new table to this query so it should always
 			// generate a new model.
-			$c['foreign_table'] = $this->add_table($c['foreign_table'], $c['as']);
+			$c['foreign_table'] = Model::for_table($c['foreign_table'], $c['as']);
 
 			// Finally, check if this is actually a valid join?
 			if (($join = JoinOne::check($c)) !== FALSE || 
@@ -352,24 +350,6 @@ class Query {
 	public function primary_table() {
 		$keys = array_keys($this->from);
 		return @$this->from[$keys[0]]?:FALSE;
-	}
-
-	public function add_table($model, $alias=FALSE, $primary=FALSE) {
-		if (is_string($model)) {
-			$model = Model::for_table($model, $alias);
-		}
-
-		if ($primary) {
-			$this->tables = array_merge(array(
-				$model
-			), $this->tables);
-		}
-
-		else {
-			$this->tables[] = $model;
-		}
-		
-		return $model;
 	}
 
 	public function tables() {
