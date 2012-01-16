@@ -131,7 +131,7 @@ class Query {
 			$alias = $matches[2];
 		}
 
-		// If we're here we know we're dealing with a vanilla table. Add it.
+		// Convert the table to a model and add it to our array of from tables
 		$this->from[] = $this->add_table($table, $alias, TRUE);
 
 		return $this;
@@ -140,9 +140,9 @@ class Query {
 	public function build_from() {
 		$sql = ' FROM ';
 		foreach ($this->from as $model) {
-			$sql.= "{$model->table_name()} AS {$model->identifier()}";
+			$sql.= "{$model->table_name()} AS {$model->identifier()}, ";
 		}
-		return $sql;
+		return rtrim($sql, ', ');
 	}
 
 	// ------------------------------------------------------------------------
