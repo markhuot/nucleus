@@ -132,7 +132,7 @@ class Query {
 		}
 
 		// If we're here we know we're dealing with a vanilla table. Add it.
-		$this->from[] = $this->add_table($table, $alias, TRUE);;
+		$this->from[] = $this->add_table($table, $alias, TRUE);
 
 		return $this;
 	}
