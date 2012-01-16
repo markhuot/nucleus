@@ -206,11 +206,6 @@ class Query {
 				$c['as'] = @$matches[3];
 			}
 
-			// If our primary table is still a string turn it into a model
-			if (is_string($c['primary_table'])) {
-				$c['primary_table'] = $this->model_for_table_name($c['primary_table']);
-			}
-
 			// Check if we're referring to a defined relationship on the
 			// primary table.
 			if ($config = $c['primary_table']->join_named($c['foreign_table'])) {
