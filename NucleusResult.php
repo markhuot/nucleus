@@ -1,52 +1,55 @@
 <?php
 
+// Our namespace…
 namespace Nucleus;
 
+/**
+ * The class, which implements an Iterator so we can loop over each record in
+ * a `foreach` loop.
+ */
 class Result implements \Iterator {
 	/**
-	 * Index
 	 * The index of the iterator as we loop over the records.
 	 */
-	public $index = 0;
+	private $index = 0;
 
 	/**
-	 * Records
 	 * Stores each record this result set is responsible for. It is stored in a
 	 * nested fashion like this:
-	 * $records = array(
-	 *     [t0] = array(                              // The table name
-	 *         [id] = array(                          // The related table key
-	 *             [null] = array(                    // The related table id
-	 *                 [12] = Nucleus_record Object,  // The related object
-	 *                 [9] = Nucleus_record Object,   // The key maps to the...
-	 *                 [2] = Nucleus_record Object,   // ..object's primary key
+	 * 
+	 *     $records = array(
+	 *         [t0] = array(                         // The table name
+	 *             [id] = array(                     // The related table key
+	 *                 [null] = array(               // The related table id
+	 *                     [12] = Nucleus_record     // The related object
+	 *                     [9] = Nucleus_record      // The key maps to the...
+	 *                     [2] = Nucleus_record,     // ..object's primary key
+	 *                 )
 	 *             )
-	 *         )
-	 *     ), 
-	 *     [t1] = array(                              // Stored by the table id
-	 *         [post_id] = array(
-	 *             [3] = Nucleus_result Object
-	 *                 [12] = Nucleus_record Object,
-	 *                 [9] = Nucleus_record Object,
-	 *                 [2] = Nucleus_record Object,
+	 *         ), 
+	 *         [t1] = array(                         // Stored by the table id
+	 *             [post_id] = array(
+	 *                 [3] = array(
+	 *                     [12] = Nucleus_record,
+	 *                     [9] = Nucleus_record,
+	 *                     [2] = Nucleus_record,
+	 *                 )
 	 *             )
-	 *         )
-	 *     ),
-	 *     [t2] = array(
-	 *         [post_id] = array(
-	 *             [3] = Nucleus_result Object (
-	 *                 [1] Nucleus_record Object,
-	 *                 [2] Nucleus_record Object,
-	 *                 [3] Nucleus_record Object,
+	 *         ),
+	 *         [t2] = array(
+	 *             [post_id] = array(
+	 *                 [3] = array(
+	 *                     [1] Nucleus_record,
+	 *                     [2] Nucleus_record,
+	 *                     [3] Nucleus_record,
+	 *                 )
 	 *             )
 	 *         )
 	 *     )
-	 * )
 	 */
 	private $records = array();
 
 	/**
-	 * Query
 	 * The query that generated this result set. This is useful because it
 	 * defines how JOINs were added and what identifiers table names were
 	 * mapped to.
@@ -54,7 +57,6 @@ class Result implements \Iterator {
 	private $query;
 
 	/**
-	 * Table Name
 	 * Each relation has one, and only one, primary table. It is this table
 	 * that we iterate over and this table that drives all the relations. In
 	 * the sample query `SELECT * FROM posts LEFT JOIN post_data…` the primary
@@ -63,7 +65,6 @@ class Result implements \Iterator {
 	private $table = 't0';
 
 	/**
-	 * Key
 	 * The key defines how related tables are joined onto the primary table.
 	 * In the $records array this is the second level key. It defaults to `id`
 	 * as a way to index the primary table.
@@ -71,14 +72,12 @@ class Result implements \Iterator {
 	private $key = 'id';
 
 	/**
-	 * Id
 	 * The ID is the way related tables are joined onto the primary table. By
 	 * default we set this to null.
 	 */
 	private $id = 'null';
 
 	/**
-	 * Construct
 	 * Accepts the rows to parse and the query that generated this result.
 	 */
 	public function __construct($query=FALSE, $rows=array()) {
@@ -93,7 +92,6 @@ class Result implements \Iterator {
 	}
 
 	/**
-	 * Clone
 	 * When a result set is cloned, possibly to reference related entries we
 	 * want to make sure certain properties are reset.
 	 */
@@ -103,7 +101,6 @@ class Result implements \Iterator {
 	}
 
 	/**
-	 * Parse Row
 	 * Parses a raw database result and turns it into actual records. The raw
 	 * database result would be an array with column names mapping to one or
 	 * more tables. This method takes each column, determines which table or
@@ -116,17 +113,20 @@ class Result implements \Iterator {
 		// We'll store each record contained in this row here
 		$records = array();
 
-		// Loop through each column in the row to determine which table
-		// it belongs to.
+		/** Loop through each column in the row to determine which table
+		 * it belongs to.
+		 */
 		foreach ($row as $key => $value) {
 
-			// Explode the column name to determine the table name. So, a
-			// column name of `posts.title` will be from the table `posts` and
-			// have a column name of `title`.
+			/** Explode the column name to determine the table name. So, a
+			 * column name of `posts.title` will be from the table `posts` and
+			 * have a column name of `title`.
+			 */
 			list($table_identifier, $column) = explode('.', $key);
 			
-			// If this is the first column from the determined table create
-			// a new database record to hold it.
+			/** If this is the first column from the determined table create
+			 * a new database record to hold it.
+			 */
 			if (!@$records[$table_identifier]) {
 				$records[$table_identifier] = new Record(
 					$this,
@@ -134,16 +134,19 @@ class Result implements \Iterator {
 				);
 			}
 
-			// Finally, add the column and its value to the appropriate
-			// database record
+			/** Finally, add the column and its value to the appropriate
+			 * database record
+			 */
 			$records[$table_identifier]->set_data($column, $value);
 		}
 
-		// Loop through each record and remove records that don't have a PK
-		// since they're probably just artifacts of the join. This happens when
-		// you SELECT * FROM posts LEFT JOIN comments. If a post has no
-		// comments the comment table columns will still be returned but
-		// instead of having any data in them they will all be null.
+		/**
+		 * Loop through each record and remove records that don't have a PK
+		 * since they're probably just artifacts of the join. This happens when
+		 * you SELECT * FROM posts LEFT JOIN comments. If a post has no
+		 * comments the comment table columns will still be returned but
+		 * instead of having any data in them they will all be null.
+		 */
 		foreach ($records as &$record) {
 			if (!$record->id()) {
 				$record = null;
@@ -155,7 +158,6 @@ class Result implements \Iterator {
 	}
 
 	/**
-	 * Add Record
 	 * Adds a record to the result set. If the record contains any foreign keys
 	 * we'll add it to the result set mutliple times for each foreign key.
 	 */
@@ -166,8 +168,10 @@ class Result implements \Iterator {
 		$key = $this->key;
 		$id = $this->id;
 
-		// Check if this record is the primary record or joined on via a
-		// relationship.
+		/**
+		 * Check if this record is the primary record or joined on via a
+		 * relationship.
+		 */
 		if ($config = $this->query->join_for($record->model())) {
 			$key = $config->foreign_key;
 			$id = $record->{$key};
@@ -178,7 +182,6 @@ class Result implements \Iterator {
 	}
 
 	/**
-	 * Query
 	 * Access to the query that generated this result
 	 */
 	public function query() {
@@ -186,7 +189,6 @@ class Result implements \Iterator {
 	}
 
 	/**
-	 * Records
 	 * Returns the currently focused collection.
 	 */
 	public function records() {
@@ -197,7 +199,6 @@ class Result implements \Iterator {
 	}
 
 	/**
-	 * Record
 	 * Returns the record in question. You can ask for a record by
 	 * index (0,1,2,3…) which will return the actual Nucleus_record or you
 	 * can ask for a string "title" or "body" to return the value of the 
@@ -217,7 +218,6 @@ class Result implements \Iterator {
 	}
 
 	/**
-	 * Related
 	 * If a relation exists at the defined key it is returned, otherwise
 	 * FALSE is returned.
 	 */
@@ -249,7 +249,6 @@ class Result implements \Iterator {
 	}
 
 	/**
-	 * Size
 	 * Returns the number of rows in this result set.
 	 */
 	public function size() {
@@ -257,30 +256,31 @@ class Result implements \Iterator {
 	}
 
 	/**
-	 * Iterators
+	 * ## Iterators
+	 * 
 	 * The required methods to iterate over an object. The trickery going on
 	 * here involves our $records array being indexed by primary key and not
 	 * incrementing numerically. So, for each of these we have to get our
 	 * array of keys and apply our index to the array of keys instead of just
-	 * using $this->records actual keys.
+	 * using `$this->records` actual keys.
 	 */
 	public function key() {
 		return $this->index;
 	}
 
-    public function current() {
-    	return $this->record($this->index);
-    }
+	public function current() {
+		return $this->record($this->index);
+	}
 
-    function next() {
-    	return $this->record(++$this->index)?:FALSE;
-    }
+	function next() {
+		return $this->record(++$this->index)?:FALSE;
+	}
 
-    function valid() {
-    	return $this->record($this->index)?TRUE:FALSE;
-    }
+	function valid() {
+		return $this->record($this->index)?TRUE:FALSE;
+	}
 
-    function rewind() {
-    	return $this->record($this->index = 0);
-    }
+	function rewind() {
+		return $this->record($this->index = 0);
+	}
 }
