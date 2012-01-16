@@ -16,7 +16,7 @@ Favoring convention over configuration writing a complex join statement is as si
 $posts = $nucleus->get('posts, users, tags, comments, comments.users')
 ```
 
-Once you've run a query you have full access to its properties and related objects through standard PHP OOP practices. For example:
+Once you've run a query you have access to its properties and related objects through standard PHP OOP practices. For example:
 
 ```php
 <?php
