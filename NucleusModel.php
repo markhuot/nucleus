@@ -5,6 +5,7 @@ namespace Nucleus;
 class Model {
 
 	private static $identifier_index = 0;
+	private static $models = array();
 
 	protected $table_name;
 	protected $alias;
@@ -13,6 +14,7 @@ class Model {
 
 	public function __construct() {
 		$this->set_identifier('t'.Model::$identifier_index++);
+		Model::$models[$this->identifier()] = $this;
 	}
 
 	public function __toString() {
@@ -81,6 +83,15 @@ class Model {
 		$model->set_alias($alias);
 
 		return $model;
+	}
+
+	public static function for_identifier($table_identifier) {
+		foreach (Model::$models as $model) {
+			if ($model->identifier() == $table_identifier) {
+				return $model;
+			}
+		}
+		return FALSE;
 	}
 
 	/**

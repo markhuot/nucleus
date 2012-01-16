@@ -376,15 +376,6 @@ class Query {
 		return $model;
 	}
 
-	public function model_for_identifier($table_identifier) {
-		foreach ($this->tables as $model) {
-			if ($model->identifier() == $table_identifier) {
-				return $model;
-			}
-		}
-		return FALSE;
-	}
-
 	/**
 	 * Model for Table Name
 	 *
