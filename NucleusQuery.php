@@ -72,7 +72,10 @@ class Query {
 			$columns = $this->query("DESCRIBE {$table}");
 
 			if (!$columns) {
-				throw new \Exception('Could not build SELECT, invalid table specified', 500);
+				throw new \Exception(
+					'Could not build SELECT, invalid table specified',
+					500
+				);
 			}
 
 			foreach($columns as $column) {
