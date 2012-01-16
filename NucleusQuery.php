@@ -223,8 +223,7 @@ class Query {
 			// because we don't ever want to "reuse" a model, specifically its
 			// identifier. The foreign table is always a new table to this
 			// query so it should always generate a new model.
-			$c['foreign_table'] = Model::for_table($c['foreign_table'], $c['as']);
-			$this->add_table($c['foreign_table'], $c['as']);
+			$c['foreign_table'] = $this->add_table($c['foreign_table'], $c['as']);
 
 			// Finally, check if this is actually a valid join?
 			if (($join = JoinOne::check($c)) !== FALSE || 
