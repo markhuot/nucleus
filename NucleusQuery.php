@@ -183,7 +183,8 @@ class Query {
 			// Determine the tables we're trying to relate here. This parses
 			// the string for the following attributes:
 			//     [primary_table].[foreign_table] as [alias]
-			preg_match('/^(?:(.*)\.)?(.*?)(?:\s+?as\s+(.*))?$/i', $c['foreign_table'], $matches);
+			$regex = '/^(?:(.*)\.)?(.*?)(?:\s+?as\s+(.*))?$/i';
+			preg_match($regex, $c['foreign_table'], $matches);
 
 			// Check if we define the primary table in the string.
 			if ($matches[1]) {
