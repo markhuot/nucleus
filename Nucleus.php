@@ -9,8 +9,8 @@ require_once 'NucleusHelper.php';
 
 /**
  * Set up the autoloader. This will be called anytime an undefined class within
- * the \Nucleus namespace is requested. We'll then, quickly, require the
- * appropriate file, defining our class.
+ * the `\Nucleus` namespace is requested. We'll then require the appropriate
+ * file, defining our class.
  * 
  * The pattern is to turn underscores (_) to directory separators mash
  * together namespaces. So, the class \Nucleus\Connection becomes
