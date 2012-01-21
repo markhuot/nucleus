@@ -12,8 +12,8 @@ class Connection extends \PDO {
 		    ($config = self::guess_default_connection())) {
 
 			$dsn = "{$config['dbtype']}:";
-			$dsn.= ($config['dbhost']) ? "host={$config['dbhost']};" : '';
-			$dsn.= ($config['dbsock']) ? "unix_socket={$config['dbsock']};" : '';
+			$dsn.= (@$config['dbhost']) ? "host={$config['dbhost']};" : '';
+			$dsn.= (@$config['dbsock']) ? "unix_socket={$config['dbsock']};" : '';
 			$dsn.= ($config['dbname']) ? "dbname={$config['dbname']};" : '';
 
 			return new Connection(
@@ -31,11 +31,10 @@ class Connection extends \PDO {
 		include APPPATH.'config/database'.EXT;
 		return array(
 			'dbtype' => $db[$active_group]['dbdriver'],
-			'dbhost' => $db[$active_group]['host'],
-			'dbname' => $db[$active_group]['name'],
-			'dbuser' => $db[$active_group]['user'],
-			'dbpass' => $db[$active_group]['pass'],
-			'dbsock' => $db[$active_group]['socket']
+			'dbhost' => $db[$active_group]['hostname'],
+			'dbname' => $db[$active_group]['database'],
+			'dbuser' => $db[$active_group]['username'],
+			'dbpass' => $db[$active_group]['password']
 		);
 	}
 
