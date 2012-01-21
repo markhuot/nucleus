@@ -212,7 +212,7 @@ class Query {
 			// table is always a new table to this query so it should always
 			// generate a new model.
 			if (is_string($c['foreign_table'])) {
-				$c['foreign_table'] = Model::for_table($c['foreign_table'], $c['as']);
+				$c['foreign_table'] = Model::for_table($c['foreign_table'], @$c['as']);
 			}
 
 			// Finally, check if this is actually a valid join?
