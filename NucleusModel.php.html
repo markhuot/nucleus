@@ -1,52 +1,163 @@
-<!DOCTYPE html><html><head><meta http-equiv="content-type" content="text/html;charset=utf-8"><title>NucleusModel.php</title><link rel="stylesheet" href="http://markhuot.github.com/phocco/resources/phocco.css"><script src="http://code.jquery.com/jquery-1.7.1.min.js"></script><script src="http://markhuot.github.com/phocco/resources/showdown.js"></script><link href="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.css" type="text/css" rel="stylesheet" /><!--script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"--></script><link href="http://alexgorbatchev.com/pub/sh/current/styles/shThemeDefault.css" rel="stylesheet" type="text/css" /><style type="text/css">.syntaxhighlighter,.syntaxhighlighter .line.alt1,.syntaxhighlighter .line.alt2{background:none !important;} td.code td.code {padding:0;border:none;}</style></head><body><div id="container"><div id="background"></div><div id="jump_to"><a id="jump_handle" href="#">Jump&nbsp;To&hellip;</a><div id="jump_wrapper"><div id="jump_page"><a class="source" href="Nucleus.php.html">Nucleus.php</a><a class="source" href="NucleusAnonymousModel.php.html">NucleusAnonymousModel.php</a><a class="source" href="NucleusConnection.php.html">NucleusConnection.php</a><a class="source" href="NucleusHelper.php.html">NucleusHelper.php</a><a class="source" href="NucleusJoin.php.html">NucleusJoin.php</a><a class="source" href="NucleusJoinMany.php.html">NucleusJoinMany.php</a><a class="source" href="NucleusJoinManyMany.php.html">NucleusJoinManyMany.php</a><a class="source" href="NucleusJoinOne.php.html">NucleusJoinOne.php</a><a class="source" href="NucleusModel.php.html">NucleusModel.php</a><a class="source" href="NucleusQuery.php.html">NucleusQuery.php</a><a class="source" href="NucleusRecord.php.html">NucleusRecord.php</a><a class="source" href="NucleusResult.php.html">NucleusResult.php</a><a class="source" href="config.php.html">config.php</a></div></div></div><table cellspacing=0 cellpadding=0><thead><tr><th class=docs><h1>NucleusModel.php</h1></th><th class=code></th></tr></thead><tbody><tr id="section-0"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-0">&#182;</a></div><div class="doc"></div></td><td class="code"><div class="highlight"><pre class="brush: php">namespace Nucleus;
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8">
+		<title>NucleusModel.php</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<link href="http://alexgorbatchev.com/pub/sh/current/styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
+		<link rel="stylesheet" href="http://markhuot.github.com/phocco/resources/phocco.css">
+	</head>
+	<body>
+		<div id="container">
+				<div id="jump_to">
+		<a id="jump_handle" href="#">Jump&nbsp;To&hellip;</a>
+		<div id="jump_wrapper">
+			<div id="jump_page">
+									<a class="source" href="config.php.html">
+						config.php					</a>
+									<a class="source" href="NucleusAnonymousModel.php.html">
+						NucleusAnonymousModel.php					</a>
+									<a class="source" href="NucleusConnection.php.html">
+						NucleusConnection.php					</a>
+									<a class="source" href="NucleusHelper.php.html">
+						NucleusHelper.php					</a>
+									<a class="source" href="NucleusJoinManyMany.php.html">
+						NucleusJoinManyMany.php					</a>
+									<a class="source" href="NucleusJoinMany.php.html">
+						NucleusJoinMany.php					</a>
+									<a class="source" href="NucleusJoinOne.php.html">
+						NucleusJoinOne.php					</a>
+									<a class="source" href="NucleusJoin.php.html">
+						NucleusJoin.php					</a>
+									<a class="source" href="NucleusModel.php.html">
+						NucleusModel.php					</a>
+									<a class="source" href="Nucleus.php.html">
+						Nucleus.php					</a>
+									<a class="source" href="NucleusQuery.php.html">
+						NucleusQuery.php					</a>
+									<a class="source" href="NucleusRecord.php.html">
+						NucleusRecord.php					</a>
+									<a class="source" href="NucleusResult.php.html">
+						NucleusResult.php					</a>
+							</div>
+		</div>
+	</div>
+			<table cellspacing=0 cellpadding=0>
+	<thead>
+		<tr>
+			<th class=docs><h1>NucleusModel.php</h1></th>
+			<th class=code></th>
+		</tr>
+	</thead>
+	<tbody>
+
+					<tr id="section-'0'">
+				<td class="docs">
+					<div class="pilwrap">
+						<a class="pilcrow" href="#section-0">&#182;
+						</a>
+					</div>
+<div class="doc">
+</div>
+				</td>
+				<td class="code">
+										<div class="highlight">
+<pre class="brush: php">
+namespace Nucleus;
+
 class Model {
+
 	private static $identifier_index = 0;
 	private static $models = array();
+
 	protected $table_name;
 	protected $alias;
 	protected $identifier;
 	protected $pk = 'id';
+
 	public function __construct() {
 		$this-&gt;set_identifier('t'.Model::$identifier_index++);
 		Model::$models[$this-&gt;identifier()] = $this;
 	}
+
 	public function __toString() {
 		return $this-&gt;table_name;
 	}
+
 	public function pk() {
 		return $this-&gt;pk;
 	}
+
 	public function table_name() {
 		return $this-&gt;table_name;
 	}
+
 	public function set_table_name($table) {
 		$this-&gt;table_name = $table;
 	}
+
 	public function identifier() {
 		return $this-&gt;identifier;
 	}
+
 	public function set_identifier($identifier) {
 		$this-&gt;identifier = $identifier;
 	}
+
 	public function alias() {
 		return $this-&gt;alias;
 	}
+
 	public function set_alias($alias) {
 		$this-&gt;alias = $alias;
-	}</pre></div></td></tr><tr id="section-1"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-1">&#182;</a></div><div class="doc">
+	}
+</pre>
+					</div>
+									</td>
+			</tr>
+					<tr id="section-'1'">
+				<td class="docs">
+					<div class="pilwrap">
+						<a class="pilcrow" href="#section-1">&#182;
+						</a>
+					</div>
+<div class="doc">
+
 SQL Select
-	 *
+
 Generates the required SQL string to identify this record.
-	 </div></td><td class="code"><div class="highlight"><pre class="brush: php">	public function sql_select() {
+</div>
+				</td>
+				<td class="code">
+										<div class="highlight">
+<pre class="brush: php">
+	public function sql_select() {
 		$pk = $this-&gt;pk();
 		$identifier = $this-&gt;identifier();
 		return &quot;{$identifier}.{$pk} AS `{$identifier}.{$pk}`&quot;;
-	}</pre></div></td></tr><tr id="section-2"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-2">&#182;</a></div><div class="doc">
+	}
+</pre>
+					</div>
+									</td>
+			</tr>
+					<tr id="section-'2'">
+				<td class="docs">
+					<div class="pilwrap">
+						<a class="pilcrow" href="#section-2">&#182;
+						</a>
+					</div>
+<div class="doc">
+
 Load Model for Table
-	 *
+
 Takes a table name and loads the corresponding model file. If no model 
 is defined we'll create an anomyous model on the author's behalf.
-	 </div></td><td class="code"><div class="highlight"><pre class="brush: php">	public static function for_table($table, $alias=FALSE) {
+</div>
+				</td>
+				<td class="code">
+										<div class="highlight">
+<pre class="brush: php">
+	public static function for_table($table, $alias=FALSE) {
 		$model_base_path = \Nucleus::config('model_path');
 		$model_name = ucfirst(singular($table)).'Model';
 		$model_path = &quot;{$model_base_path}/&quot;.$model_name.'.php';
@@ -54,13 +165,17 @@ is defined we'll create an anomyous model on the author's behalf.
 			require_once $model_path;
 			$model = new $model_name;
 		}
+
 		else {
 			$model = new AnonymousModel;
 		}
+
 		$model-&gt;set_table_name($table);
 		$model-&gt;set_alias($alias);
+
 		return $model;
 	}
+
 	public static function for_identifier($table_identifier) {
 		foreach (Model::$models as $model) {
 			if ($model-&gt;identifier() == $table_identifier) {
@@ -68,71 +183,202 @@ is defined we'll create an anomyous model on the author's behalf.
 			}
 		}
 		return FALSE;
-	}</pre></div></td></tr><tr id="section-3"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-3">&#182;</a></div><div class="doc">
+	}
+</pre>
+					</div>
+									</td>
+			</tr>
+					<tr id="section-'3'">
+				<td class="docs">
+					<div class="pilwrap">
+						<a class="pilcrow" href="#section-3">&#182;
+						</a>
+					</div>
+<div class="doc">
+
 Join Named
-	 *
+
 Look through each of the joins defined on this model and check for any
 matching the requested name.
-	 </div></td><td class="code"><div class="highlight"><pre class="brush: php">	public function join_named($name) {
+</div>
+				</td>
+				<td class="code">
+										<div class="highlight">
+<pre class="brush: php">
+	public function join_named($name) {
 		foreach (array(
 			'has_one',
 			'has_many',
 			'habtm'
-		) as $key) {</pre></div></td></tr><tr id="section-4"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-4">&#182;</a></div><div class="doc"> Check that there are joins defined for this key</div></td><td class="code"><div class="highlight"><pre class="brush: php">			if (isset($this-&gt;{$key})) {</pre></div></td></tr><tr id="section-5"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-5">&#182;</a></div><div class="doc"> Check that the join has numerical indexes. If it doesn't</div></td><td class="code"><div class="highlight"><pre class="brush: php"></pre></div></td></tr><tr id="section-6"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-6">&#182;</a></div><div class="doc"> then our author forgot to nest the join witin an arry so</div></td><td class="code"><div class="highlight"><pre class="brush: php"></pre></div></td></tr><tr id="section-7"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-7">&#182;</a></div><div class="doc"> we'll fix that for them.</div></td><td class="code"><div class="highlight"><pre class="brush: php">				$keys = array_keys($this-&gt;{$key});
+		) as $key) {
+</pre>
+					</div>
+									</td>
+			</tr>
+					<tr id="section-'4'">
+				<td class="docs">
+					<div class="pilwrap">
+						<a class="pilcrow" href="#section-4">&#182;
+						</a>
+					</div>
+<div class="doc">
+ Check that there are joins defined for this key</div>
+				</td>
+				<td class="code">
+										<div class="highlight">
+<pre class="brush: php">
+			if (isset($this-&gt;{$key})) {
+</pre>
+					</div>
+									</td>
+			</tr>
+					<tr id="section-'5'">
+				<td class="docs">
+					<div class="pilwrap">
+						<a class="pilcrow" href="#section-5">&#182;
+						</a>
+					</div>
+<div class="doc">
+ Check that the join has numerical indexes. If it doesn't
+ then our author forgot to nest the join witin an arry so
+ we'll fix that for them.</div>
+				</td>
+				<td class="code">
+										<div class="highlight">
+<pre class="brush: php">
+				$keys = array_keys($this-&gt;{$key});
 				if (!is_numeric($keys[0])) {
 					$this-&gt;{$key} = array($this-&gt;{$key});
-				}</pre></div></td></tr><tr id="section-8"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-8">&#182;</a></div><div class="doc"> Loop through each join.</div></td><td class="code"><div class="highlight"><pre class="brush: php">				foreach ($this-&gt;{$key} as $join) {</pre></div></td></tr><tr id="section-9"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-9">&#182;</a></div><div class="doc"> If it's a match return it.</div></td><td class="code"><div class="highlight"><pre class="brush: php">					if (isset($join['as']) &amp;&amp; $join['as'] == $name) {
+				}
+</pre>
+					</div>
+									</td>
+			</tr>
+					<tr id="section-'6'">
+				<td class="docs">
+					<div class="pilwrap">
+						<a class="pilcrow" href="#section-6">&#182;
+						</a>
+					</div>
+<div class="doc">
+ Loop through each join.</div>
+				</td>
+				<td class="code">
+										<div class="highlight">
+<pre class="brush: php">
+				foreach ($this-&gt;{$key} as $join) {
+</pre>
+					</div>
+									</td>
+			</tr>
+					<tr id="section-'7'">
+				<td class="docs">
+					<div class="pilwrap">
+						<a class="pilcrow" href="#section-7">&#182;
+						</a>
+					</div>
+<div class="doc">
+ If it's a match return it.</div>
+				</td>
+				<td class="code">
+										<div class="highlight">
+<pre class="brush: php">
+					if (isset($join['as']) &amp;&amp; $join['as'] == $name) {
 						$join['type'] = $key;
 						return $join;
-					}</pre></div></td></tr><tr id="section-10"><td class="docs"><div class="pilwrap"><a class="pilcrow" href="#section-10">&#182;</a></div><div class="doc"> If no :as is defined, check the table name</div></td><td class="code"><div class="highlight"><pre class="brush: php">					else if (!isset($join['as']) &amp;&amp; $join['foreign_table'] == $name) {
+					}
+</pre>
+					</div>
+									</td>
+			</tr>
+					<tr id="section-'8'">
+				<td class="docs">
+					<div class="pilwrap">
+						<a class="pilcrow" href="#section-8">&#182;
+						</a>
+					</div>
+<div class="doc">
+ If no :as is defined, check the table name</div>
+				</td>
+				<td class="code">
+										<div class="highlight">
+<pre class="brush: php">
+					else if (!isset($join['as']) &amp;&amp; $join['foreign_table'] == $name) {
 						$join['type'] = $key;
 						return $join;
 					}
 				}
 			}
 		}
+
 		return FALSE;
 	}
-}</pre></div></td></tr></table></div><script>converter = new Showdown.converter();$(".doc").each(function() { $(this).html(converter.makeHtml($(this).text())); }); $("#jump_handle").click(function(e){ $("#jump_wrapper").toggle(); e.preventDefault(); }); </script><script src="https://raw.github.com/alexgorbatchev/SyntaxHighlighter/master/scripts/XRegExp.js"></script><script src="https://raw.github.com/alexgorbatchev/SyntaxHighlighter/master/scripts/shCore.js" type="text/javascript"></script><script src="http://alexgorbatchev.com/pub/sh/current/scripts/shAutoloader.js" type="text/javascript"></script><script type="text/javascript">
-function path()
-{
-  var args = arguments,
-      result = []
-      ;
-       
-  for(var i = 0; i < args.length; i++)
-      result.push(args[i].replace("@", "http://alexgorbatchev.com/pub/sh/current/scripts/"));
-       
-  return result
-};
 
-SyntaxHighlighter.autoloader.apply(null, path(
-  "applescript            @shBrushAppleScript.js",
-  "actionscript3 as3      @shBrushAS3.js",
-  "bash shell             @shBrushBash.js",
-  "coldfusion cf          @shBrushColdFusion.js",
-  "cpp c                  @shBrushCpp.js",
-  "c# c-sharp csharp      @shBrushCSharp.js",
-  "css                    @shBrushCss.js",
-  "delphi pascal          @shBrushDelphi.js",
-  "diff patch pas         @shBrushDiff.js",
-  "erl erlang             @shBrushErlang.js",
-  "groovy                 @shBrushGroovy.js",
-  "java                   @shBrushJava.js",
-  "jfx javafx             @shBrushJavaFX.js",
-  "js jscript javascript  @shBrushJScript.js",
-  "perl pl                @shBrushPerl.js",
-  "php                    @shBrushPhp.js",
-  "text plain             @shBrushPlain.js",
-  "py python              @shBrushPython.js",
-  "ruby rails ror rb      @shBrushRuby.js",
-  "sass scss              @shBrushSass.js",
-  "scala                  @shBrushScala.js",
-  "sql                    @shBrushSql.js",
-  "vb vbnet               @shBrushVb.js",
-  "xml xhtml xslt html    @shBrushXml.js"
-));
-SyntaxHighlighter.defaults["light"] = true;
-SyntaxHighlighter.defaults["unindent"] = false;
-SyntaxHighlighter.all();
-	</script></body>
+}</pre>
+					</div>
+									</td>
+			</tr>
+			</tbody>
+</table>
+		</div>
+		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script src="http://markhuot.github.com/phocco/resources/showdown.js"></script>
+<script>
+	converter = new Showdown.converter();
+	$(".doc").each(function() {
+		$(this).html(converter.makeHtml($(this).text()));
+	});
+
+	$("#jump_handle").click(function(e){
+		$("#jump_wrapper").toggle();
+		e.preventDefault();
+	});
+</script>
+<script src="https://raw.github.com/alexgorbatchev/SyntaxHighlighter/master/scripts/XRegExp.js"></script>
+<script src="https://raw.github.com/alexgorbatchev/SyntaxHighlighter/master/scripts/shCore.js" type="text/javascript"></script>
+<script src="http://alexgorbatchev.com/pub/sh/current/scripts/shAutoloader.js" type="text/javascript"></script>
+<script type="text/javascript">
+	function path()
+	{
+	  var args = arguments,
+	      result = []
+	      ;
+	       
+	  for(var i = 0; i < args.length; i++)
+	      result.push(args[i].replace("@", "http://alexgorbatchev.com/pub/sh/current/scripts/"));
+	       
+	  return result
+	};
+
+	SyntaxHighlighter.autoloader.apply(null, path(
+	  "applescript            @shBrushAppleScript.js",
+	  "actionscript3 as3      @shBrushAS3.js",
+	  "bash shell             @shBrushBash.js",
+	  "coldfusion cf          @shBrushColdFusion.js",
+	  "cpp c                  @shBrushCpp.js",
+	  "c# c-sharp csharp      @shBrushCSharp.js",
+	  "css                    @shBrushCss.js",
+	  "delphi pascal          @shBrushDelphi.js",
+	  "diff patch pas         @shBrushDiff.js",
+	  "erl erlang             @shBrushErlang.js",
+	  "groovy                 @shBrushGroovy.js",
+	  "java                   @shBrushJava.js",
+	  "jfx javafx             @shBrushJavaFX.js",
+	  "js jscript javascript  @shBrushJScript.js",
+	  "perl pl                @shBrushPerl.js",
+	  "php                    @shBrushPhp.js",
+	  "text plain             @shBrushPlain.js",
+	  "py python              @shBrushPython.js",
+	  "ruby rails ror rb      @shBrushRuby.js",
+	  "sass scss              @shBrushSass.js",
+	  "scala                  @shBrushScala.js",
+	  "sql                    @shBrushSql.js",
+	  "vb vbnet               @shBrushVb.js",
+	  "xml xhtml xslt html    @shBrushXml.js"
+	));
+	SyntaxHighlighter.defaults["light"] = true;
+	SyntaxHighlighter.defaults["unindent"] = false;
+	SyntaxHighlighter.all();
+</script>
+	</body>
+</html>
