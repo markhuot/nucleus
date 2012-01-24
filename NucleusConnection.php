@@ -8,37 +8,23 @@ class Connection extends \PDO {
 	// ------------------------------------------------------------------------
 	
 	private static function guess_connection() {
-		if (($config = self::guess_codeigniter_connection()) ||
-		    ($config = self::guess_default_connection())) {
-			$dsn = "{$config['dbtype']}:";
-			$dsn.= (@$config['dbhost']) ? "host={$config['dbhost']};" : '';
-			$dsn.= (@$config['dbsock']) ? "unix_socket={$config['dbsock']};" : '';
-			$dsn.= ($config['dbname']) ? "dbname={$config['dbname']};" : '';
+		$dsn = \Nucleus::config('dbtype').':';
 
-			return new Connection(
-				$dsn,
-				$config['dbuser'],
-				$config['dbpass']
-			);
+		if (\Nucleus::config('dbhost')) {
+			$dsn.= 'host='.\Nucleus::config('dbhost').';';
 		}
 
-		return FALSE;
-	}
+		if (\Nucleus::config('dbsock')) {
+			$dsn.= 'host='.\Nucleus::config('dbsock').';';
+		}
+		
+		$dsn.= 'dbname='.\Nucleus::config('dbname').';';
 
-	private static function guess_codeigniter_connection() {
-		if (!defined('APPPATH')) { return FALSE; }
-		return array(
-			'dbtype' => \Nucleus::config('dbdriver'),
-			'dbhost' => \Nucleus::config('hostname'),
-			'dbname' => \Nucleus::config('database'),
-			'dbuser' => \Nucleus::config('username'),
-			'dbpass' => \Nucleus::config('password')
+		return new Connection(
+			$dsn,
+			\Nucleus::config('dbuser'),
+			\Nucleus::config('dbpass')
 		);
-	}
-
-	private static function guess_default_connection() {
-		include rtrim(__DIR__, '/').'/config.php';
-		return $config;
 	}
 
 	// ------------------------------------------------------------------------

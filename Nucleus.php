@@ -49,9 +49,7 @@ spl_autoload_register(function($class_name) {
  */
 class Nucleus {
 	private $query;
-	private static $config = array(
-		
-	);
+	private static $config;
 
 	public function __construct() {
 		$this->query = new \Nucleus\Query();
@@ -65,15 +63,20 @@ class Nucleus {
 	}
 
 	public static function config($key=FALSE) {
-		if (isset(self::$config[$key])) {
-			return self::$config[$key];
+		if (!self::$config) {
+			self::$config = array();
+			if ($config = self::guess_codeigniter_config()) {
+				self::$config = array_merge(self::$config, $config);
+			}
+			else if ($config = self::guess_default_config()) {
+				self::$config = array_merge(self::$config, $config);
+			}
 		}
-		else if ($config = self::guess_codeigniter_config()) {
-			self::$config = array_merge(self::$config, $config);
+
+		if ($key === FALSE) {
+			return self::$config;
 		}
-		else if ($config = self::guess_default_config()) {
-			self::$config = array_merge(self::$config, $config);
-		}
+
 		return @self::$config[$key];
 	}
 
@@ -86,7 +89,11 @@ class Nucleus {
 		}
 		if (is_file($database_config = APPPATH.'config/database'.EXT)) {
 			include $database_config;
-			$config = array_merge($config, $db[$active_group]);
+			$config['dbtype'] = $db[$active_group]['dbdriver'];
+			$config['dbhost'] = $db[$active_group]['hostname'];
+			$config['dbname'] = $db[$active_group]['database'];
+			$config['dbuser'] = $db[$active_group]['username'];
+			$config['dbpass'] = $db[$active_group]['password'];
 		}
 		return $config;
 	}
