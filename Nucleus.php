@@ -50,7 +50,7 @@ spl_autoload_register(function($class_name) {
 class Nucleus {
 	private $query;
 	private static $config = array(
-		'model_path' => FALSE
+		
 	);
 
 	public function __construct() {
@@ -65,24 +65,33 @@ class Nucleus {
 	}
 
 	public static function config($key=FALSE) {
-		if ($config = self::guess_default_config()) {
+		if (isset(self::$config[$key])) {
+			return self::$config[$key];
+		}
+		else if ($config = self::guess_codeigniter_config()) {
 			self::$config = array_merge(self::$config, $config);
 		}
-		if ($config = self::guess_codeigniter_config()) {
+		else if ($config = self::guess_default_config()) {
 			self::$config = array_merge(self::$config, $config);
 		}
 		return @self::$config[$key];
 	}
 
-	public static function guess_default_config() {
-		include rtrim(__DIR__, '/').'/config.php';
+	public static function guess_codeigniter_config() {
+		if (!defined('APPPATH')) { return FALSE; }
+		$config = array();
+		if (is_file($nucleus_config = APPPATH.'config/nucleus'.EXT)) {
+			include $nucleus_config;
+		}
+		if (is_file($database_config = APPPATH.'config/database'.EXT)) {
+			include $database_config;
+			$config = array_merge($config, $db[$active_group]);
+		}
 		return $config;
 	}
 
-	public static function guess_codeigniter_config() {
-		if (!defined('APPPATH')) { return FALSE; }
-		if (!is_file(APPPATH.'config/nucleus'.EXT)) { return FALSE; }
-		include APPPATH.'config/nucleus'.EXT;
+	public static function guess_default_config() {
+		include rtrim(__DIR__, '/').'/config.php';
 		return $config;
 	}
 }

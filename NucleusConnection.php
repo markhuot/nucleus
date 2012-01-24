@@ -10,7 +10,6 @@ class Connection extends \PDO {
 	private static function guess_connection() {
 		if (($config = self::guess_codeigniter_connection()) ||
 		    ($config = self::guess_default_connection())) {
-
 			$dsn = "{$config['dbtype']}:";
 			$dsn.= (@$config['dbhost']) ? "host={$config['dbhost']};" : '';
 			$dsn.= (@$config['dbsock']) ? "unix_socket={$config['dbsock']};" : '';
@@ -28,13 +27,12 @@ class Connection extends \PDO {
 
 	private static function guess_codeigniter_connection() {
 		if (!defined('APPPATH')) { return FALSE; }
-		include APPPATH.'config/database'.EXT;
 		return array(
-			'dbtype' => $db[$active_group]['dbdriver'],
-			'dbhost' => $db[$active_group]['hostname'],
-			'dbname' => $db[$active_group]['database'],
-			'dbuser' => $db[$active_group]['username'],
-			'dbpass' => $db[$active_group]['password']
+			'dbtype' => \Nucleus::config('dbdriver'),
+			'dbhost' => \Nucleus::config('hostname'),
+			'dbname' => \Nucleus::config('database'),
+			'dbuser' => \Nucleus::config('username'),
+			'dbpass' => \Nucleus::config('password')
 		);
 	}
 
