@@ -15,7 +15,7 @@ class Connection extends \PDO {
 		}
 
 		if (\Nucleus::config('dbsock')) {
-			$dsn.= 'host='.\Nucleus::config('dbsock').';';
+			$dsn.= 'socket='.\Nucleus::config('dbsock').';';
 		}
 		
 		$dsn.= 'dbname='.\Nucleus::config('dbname').';';
