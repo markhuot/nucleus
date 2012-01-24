@@ -206,6 +206,10 @@ class Result implements \Iterator {
 	 */
 	public function record($key) {
 		$collection = $this->records();
+		if (!$collection) {
+			return false;
+		}
+
 		$keys = array_keys($collection);
 
 		if (is_string($key)) {
