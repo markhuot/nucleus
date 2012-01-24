@@ -34,7 +34,7 @@ class Record {
 
 	/**
 	 * The `__call` and `__get` magic methods both just run our internal
-	 * `__access` method. This method 
+	 * `__access` method.
 	 */
 	public function __call($method, $args) {
 		return $this->__access($method, $args);
