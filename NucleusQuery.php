@@ -260,6 +260,7 @@ class Query {
 
 		$this->where[$key] = array(
 			'key' => $key,
+			'ref' => str_replace(array('.'), array('_'), $key),
 			'operator' => $operator,
 			'value' => $value
 		);
@@ -271,9 +272,13 @@ class Query {
 		$sql = '';
 		if ($this->where) {
 			$sql.= ' WHERE ';
-
-			foreach ($this->where as $key => $w) {
-				$sql.= "{$key} {$w['operator']} :{$key}";
+			foreach ($this->where as &$w) {
+				$w['key'] = preg_replace(
+					'/^(?:(.*)\.)?(.*)$/e',
+					'$this->model_for_table_path("$1")->identifier().".$2"',
+					$w['key']
+				);
+				$sql.= "{$w['key']} {$w['operator']} :{$w['ref']}";
 			}
 		}
 		return $sql;
@@ -281,8 +286,8 @@ class Query {
 
 	public function build_where_parameters() {
 		$where = array();
-		foreach ($this->where as $key => $w) {
-			$where[$key] = $w['value'];
+		foreach ($this->where as $w) {
+			$where[$w['ref']] = $w['value'];
 		}
 		return $where;
 	}
@@ -396,7 +401,7 @@ class Query {
 		// Explode out our string
 		$tables = preg_split('/\./', $path);
 
-		// Find the initial model for the furthese left table
+		// Find the initial model for the furthest left table
 		$primary_table = $this->model_for_table_name(array_shift($tables));
 
 		// Loop through subsequent tables
