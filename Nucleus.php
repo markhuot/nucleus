@@ -81,6 +81,7 @@ class Nucleus {
 
 	public static function guess_codeigniter_config() {
 		if (!defined('APPPATH')) { return FALSE; }
+		if (!is_file(APPPATH.'config/nucleus'.EXT)) { return FALSE; }
 		include APPPATH.'config/nucleus'.EXT;
 		return $config;
 	}
