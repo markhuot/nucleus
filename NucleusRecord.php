@@ -32,61 +32,49 @@ class Record {
 		$this->data[$key] = $value;
 	}
 
-	public function data($key=FALSE) {
-		if ($key) {
-			return @$this->data[$key];
-		}
-
-		return $this->data;
-	}
-
 	/**
-	 * URL returns the permalinked route to this record. This will probably be
-	 * overridden by a more specific model. For example, the CommentsModel will
-	 * probably define the url as the `{$entry_slug}/#comments{$this->id()}`.
+	 * The `__call` and `__get` magic methods both just run our internal
+	 * `__access` method. This method 
 	 */
-	public function url() {
-		return "{$this->model->table_name()}/{$this->id()}";
+	public function __call($method, $args) {
+		return $this->__access($method, $args);
 	}
-
-	/**
-	 * ID
-	 *
-	 * Get the value of the primary key
-	 */
-	public function id() {
-		return $this->data($this->model->pk());
-	}
-
-	/**
-	 * Call
-	 *
-	 * There are two ways to access record properties, the first is through a
-	 * method call matching the key. So something like Post::title() would
-	 * look for the `title` column. Both are needed to account for the various
-	 * template languages (such as Mustache and Twig which both use different
-	 * access methodologies).
-	 */
-	public function __call($key, $args) {
-		return $this->__get($key);
-	}
-
-	/**
-	 * Get
-	 *
-	 * The second way to find a property is through direct access on the
-	 * object. This would happen like so: $post->title and would also look for
-	 * a `title` column. Both are needed to account for the various template
-	 * languages (such as Mustache and Twig which both use different access
-	 * methodologies).
-	 */
 	public function __get($key) {
+		return $this->__access($key);
+	}
 
-		if (isset($this->data[$key])) {
-			return $this->data[$key];
+	/**
+	 * Or universal getter method checks for three things:
+	 * 
+	 * 1. If the property is a method on our model. If so we'll call the
+	 * model's method and return the result. Additionally, for convienience,
+	 * we'll copy our record's data over to the model so the model can refer
+	 * to things like `$this->title` or `$this->user_id`.
+	 * 2. If the property refers to the data of this record simply return the
+	 * value.
+	 * 3. If the property refers to a related record or result return the
+	 * appropriate result.
+	 */
+	private function __access($property, $args=array()) {
+		if (method_exists($this->model, $property)) {
+			foreach ($this->data as $key => $value) {
+				$this->model->{$key} = $value;
+			}
+			$result = call_user_func_array(
+				array($this->model, $property),
+				$args
+			);
+			foreach ($this->data as $key => $value) {
+				unset($this->model->{$key});
+			}
+			return $result;
 		}
 
-		if ($related = $this->result->related($this, $key)) {
+		if (isset($this->data[$property])) {
+			return $this->data[$property];
+		}
+
+		if ($related = $this->result->related($this, $property)) {
 			return $related;
 		}
 
