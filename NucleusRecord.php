@@ -41,6 +41,15 @@ class Record {
 	}
 
 	/**
+	 * URL returns the permalinked route to this record. This will probably be
+	 * overridden by a more specific model. For example, the CommentsModel will
+	 * probably define the url as the `{$entry_slug}/#comments{$this->id()}`.
+	 */
+	public function url() {
+		return "{$this->model->table_name()}/{$this->id()}";
+	}
+
+	/**
 	 * ID
 	 *
 	 * Get the value of the primary key
